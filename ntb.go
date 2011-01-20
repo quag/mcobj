@@ -3,9 +3,11 @@ package main
 import (
     "bufio"
     "compress/gzip"
+    "flag"
     "fmt"
-    "os"
     "io"
+    "os"
+    "path"
 )
 
 const (
@@ -26,18 +28,83 @@ const (
     trace = false
 )
 
+var (
+    out *bufio.Writer
+)
+
 func main() {
-    var file, fileErr = os.Open("c.4.4.dat", os.O_RDONLY, 0666) // x: 76, y: 69
+    var outFile, outErr = os.Open("a.obj", os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0666)
+    if outErr != nil {
+        fmt.Fprintln(os.Stderr, outErr)
+        return
+    }
+    defer outFile.Close()
+    var bufErr os.Error
+    out, bufErr = bufio.NewWriterSize(outFile, 1024 * 1024)
+    if bufErr != nil {
+        fmt.Fprintln(os.Stderr, bufErr)
+        return
+    }
+
+    flag.Parse()
+    for i := 0; i < flag.NArg(); i++ {
+        var filepath = flag.Arg(i)
+        var fi, err = os.Stat(filepath)
+        if err != nil {
+            fmt.Fprintln(os.Stderr, err)
+        }
+
+        switch {
+        case fi.IsRegular():
+            processFile(filepath)
+        case fi.IsDirectory():
+            var errors = make(chan os.Error, 5)
+            var done = make(chan bool)
+            go func(){
+                for error := range errors {
+                    fmt.Fprintln(os.Stderr, error)
+                }
+                done <- true
+            }()
+            path.Walk(filepath, &visitor{}, errors)
+            close(errors)
+            <-done
+        }
+    }
+}
+
+type visitor struct {}
+
+func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
+    return true
+}
+
+func (v *visitor) VisitFile(file string, f *os.FileInfo) {
+    var _, name = path.Split(file)
+    var match, err = path.Match("c.*.dat", name)
+    if match && err == nil {
+        processFile(file)
+    }
+}
+
+func processFile(filename string) bool {
+    fmt.Fprintln(out, "#", filename)
+    fmt.Fprintln(os.Stderr, filename)
+    var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
     if fileErr != nil {
         fmt.Println(fileErr)
-        return
+        return true
     }
 
     var r, rErr = gzip.NewReader(file)
     if rErr != nil {
         fmt.Println(rErr)
-        return
+        return true
     }
+
+    var xPos, zPos int
+
+    var abort = false
 
     var br = bufio.NewReader(r)
 
@@ -60,17 +127,19 @@ func main() {
             var bytes, err2 = readBytes(br)
             if err2 != nil {
                 fmt.Println(err2)
+                return true
             }
             if trace {
                 fmt.Printf("%s bytes(%d) %v\n", name, len(bytes), bytes)
             }
             if name == "Blocks" {
-                processBlocks(bytes)
+                processBlocks(bytes, xPos, zPos)
             }
         case tagInt8:
             var number, err2 = readInt8(br)
             if err2 != nil {
                 fmt.Println(err2)
+                return true
             }
             if trace {
                 fmt.Printf("%s int8 %v\n", name, number)
@@ -79,6 +148,7 @@ func main() {
             var number, err2 = readInt16(br)
             if err2 != nil {
                 fmt.Println(err2)
+                return true
             }
             if trace {
                 fmt.Printf("%s int16 %v\n", name, number)
@@ -87,22 +157,59 @@ func main() {
             var number, err2 = readInt32(br)
             if err2 != nil {
                 fmt.Println(err2)
+                return true
             }
             if trace {
                 fmt.Printf("%s int32 %v\n", name, number)
+            }
+
+            if name == "xPos" {
+                xPos = number
+            }
+            if name == "zPos" {
+                zPos = number
             }
         case tagInt64:
             var number, err2 = readInt64(br)
             if err2 != nil {
                 fmt.Println(err2)
+                return true
             }
             if trace {
                 fmt.Printf("%s int64 %v\n", name, number)
+            }
+        case tagFloat32:
+            var number, err2 = readInt32(br) // TODO(jw): read floats not ints
+            if err2 != nil {
+                fmt.Println(err2)
+                return true
+            }
+            if trace {
+                fmt.Printf("%s int32 %v\n", name, number)
+            }
+        case tagFloat64:
+            var number, err2 = readInt64(br) // TODO(jw): read floats not ints
+            if err2 != nil {
+                fmt.Println(err2)
+                return true
+            }
+            if trace {
+                fmt.Printf("%s int64 %v\n", name, number)
+            }
+        case tagString:
+            var s, err2 = readString(br)
+            if err2 != nil {
+                fmt.Println(err2)
+                return true
+            }
+            if trace {
+                fmt.Printf("%s string \"%s\"", name, s)
             }
         case tagList:
             var itemTypeId, length, err2 = readListHeader(br)
             if err2 != nil {
                 fmt.Println(err2)
+                return true
             }
             switch itemTypeId {
                 case tagInt8:
@@ -113,19 +220,55 @@ func main() {
                         var v, err3 = readInt8(br)
                         if err3 != nil {
                             fmt.Println(err3)
+                            return true
                         }
                         if trace {
                             fmt.Println("  ", v)
                         }
                     }
+                case tagFloat32:
+                    if trace {
+                        fmt.Printf("%s list float64 (%d)\n", name, length)
+                    }
+                    for i := 0; i < length; i++ {
+                        var v, err3 = readInt32(br) // TODO(jw) read float32 instead of int32
+                        if err3 != nil {
+                            fmt.Println(err3)
+                            return true
+                        }
+                        if trace {
+                            fmt.Println("  ", v)
+                        }
+                    }
+                case tagFloat64:
+                    if trace {
+                        fmt.Printf("%s list float64 (%d)\n", name, length)
+                    }
+                    for i := 0; i < length; i++ {
+                        var v, err3 = readInt64(br) // TODO(jw) read float64 instead of int64
+                        if err3 != nil {
+                            fmt.Println(err3)
+                            return true
+                        }
+                        if trace {
+                            fmt.Println("  ", v)
+                        }
+                    }
+                case tagStruct:
+                    if trace {
+                        fmt.Printf("%s list struct (%d)\n", name, length)
+                    }
+                    abort = true
                 default:
-                    fmt.Printf("list todo(%n) %n\n", itemTypeId, length)
+                    fmt.Printf("# %s list todo(%v) %v\n", name, itemTypeId, length)
             }
         default:
-            fmt.Printf("%s todo(%d)\n", name, typeId)
+            fmt.Printf("# %s todo(%d)\n", name, typeId)
         }
     }
-    fmt.Println()
+    fmt.Fprintln(out)
+
+    return abort
 }
 
 func readTag(r *bufio.Reader) (byte, string, os.Error) {
@@ -212,65 +355,91 @@ func (b *Blocks) Get(x, y, z int) byte {
 }
 
 func (b *Blocks) IsEmpty(x, y, z int) bool {
-    if x < 0 || y < 0 || z < 0 || x >= 16 || y >= 16 || z >= 16 {
+    if x < 0 || y < 0 || z < 0 || x >= 16 || y >= 128 || z >= 16 {
         return true
     }
     return isEmptyBlockId(b.Get(x, y, z))
+}
+
+func (b *Blocks) IsBoundary(x, y, z int, blockId byte) bool {
+    if x < 0 || y < 0 || z < 0 || x >= 16 || y >= 128 || z >= 16 {
+        return blockId != 0
+    }
+
+    var otherBlockId = b.Get(x, y, z)
+
+    if blockId == 1 && otherBlockId == 0 {
+        return true
+    }
+
+    return (blockId != 0 && blockId != 1) && (otherBlockId == 0 || blockId == 1)
 }
 
 func isEmptyBlockId(blockId byte) bool {
     return blockId == 0 || blockId == 1
 }
 
-func processBlocks(bytes []byte) {
+func processBlocks(bytes []byte, xPos, zPos int) {
     var blocks = Blocks(bytes)
+
+    fmt.Fprintf(out, "# %v,%v\n", xPos, zPos)
+
+    xPos = xPos * 16
+    zPos = zPos * 16
+
+    var faces = 0
 
     for i := 0; i < len(blocks); i += 128 {
         var x, z = (i / 128) / 16, (i / 128) % 16
 
         var column = blocks[i:i+128]
-        fmt.Printf("# %x, %x:\n", x, z)
         for y, blockId := range column {
-            if !isEmptyBlockId(blockId) {
-                if blocks.IsEmpty(x, y-1, z) {
-                    printFace(v{x, y, z}, v{x+1, y, z}, v{x+1, y, z+1}, v{x, y, z+1})
-                }
+            if y < 62 { continue }
+            if blocks.IsBoundary(x, y-1, z, blockId) {
+                printFace(v{xPos+x, y, zPos+z}, v{xPos+x+1, y, zPos+z}, v{xPos+x+1, y, zPos+z+1}, v{xPos+x, y, zPos+z+1})
+                faces++
+            }
 
-                if blocks.IsEmpty(x, y+1, z) {
-                    printFace(v{x, y+1, z}, v{x, y+1, z+1}, v{x+1, y+1, z+1}, v{x+1, y+1, z})
-                }
+            if blocks.IsBoundary(x, y+1, z, blockId) {
+                printFace(v{xPos+x, y+1, zPos+z}, v{xPos+x, y+1, zPos+z+1}, v{xPos+x+1, y+1, zPos+z+1}, v{xPos+x+1, y+1, zPos+z})
+                faces++
+            }
 
-                if blocks.IsEmpty(x-1, y, z) {
-                    printFace(v{x, y, z}, v{x, y, z+1}, v{x, y+1, z+1}, v{x, y+1, z})
-                }
+            if blocks.IsBoundary(x-1, y, z, blockId) {
+                printFace(v{xPos+x, y, zPos+z}, v{xPos+x, y, zPos+z+1}, v{xPos+x, y+1, zPos+z+1}, v{xPos+x, y+1, zPos+z})
+                faces++
+            }
 
-                if blocks.IsEmpty(x+1, y, z) {
-                    printFace(v{x+1, y, z}, v{x+1, y+1, z}, v{x+1, y+1, z+1}, v{x+1, y, z+1})
-                }
+            if blocks.IsBoundary(x+1, y, z, blockId) {
+                printFace(v{xPos+x+1, y, zPos+z}, v{xPos+x+1, y+1, zPos+z}, v{xPos+x+1, y+1, zPos+z+1}, v{xPos+x+1, y, zPos+z+1})
+                faces++
+            }
 
-                if blocks.IsEmpty(x, y, z-1) {
-                    printFace(v{x, y, z}, v{x, y+1, z}, v{x+1, y+1, z}, v{x+1, y, z})
-                }
+            if blocks.IsBoundary(x, y, z-1, blockId) {
+                printFace(v{xPos+x, y, zPos+z}, v{xPos+x, y+1, zPos+z}, v{xPos+x+1, y+1, zPos+z}, v{xPos+x+1, y, zPos+z})
+                faces++
+            }
 
-                if blocks.IsEmpty(x, y, z+1) {
-                    printFace(v{x, y, z+1}, v{x+1, y, z+1}, v{x+1, y+1, z+1}, v{x, y+1, z+1})
-                }
+            if blocks.IsBoundary(x, y, z+1, blockId) {
+                printFace(v{xPos+x, y, zPos+z+1}, v{xPos+x+1, y, zPos+z+1}, v{xPos+x+1, y+1, zPos+z+1}, v{xPos+x, y+1, zPos+z+1})
+                faces++
             }
         }
-        fmt.Println()
+        fmt.Fprintln(out)
     }
+    fmt.Fprintln(os.Stderr, "Faces:", faces)
 }
 
 func printVertex(x, y, z int) {
-    fmt.Printf("v %v %v %v\n", float64(x)*0.05, float64(y)*0.05, float64(z)*0.05)
+    fmt.Fprintf(out, "v %.2f %.2f %.2f\n", float64(x)*0.05, float64(y)*0.05, float64(z)*0.05)
 }
 
 func printFaceN(vertexes... int) {
-    fmt.Printf("f")
+    fmt.Fprintf(out, "f")
     for _, vertex := range vertexes {
-        fmt.Printf(" %v", vertex)
+        fmt.Fprintf(out, " %v", vertex)
     }
-    fmt.Println()
+    fmt.Fprintln(out)
 }
 
 type v struct { x, y, z int }
@@ -279,9 +448,9 @@ func printFace(vertexes... v) {
     for _, vertex := range vertexes {
         printVertex(vertex.x, vertex.y, vertex.z)
     }
-    fmt.Printf("f")
+    fmt.Fprintf(out, "f")
     for i, _ := range vertexes {
-        fmt.Printf(" -%d", len(vertexes) - i)
+        fmt.Fprintf(out, " -%d", len(vertexes) - i)
     }
-    fmt.Println()
+    fmt.Fprintln(out)
 }

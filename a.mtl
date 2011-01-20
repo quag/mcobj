@@ -1,0 +1,58 @@
+newmtl terrain
+map_Ka terrain.png
+
+newmtl grass
+Kd  0.1797  0.4258  0.0195
+
+newmtl water
+Kd  0.2383  0.4258  0.9961
+
+newmtl stone
+Kd  0.4570  0.4570  0.4570
+
+newmtl dirt
+Kd  0.3477  0.2383  0.1602
+
+newmtl cobble
+Kd  0.2383  0.2383  0.2383
+
+newmtl plank
+Kd  0.6211  0.5156  0.3008
+
+newmtl bedrock
+Kd  0.0273  0.0273  0.0273
+
+newmtl sand
+Kd  0.7461  0.7188  0.5078
+
+newmtl wood
+Kd  0.4023  0.3203  0.1914
+
+newmtl leaves
+Kd  0.3125  0.5625  0.1484
+
+newmtl default
+Kd  0.5000  0.5000  0.5000
+illum 1
+
+
+# Examples
+
+newmtl flatwhite
+Ka  0.5000  0.5000  0.5000
+Kd  1.0000  1.0000  1.0000
+illum 1
+
+newmtl shinyred
+Ka  0.1985  0.0000  0.0000
+Kd  0.5921  0.0167  0.0000
+Ks  0.5973  0.2083  0.2083
+illum 2
+Ns 100.2235
+
+newmtl clearblue
+Ka  0.0394  0.0394  0.3300
+Kd  0.1420  0.1420  0.9500
+illum 1
+Tr 0.4300
+

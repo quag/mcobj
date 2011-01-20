@@ -45,6 +45,9 @@ func main() {
         fmt.Fprintln(os.Stderr, bufErr)
         return
     }
+    defer out.Flush()
+
+    fmt.Fprintln(out, "mtllib a.mtl")
 
     flag.Parse()
     for i := 0; i < flag.NArg(); i++ {
@@ -395,32 +398,39 @@ func processBlocks(bytes []byte, xPos, zPos int) {
         var column = blocks[i:i+128]
         for y, blockId := range column {
             if y < 62 { continue }
+
             if blocks.IsBoundary(x, y-1, z, blockId) {
+                printMtl(blockId)
                 printFace(v{xPos+x, y, zPos+z}, v{xPos+x+1, y, zPos+z}, v{xPos+x+1, y, zPos+z+1}, v{xPos+x, y, zPos+z+1})
                 faces++
             }
 
             if blocks.IsBoundary(x, y+1, z, blockId) {
+                printMtl(blockId)
                 printFace(v{xPos+x, y+1, zPos+z}, v{xPos+x, y+1, zPos+z+1}, v{xPos+x+1, y+1, zPos+z+1}, v{xPos+x+1, y+1, zPos+z})
                 faces++
             }
 
             if blocks.IsBoundary(x-1, y, z, blockId) {
+                printMtl(blockId)
                 printFace(v{xPos+x, y, zPos+z}, v{xPos+x, y, zPos+z+1}, v{xPos+x, y+1, zPos+z+1}, v{xPos+x, y+1, zPos+z})
                 faces++
             }
 
             if blocks.IsBoundary(x+1, y, z, blockId) {
+                printMtl(blockId)
                 printFace(v{xPos+x+1, y, zPos+z}, v{xPos+x+1, y+1, zPos+z}, v{xPos+x+1, y+1, zPos+z+1}, v{xPos+x+1, y, zPos+z+1})
                 faces++
             }
 
             if blocks.IsBoundary(x, y, z-1, blockId) {
+                printMtl(blockId)
                 printFace(v{xPos+x, y, zPos+z}, v{xPos+x, y+1, zPos+z}, v{xPos+x+1, y+1, zPos+z}, v{xPos+x+1, y, zPos+z})
                 faces++
             }
 
             if blocks.IsBoundary(x, y, z+1, blockId) {
+                printMtl(blockId)
                 printFace(v{xPos+x, y, zPos+z+1}, v{xPos+x+1, y, zPos+z+1}, v{xPos+x+1, y+1, zPos+z+1}, v{xPos+x, y+1, zPos+z+1})
                 faces++
             }
@@ -428,6 +438,35 @@ func processBlocks(bytes []byte, xPos, zPos int) {
         fmt.Fprintln(out)
     }
     fmt.Fprintln(os.Stderr, "Faces:", faces)
+}
+
+func printMtl(blockId byte) {
+    switch blockId {
+    case 1:
+        fmt.Fprintln(out, "usemtl stone")
+    case 2:
+        fmt.Fprintln(out, "usemtl grass")
+    case 3:
+        fmt.Fprintln(out, "usemtl dirt")
+    case 4:
+        fmt.Fprintln(out, "usemtl cobble")
+    case 5:
+        fmt.Fprintln(out, "usemtl plank")
+    case 7:
+        fmt.Fprintln(out, "usemtl bedrock")
+    case 8:
+    case 9:
+        fmt.Fprintln(out, "usemtl water")
+    case 12:
+        fmt.Fprintln(out, "usemtl sand")
+    case 17:
+        fmt.Fprintln(out, "usemtl wood")
+    case 6: // Sapling
+    case 18:
+        fmt.Fprintln(out, "usemtl leaves")
+    default:
+        fmt.Fprintln(out, "usemtl default")
+    }
 }
 
 func printVertex(x, y, z int) {

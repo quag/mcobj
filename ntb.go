@@ -35,6 +35,7 @@ var (
 	blockFaces  bool
 	showTunnels bool
 	hideStone   bool
+	noColor     bool
 )
 
 func main() {
@@ -43,6 +44,7 @@ func main() {
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&showTunnels, "t", false, "Show tunnels")
 	flag.BoolVar(&hideStone, "hs", false, "Hide stone")
+	flag.BoolVar(&noColor, "g", false, "Omit materials")
 	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
 	flag.Parse()
 
@@ -548,10 +550,16 @@ func printFace(xPos, zPos int, vertexes ...Vertex) {
 }
 
 func printMtl(w io.Writer, blockId byte) {
-	fmt.Fprintln(w, "usemtl", blockId)
+	if !noColor {
+		fmt.Fprintln(w, "usemtl", blockId)
+	}
 }
 
 func writeMtlFile(filename string) os.Error {
+	if noColor {
+		return nil
+	}
+
 	var outFile, outErr = os.Open(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if outErr != nil {
 		return outErr

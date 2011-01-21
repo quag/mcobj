@@ -29,5 +29,11 @@ Kd  0.4023  0.3203  0.1914
 newmtl leaves
 Kd  0.3125  0.5625  0.1484
 
+newmtl snow
+Kd  0.0000  0.0000  0.0000
+
+newmtl ice
+Kd  0.4383  0.6258  0.9961
+
 newmtl default
 Kd  0.5000  0.5000  0.5000

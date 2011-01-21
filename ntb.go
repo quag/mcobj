@@ -26,55 +26,20 @@ const (
 )
 
 const (
-	mtl = `
-newmtl grass
-Kd  0.1797  0.4258  0.0195
-
-newmtl water
-Kd  0.2383  0.4258  0.9961
-
-newmtl stone
-Kd  0.4570  0.4570  0.4570
-
-newmtl dirt
-Kd  0.3477  0.2383  0.1602
-
-newmtl cobble
-Kd  0.2383  0.2383  0.2383
-
-newmtl plank
-Kd  0.6211  0.5156  0.3008
-
-newmtl bedrock
-Kd  0.0273  0.0273  0.0273
-
-newmtl sand
-Kd  0.7461  0.7188  0.5078
-
-newmtl wood
-Kd  0.4023  0.3203  0.1914
-
-newmtl leaves
-Kd  0.3125  0.5625  0.1484
-
-newmtl default
-Kd  0.5000  0.5000  0.5000
-`
-)
-
-const (
 	trace = false
 )
 
 var (
-	out   *bufio.Writer
-	faces *Faces
-	yMin  int
+	out        *bufio.Writer
+	faces      *Faces
+	yMin       int
+	blockFaces bool
 )
 
 func main() {
 	var filename string
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
+	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
 	flag.Parse()
 
@@ -593,11 +558,96 @@ func printMtl(w io.Writer, blockId byte) {
 	case 6: // Sapling
 	case 18:
 		fmt.Fprintln(w, "usemtl leaves")
+	case 78:
+	case 80:
+		fmt.Fprintln(w, "usemtl snow")
+	case 79:
+		fmt.Fprintln(w, "usemtl ice")
 	default:
 		fmt.Fprintln(w, "usemtl default")
 	}
 }
 
+const (
+	mtl = `
+newmtl grass
+Kd  0.1797  0.4258  0.0195
+
+newmtl water
+Kd  0.2383  0.4258  0.9961
+
+newmtl stone
+Kd  0.4570  0.4570  0.4570
+
+newmtl dirt
+Kd  0.3477  0.2383  0.1602
+
+newmtl cobble
+Kd  0.2383  0.2383  0.2383
+
+newmtl plank
+Kd  0.6211  0.5156  0.3008
+
+newmtl bedrock
+Kd  0.0273  0.0273  0.0273
+
+newmtl sand
+Kd  0.7461  0.7188  0.5078
+
+newmtl wood
+Kd  0.4023  0.3203  0.1914
+
+newmtl leaves
+Kd  0.3125  0.5625  0.1484
+
+newmtl snow
+Kd  0.0000  0.0000  0.0000
+
+newmtl ice
+Kd  0.4383  0.6258  0.9961
+
+newmtl default
+Kd  0.5000  0.5000  0.5000
+`
+)
+
+
+type blockRun struct {
+	blockId        byte
+	v1, v2, v3, v4 Vertex
+	dirty          bool
+}
+
+func (r *blockRun) AddFace(faces AddFacer) {
+	if r.dirty {
+		faces.AddFace(r.blockId, r.v1, r.v2, r.v3, r.v4)
+		r.dirty = false
+	}
+}
+
+func (r *blockRun) Update(faces AddFacer, nr *blockRun, flag bool) {
+	if !blockFaces {
+		if r.dirty {
+			if nr.blockId == r.blockId {
+				if flag {
+					r.v3 = nr.v3
+					r.v4 = nr.v4
+				} else {
+					r.v2 = nr.v2
+					r.v3 = nr.v3
+				}
+			} else {
+				r.AddFace(faces)
+				*r = *nr
+			}
+		} else {
+			*r = *nr
+		}
+	} else {
+		nr.AddFace(faces)
+		nr.dirty = false
+	}
+}
 
 func processBlocks(bytes []byte, faces AddFacer) {
 	var blocks = Blocks(bytes)
@@ -605,11 +655,14 @@ func processBlocks(bytes []byte, faces AddFacer) {
 	for i := 0; i < len(blocks); i += 128 {
 		var x, z = (i / 128) / 16, (i / 128) % 16
 
+		var r1, r2, r3, r4 blockRun
+
 		var column = blocks[i : i+128]
 		for y, blockId := range column {
 			if y < yMin {
 				continue
 			}
+
 			if blocks.IsBoundary(x, y-1, z, blockId) {
 				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x + 1, y, z}, Vertex{x + 1, y, z + 1}, Vertex{x, y, z + 1})
 			}
@@ -619,20 +672,25 @@ func processBlocks(bytes []byte, faces AddFacer) {
 			}
 
 			if blocks.IsBoundary(x-1, y, z, blockId) {
-				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z})
+				r1.Update(faces, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true}, true)
 			}
 
 			if blocks.IsBoundary(x+1, y, z, blockId) {
-				faces.AddFace(blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1})
+				r2.Update(faces, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true}, false)
 			}
 
 			if blocks.IsBoundary(x, y, z-1, blockId) {
-				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z})
+				r3.Update(faces, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true}, false)
 			}
 
 			if blocks.IsBoundary(x, y, z+1, blockId) {
-				faces.AddFace(blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1})
+				r4.Update(faces, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true}, true)
 			}
 		}
+
+		r1.AddFace(faces)
+		r2.AddFace(faces)
+		r3.AddFace(faces)
+		r4.AddFace(faces)
 	}
 }

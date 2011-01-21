@@ -31,50 +31,57 @@ const (
 var (
 	out   *bufio.Writer
 	faces *Faces
+	yMin  int
 )
 
 func main() {
-	var outFile, outErr = os.Open("a.obj", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-	if outErr != nil {
-		fmt.Fprintln(os.Stderr, outErr)
-		return
-	}
-	defer outFile.Close()
-	var bufErr os.Error
-	out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
-	if bufErr != nil {
-		fmt.Fprintln(os.Stderr, bufErr)
-		return
-	}
-	defer out.Flush()
-
-	faces = NewFaces()
-
-	fmt.Fprintln(out, "mtllib a.mtl")
-
+	var filename string
+	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
+	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
 	flag.Parse()
-	for i := 0; i < flag.NArg(); i++ {
-		var filepath = flag.Arg(i)
-		var fi, err = os.Stat(filepath)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
 
-		switch {
-		case fi.IsRegular():
-			processChunk(filepath)
-		case fi.IsDirectory():
-			var errors = make(chan os.Error, 5)
-			var done = make(chan bool)
-			go func() {
-				for error := range errors {
-					fmt.Fprintln(os.Stderr, error)
-				}
-				done <- true
-			}()
-			path.Walk(filepath, &visitor{}, errors)
-			close(errors)
-			<-done
+	if flag.NArg() != 0 {
+		var outFile, outErr = os.Open(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		if outErr != nil {
+			fmt.Fprintln(os.Stderr, outErr)
+			return
+		}
+		defer outFile.Close()
+		var bufErr os.Error
+		out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
+		if bufErr != nil {
+			fmt.Fprintln(os.Stderr, bufErr)
+			return
+		}
+		defer out.Flush()
+
+		faces = NewFaces()
+
+		fmt.Fprintln(out, "mtllib a.mtl")
+
+		for i := 0; i < flag.NArg(); i++ {
+			var filepath = flag.Arg(i)
+			var fi, err = os.Stat(filepath)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
+
+			switch {
+			case fi.IsRegular():
+				processChunk(filepath)
+			case fi.IsDirectory():
+				var errors = make(chan os.Error, 5)
+				var done = make(chan bool)
+				go func() {
+					for error := range errors {
+						fmt.Fprintln(os.Stderr, error)
+					}
+					done <- true
+				}()
+				path.Walk(filepath, &visitor{}, errors)
+				close(errors)
+				<-done
+			}
 		}
 	}
 }
@@ -424,29 +431,29 @@ func (fs *Faces) Process() {
 	fs.vertexes.Number()
 	var vc = int16(fs.vertexes.Print(out, fs.xPos, fs.zPos))
 
-    var blockIds = make([]byte, 0, 16)
+	var blockIds = make([]byte, 0, 16)
 	for _, face := range fs.faces {
-        var found = false
-        for _, id := range blockIds {
-            if id == face.blockId {
-                found = true
-                break
-            }
-        }
+		var found = false
+		for _, id := range blockIds {
+			if id == face.blockId {
+				found = true
+				break
+			}
+		}
 
-        if !found {
-            blockIds = append(blockIds, face.blockId)
-        }
-    }
+		if !found {
+			blockIds = append(blockIds, face.blockId)
+		}
+	}
 
-    for _, blockId := range blockIds {
-        printMtl(out, blockId)
-        for _, face := range fs.faces {
-            if face.blockId == blockId {
-                fmt.Fprintln(out, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
-            }
-        }
-    }
+	for _, blockId := range blockIds {
+		printMtl(out, blockId)
+		for _, face := range fs.faces {
+			if face.blockId == blockId {
+				fmt.Fprintln(out, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
+			}
+		}
+	}
 
 	fmt.Fprintln(os.Stderr, "Faces:", len(fs.faces))
 }
@@ -560,7 +567,9 @@ func processBlocks(bytes []byte, faces AddFacer) {
 
 		var column = blocks[i : i+128]
 		for y, blockId := range column {
-            if y < 62 { continue }
+			if y < yMin {
+				continue
+			}
 			if blocks.IsBoundary(x, y-1, z, blockId) {
 				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x + 1, y, z}, Vertex{x + 1, y, z + 1}, Vertex{x, y, z + 1})
 			}

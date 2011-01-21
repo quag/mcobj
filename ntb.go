@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 )
@@ -25,6 +26,43 @@ const (
 )
 
 const (
+	mtl = `
+newmtl grass
+Kd  0.1797  0.4258  0.0195
+
+newmtl water
+Kd  0.2383  0.4258  0.9961
+
+newmtl stone
+Kd  0.4570  0.4570  0.4570
+
+newmtl dirt
+Kd  0.3477  0.2383  0.1602
+
+newmtl cobble
+Kd  0.2383  0.2383  0.2383
+
+newmtl plank
+Kd  0.6211  0.5156  0.3008
+
+newmtl bedrock
+Kd  0.0273  0.0273  0.0273
+
+newmtl sand
+Kd  0.7461  0.7188  0.5078
+
+newmtl wood
+Kd  0.4023  0.3203  0.1914
+
+newmtl leaves
+Kd  0.3125  0.5625  0.1484
+
+newmtl default
+Kd  0.5000  0.5000  0.5000
+`
+)
+
+const (
 	trace = false
 )
 
@@ -41,6 +79,9 @@ func main() {
 	flag.Parse()
 
 	if flag.NArg() != 0 {
+		var mtlFilename = fmt.Sprintf("%s.mtl", filename[:len(filename)-len(path.Ext(filename))])
+		ioutil.WriteFile(mtlFilename, []byte(mtl), 0666)
+
 		var outFile, outErr = os.Open(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		if outErr != nil {
 			fmt.Fprintln(os.Stderr, outErr)
@@ -57,7 +98,7 @@ func main() {
 
 		faces = NewFaces()
 
-		fmt.Fprintln(out, "mtllib a.mtl")
+		fmt.Fprintln(out, "mtllib", path.Base(mtlFilename))
 
 		for i := 0; i < flag.NArg(); i++ {
 			var filepath = flag.Arg(i)
@@ -93,8 +134,7 @@ func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
 }
 
 func (v *visitor) VisitFile(file string, f *os.FileInfo) {
-	var _, name = path.Split(file)
-	var match, err = path.Match("c.*.dat", name)
+	var match, err = path.Match("c.*.dat", path.Base(file))
 	if match && err == nil {
 		processChunk(file)
 	}

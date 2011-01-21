@@ -29,7 +29,8 @@ const (
 )
 
 var (
-	out *bufio.Writer
+	out   *bufio.Writer
+	faces *Faces
 )
 
 func main() {
@@ -46,6 +47,8 @@ func main() {
 		return
 	}
 	defer out.Flush()
+
+	faces = NewFaces()
 
 	fmt.Fprintln(out, "mtllib a.mtl")
 
@@ -136,7 +139,9 @@ func processChunk(filename string) bool {
 				fmt.Printf("%s bytes(%d) %v\n", name, len(bytes), bytes)
 			}
 			if name == "Blocks" {
-				processBlocks(bytes, xPos, zPos)
+				faces.Clean(xPos, zPos)
+				processBlocks(bytes, faces)
+				faces.Process()
 			}
 		case tagInt8:
 			var number, err2 = readInt8(br)
@@ -382,118 +387,203 @@ func isEmptyBlockId(blockId byte) bool {
 	return blockId == 0 || blockId == 1
 }
 
-func processBlocks(bytes []byte, xPos, zPos int) {
-	var blocks = Blocks(bytes)
+type AddFacer interface {
+	AddFace(blockId byte, v1, v2, v3, v4 Vertex)
+}
 
-	fmt.Fprintf(out, "# %v,%v\n", xPos, zPos)
+type Faces struct {
+	xPos, zPos int
+	count      int
 
-	xPos = xPos * 16
-	zPos = zPos * 16
+	vertexes Vertexes
+	faces    []Face
+}
 
-	var faces = 0
+type Face struct {
+	blockId byte
+	indexes [4]int
+}
 
-	for i := 0; i < len(blocks); i += 128 {
-		var x, z = (i / 128) / 16, (i / 128) % 16
+func NewFaces() *Faces {
+	return &Faces{0, 0, 0, make([]int16, (128+1)*(16+1)*(16+1)), make([]Face, 0, 8192)}
+}
 
-		var column = blocks[i : i+128]
-		for y, blockId := range column {
-			if y < 62 {
-				continue
-			}
+func (fs *Faces) Clean(xPos, zPos int) {
+	fs.xPos = xPos
+	fs.zPos = zPos
+	fs.vertexes.Clear()
+	fs.faces = fs.faces[0:0]
+}
 
-			if blocks.IsBoundary(x, y-1, z, blockId) {
-				printMtl(blockId)
-				printFace(v{xPos + x, y, zPos + z}, v{xPos + x + 1, y, zPos + z}, v{xPos + x + 1, y, zPos + z + 1}, v{xPos + x, y, zPos + z + 1})
-				faces++
-			}
+func (fs *Faces) AddFace(blockId byte, v1, v2, v3, v4 Vertex) {
+	var face = Face{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}}
+	fs.faces = append(fs.faces, face)
+}
 
-			if blocks.IsBoundary(x, y+1, z, blockId) {
-				printMtl(blockId)
-				printFace(v{xPos + x, y + 1, zPos + z}, v{xPos + x, y + 1, zPos + z + 1}, v{xPos + x + 1, y + 1, zPos + z + 1}, v{xPos + x + 1, y + 1, zPos + z})
-				faces++
-			}
+func (fs *Faces) Process() {
+	fs.vertexes.Number()
+	var vc = int16(fs.vertexes.Print(out, fs.xPos, fs.zPos))
 
-			if blocks.IsBoundary(x-1, y, z, blockId) {
-				printMtl(blockId)
-				printFace(v{xPos + x, y, zPos + z}, v{xPos + x, y, zPos + z + 1}, v{xPos + x, y + 1, zPos + z + 1}, v{xPos + x, y + 1, zPos + z})
-				faces++
-			}
+    var blockIds = make([]byte, 0, 16)
+	for _, face := range fs.faces {
+        var found = false
+        for _, id := range blockIds {
+            if id == face.blockId {
+                found = true
+                break
+            }
+        }
 
-			if blocks.IsBoundary(x+1, y, z, blockId) {
-				printMtl(blockId)
-				printFace(v{xPos + x + 1, y, zPos + z}, v{xPos + x + 1, y + 1, zPos + z}, v{xPos + x + 1, y + 1, zPos + z + 1}, v{xPos + x + 1, y, zPos + z + 1})
-				faces++
-			}
+        if !found {
+            blockIds = append(blockIds, face.blockId)
+        }
+    }
 
-			if blocks.IsBoundary(x, y, z-1, blockId) {
-				printMtl(blockId)
-				printFace(v{xPos + x, y, zPos + z}, v{xPos + x, y + 1, zPos + z}, v{xPos + x + 1, y + 1, zPos + z}, v{xPos + x + 1, y, zPos + z})
-				faces++
-			}
+    for _, blockId := range blockIds {
+        printMtl(out, blockId)
+        for _, face := range fs.faces {
+            if face.blockId == blockId {
+                fmt.Fprintln(out, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
+            }
+        }
+    }
 
-			if blocks.IsBoundary(x, y, z+1, blockId) {
-				printMtl(blockId)
-				printFace(v{xPos + x, y, zPos + z + 1}, v{xPos + x + 1, y, zPos + z + 1}, v{xPos + x + 1, y + 1, zPos + z + 1}, v{xPos + x, y + 1, zPos + z + 1})
-				faces++
+	fmt.Fprintln(os.Stderr, "Faces:", len(fs.faces))
+}
+
+type Vertexes []int16
+
+func (vs *Vertexes) Index(x, y, z int) int {
+	return y + (z*129 + (x * 129 * 17))
+}
+
+func (vs *Vertexes) Use(v Vertex) int {
+	var i = vs.Index(v.x, v.y, v.z)
+	(*vs)[i]++
+	return i
+}
+
+func (vs *Vertexes) Release(v Vertex) int {
+	var i = vs.Index(v.x, v.y, v.z)
+	(*vs)[i]--
+	return i
+}
+
+func (vs *Vertexes) Get(i int) int16 {
+	return (*vs)[i]
+}
+
+func (vs *Vertexes) Clear() {
+	for i, _ := range *vs {
+		(*vs)[i] = 0
+	}
+}
+
+func (vs *Vertexes) Number() {
+	var count int16 = 0
+	for i, references := range *vs {
+		if references != 0 {
+			count++
+			(*vs)[i] = count
+		} else {
+			(*vs)[i] = -1
+		}
+	}
+}
+
+func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
+	count = 0
+	for i := 0; i < len(*vs); i += 129 {
+		var x, z = (i / 129) / 17, (i / 129) % 17
+
+		var column = (*vs)[i : i+129]
+		for y, offset := range column {
+			if offset != -1 {
+				count++
+				fmt.Fprintf(writer, "v %.2f %.2f %.2f\n", float64(x+xPos*16)*0.05, float64(y)*0.05, float64(z+zPos*16)*0.05)
 			}
 		}
-		fmt.Fprintln(out)
 	}
-	fmt.Fprintln(os.Stderr, "Faces:", faces)
+	return
 }
 
-func printMtl(blockId byte) {
-	switch blockId {
-	case 1:
-		fmt.Fprintln(out, "usemtl stone")
-	case 2:
-		fmt.Fprintln(out, "usemtl grass")
-	case 3:
-		fmt.Fprintln(out, "usemtl dirt")
-	case 4:
-		fmt.Fprintln(out, "usemtl cobble")
-	case 5:
-		fmt.Fprintln(out, "usemtl plank")
-	case 7:
-		fmt.Fprintln(out, "usemtl bedrock")
-	case 8:
-	case 9:
-		fmt.Fprintln(out, "usemtl water")
-	case 12:
-		fmt.Fprintln(out, "usemtl sand")
-	case 17:
-		fmt.Fprintln(out, "usemtl wood")
-	case 6: // Sapling
-	case 18:
-		fmt.Fprintln(out, "usemtl leaves")
-	default:
-		fmt.Fprintln(out, "usemtl default")
-	}
-}
-
-func printVertex(x, y, z int) {
-	fmt.Fprintf(out, "v %.2f %.2f %.2f\n", float64(x)*0.05, float64(y)*0.05, float64(z)*0.05)
-}
-
-func printFaceN(vertexes ...int) {
-	fmt.Fprintf(out, "f")
-	for _, vertex := range vertexes {
-		fmt.Fprintf(out, " %v", vertex)
-	}
-	fmt.Fprintln(out)
-}
-
-type v struct {
+type Vertex struct {
 	x, y, z int
 }
 
-func printFace(vertexes ...v) {
+func printFace(xPos, zPos int, vertexes ...Vertex) {
 	for _, vertex := range vertexes {
-		printVertex(vertex.x, vertex.y, vertex.z)
+		fmt.Fprintf(out, "v %.2f %.2f %.2f\n", float64(vertex.x+xPos*16)*0.05, float64(vertex.y)*0.05, float64(vertex.z+zPos*16)*0.05)
 	}
 	fmt.Fprintf(out, "f")
 	for i, _ := range vertexes {
 		fmt.Fprintf(out, " -%d", len(vertexes)-i)
 	}
 	fmt.Fprintln(out)
+}
+
+func printMtl(w io.Writer, blockId byte) {
+	switch blockId {
+	case 1:
+		fmt.Fprintln(w, "usemtl stone")
+	case 2:
+		fmt.Fprintln(w, "usemtl grass")
+	case 3:
+		fmt.Fprintln(w, "usemtl dirt")
+	case 4:
+		fmt.Fprintln(w, "usemtl cobble")
+	case 5:
+		fmt.Fprintln(w, "usemtl plank")
+	case 7:
+		fmt.Fprintln(w, "usemtl bedrock")
+	case 8:
+	case 9:
+		fmt.Fprintln(w, "usemtl water")
+	case 12:
+		fmt.Fprintln(w, "usemtl sand")
+	case 17:
+		fmt.Fprintln(w, "usemtl wood")
+	case 6: // Sapling
+	case 18:
+		fmt.Fprintln(w, "usemtl leaves")
+	default:
+		fmt.Fprintln(w, "usemtl default")
+	}
+}
+
+
+func processBlocks(bytes []byte, faces AddFacer) {
+	var blocks = Blocks(bytes)
+
+	for i := 0; i < len(blocks); i += 128 {
+		var x, z = (i / 128) / 16, (i / 128) % 16
+
+		var column = blocks[i : i+128]
+		for y, blockId := range column {
+            if y < 62 { continue }
+			if blocks.IsBoundary(x, y-1, z, blockId) {
+				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x + 1, y, z}, Vertex{x + 1, y, z + 1}, Vertex{x, y, z + 1})
+			}
+
+			if blocks.IsBoundary(x, y+1, z, blockId) {
+				faces.AddFace(blockId, Vertex{x, y + 1, z}, Vertex{x, y + 1, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y + 1, z})
+			}
+
+			if blocks.IsBoundary(x-1, y, z, blockId) {
+				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z})
+			}
+
+			if blocks.IsBoundary(x+1, y, z, blockId) {
+				faces.AddFace(blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1})
+			}
+
+			if blocks.IsBoundary(x, y, z-1, blockId) {
+				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z})
+			}
+
+			if blocks.IsBoundary(x, y, z+1, blockId) {
+				faces.AddFace(blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1})
+			}
+		}
+	}
 }

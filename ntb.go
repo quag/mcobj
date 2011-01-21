@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 )
@@ -45,7 +44,11 @@ func main() {
 
 	if flag.NArg() != 0 {
 		var mtlFilename = fmt.Sprintf("%s.mtl", filename[:len(filename)-len(path.Ext(filename))])
-		ioutil.WriteFile(mtlFilename, []byte(mtl), 0666)
+		var mtlErr = writeMtlFile(mtlFilename)
+        if mtlErr != nil {
+            fmt.Fprintln(os.Stderr, mtlErr)
+            return
+        }
 
 		var outFile, outErr = os.Open(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		if outErr != nil {
@@ -535,82 +538,136 @@ func printFace(xPos, zPos int, vertexes ...Vertex) {
 }
 
 func printMtl(w io.Writer, blockId byte) {
-	switch blockId {
-	case 1:
-		fmt.Fprintln(w, "usemtl stone")
-	case 2:
-		fmt.Fprintln(w, "usemtl grass")
-	case 3:
-		fmt.Fprintln(w, "usemtl dirt")
-	case 4:
-		fmt.Fprintln(w, "usemtl cobble")
-	case 5:
-		fmt.Fprintln(w, "usemtl plank")
-	case 7:
-		fmt.Fprintln(w, "usemtl bedrock")
-	case 8:
-	case 9:
-		fmt.Fprintln(w, "usemtl water")
-	case 12:
-		fmt.Fprintln(w, "usemtl sand")
-	case 17:
-		fmt.Fprintln(w, "usemtl wood")
-	case 6: // Sapling
-	case 18:
-		fmt.Fprintln(w, "usemtl leaves")
-	case 78:
-	case 80:
-		fmt.Fprintln(w, "usemtl snow")
-	case 79:
-		fmt.Fprintln(w, "usemtl ice")
-	default:
-		fmt.Fprintln(w, "usemtl default")
-	}
+	fmt.Fprintln(w, "usemtl", blockId)
 }
 
-const (
-	mtl = `
-newmtl grass
-Kd  0.1797  0.4258  0.0195
+func writeMtlFile(filename string) os.Error {
+    var outFile, outErr = os.Open(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+    if outErr != nil {
+        return outErr
+    }
+    defer outFile.Close()
 
-newmtl water
-Kd  0.2383  0.4258  0.9961
+    var p = 0
 
-newmtl stone
-Kd  0.4570  0.4570  0.4570
+    for i := 0; i < 256; i++ {
+        var mtl *MTL
+        if p < len(colors) && colors[p].blockId == byte(i) {
+            mtl = &colors[p]
+            p++
+        } else {
+            mtl = &MTL{byte(i), 0x7f7f7f, "Unknown"}
+        }
 
-newmtl dirt
-Kd  0.3477  0.2383  0.1602
+        mtl.Print(outFile)
+    }
 
-newmtl cobble
-Kd  0.2383  0.2383  0.2383
+    return nil
+}
 
-newmtl plank
-Kd  0.6211  0.5156  0.3008
+type MTL struct {
+	blockId byte
+	kd      int
+	name    string
+}
 
-newmtl bedrock
-Kd  0.0273  0.0273  0.0273
+func (mtl *MTL) Print(w io.Writer) {
+    var (
+        r = mtl.kd >> 16
+        g = mtl.kd >> 8 & 0xff
+        b = mtl.kd & 0xff
+    )
 
-newmtl sand
-Kd  0.7461  0.7188  0.5078
+    fmt.Fprintf(w, "# %s\nnewmtl %d\nKd %.4f %.4f %.4f\n\n", mtl.name, mtl.blockId, float64(r) / 255, float64(g) / 255, float64(b) / 255)
+}
 
-newmtl wood
-Kd  0.4023  0.3203  0.1914
-
-newmtl leaves
-Kd  0.3125  0.5625  0.1484
-
-newmtl snow
-Kd  0.0000  0.0000  0.0000
-
-newmtl ice
-Kd  0.4383  0.6258  0.9961
-
-newmtl default
-Kd  0.5000  0.5000  0.5000
-`
+var (
+	colors = []MTL{
+		MTL{0, 0xff0000, "Air"},
+		MTL{1, 0x757575, "Stone"},
+		MTL{2, 0x2e6d05, "Grass"},
+		MTL{3, 0x593d29, "Dirt"},
+		MTL{4, 0x3d3d3d, "Cobblestone"},
+		MTL{5, 0x9f844d, "Wooden Plank"},
+		MTL{6, 0x7f7f7f, "Sapling"},
+		MTL{7, 0x070707, "Bedrock"},
+		MTL{8, 0x3d6dff, "Water"},
+		MTL{9, 0x3d6dff, "Stationary water"},
+		MTL{10, 0x7f7f7f, "Lava"},
+		MTL{11, 0x7f7f7f, "Stationary lava"},
+		MTL{12, 0xbfb882, "Sand"},
+		MTL{13, 0x7f7f7f, "Gravel"},
+		MTL{14, 0x7f7f7f, "Gold ore"},
+		MTL{15, 0x7f7f7f, "Iron ore"},
+		MTL{16, 0x7f7f7f, "Coal ore"},
+		MTL{17, 0x675231, "Wood"},
+		MTL{18, 0x509026, "Leaves"},
+		MTL{19, 0x7f7f7f, "Sponge"},
+		MTL{20, 0x7f7f7f, "Glass"},
+		MTL{21, 0x7f7f7f, "Lapis Lazuli Ore"},
+		MTL{22, 0x7f7f7f, "Lapis Lazuli Block"},
+		MTL{23, 0x7f7f7f, "Dispenser"},
+		MTL{24, 0xbfb882, "Sandstone"},
+		MTL{25, 0x7f7f7f, "Note Block"},
+		MTL{35, 0x7f7f7f, "Wool D B"},
+		MTL{37, 0x7f7f7f, "Yellow flower"},
+		MTL{38, 0x7f7f7f, "Red rose"},
+		MTL{39, 0x7f7f7f, "Brown Mushroom"},
+		MTL{40, 0x7f7f7f, "Red Mushroom"},
+		MTL{41, 0x7f7f7f, "Gold Block"},
+		MTL{42, 0x7f7f7f, "Iron Block"},
+		MTL{43, 0x7f7f7f, "Double Stone Slab"},
+		MTL{44, 0x7f7f7f, "Stone Slab"},
+		MTL{45, 0x7f7f7f, "Brick"},
+		MTL{46, 0x7f7f7f, "TNT"},
+		MTL{47, 0x7f7f7f, "Bookshelf"},
+		MTL{48, 0x7f7f7f, "Moss Stone"},
+		MTL{49, 0x7f7f7f, "Obsidian"},
+		MTL{50, 0x7f7f7f, "Torch"},
+		MTL{51, 0x7f7f7f, "Fire"},
+		MTL{52, 0x7f7f7f, "Monster Spawner"},
+		MTL{53, 0x7f7f7f, "Wooden Stairs"},
+		MTL{54, 0x7f7f7f, "Chest"},
+		MTL{55, 0x7f7f7f, "Redstone Wire"},
+		MTL{56, 0x7f7f7f, "Diamond Ore"},
+		MTL{57, 0x7f7f7f, "Diamond Block"},
+		MTL{58, 0x7f7f7f, "Workbench"},
+		MTL{59, 0x7f7f7f, "Crops"},
+		MTL{60, 0x7f7f7f, "Soil"},
+		MTL{61, 0x7f7f7f, "Furnace"},
+		MTL{62, 0x7f7f7f, "Burning Furnace"},
+		MTL{63, 0x7f7f7f, "Sign Post"},
+		MTL{64, 0x7f7f7f, "Wooden Door"},
+		MTL{65, 0x7f7f7f, "Ladder"},
+		MTL{66, 0x7f7f7f, "Minecart Tracks"},
+		MTL{67, 0x7f7f7f, "Cobblestone Stairs"},
+		MTL{68, 0x7f7f7f, "Wall Sign"},
+		MTL{69, 0x7f7f7f, "Lever"},
+		MTL{70, 0x7f7f7f, "Stone Pressure Plate"},
+		MTL{71, 0x7f7f7f, "Iron Door"},
+		MTL{72, 0x7f7f7f, "Wooden Pressure Plate"},
+		MTL{73, 0x7f7f7f, "Redstone Ore"},
+		MTL{74, 0x7f7f7f, "Glowing Redstone Ore"},
+		MTL{75, 0x7f7f7f, "Redstone torch (\"off\" state)"},
+		MTL{76, 0x7f7f7f, "Redstone torch (\"on\" state)"},
+		MTL{77, 0x7f7f7f, "Stone Button"},
+		MTL{78, 0x000000, "Snow"},
+		MTL{79, 0x70a0ff, "Ice"},
+		MTL{80, 0x000000, "Snow Block"},
+		MTL{81, 0x7f7f7f, "Cactus"},
+		MTL{82, 0x7f7f7f, "Clay"},
+		MTL{83, 0x7f7f7f, "Sugar Cane"},
+		MTL{84, 0x7f7f7f, "Jukebox"},
+		MTL{85, 0x7f7f7f, "Fence"},
+		MTL{86, 0x7f7f7f, "Pumpkin"},
+		MTL{87, 0x7f7f7f, "Netherrack"},
+		MTL{88, 0x7f7f7f, "Soul Sand"},
+		MTL{89, 0x7f7f7f, "Glowstone"},
+		MTL{90, 0x7f7f7f, "Portal"},
+		MTL{91, 0x7f7f7f, "Jack-O-Lantern"},
+		MTL{92, 0xffffff, "Cake Block"},
+	}
 )
-
 
 type blockRun struct {
 	blockId        byte

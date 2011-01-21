@@ -1,1024 +1,1536 @@
 # Air
 newmtl 0
 Kd 1.0000 0.0000 0.0000
+d 1.0000
+illum 1
 
 # Stone
 newmtl 1
 Kd 0.4588 0.4588 0.4588
+d 1.0000
+illum 1
 
 # Grass
 newmtl 2
 Kd 0.1804 0.4275 0.0196
+d 1.0000
+illum 1
 
 # Dirt
 newmtl 3
 Kd 0.3490 0.2392 0.1608
+d 1.0000
+illum 1
 
 # Cobblestone
 newmtl 4
 Kd 0.2392 0.2392 0.2392
+d 1.0000
+illum 1
 
 # Wooden Plank
 newmtl 5
 Kd 0.6235 0.5176 0.3020
+d 1.0000
+illum 1
 
 # Sapling
 newmtl 6
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Bedrock
 newmtl 7
 Kd 0.0275 0.0275 0.0275
+d 1.0000
+illum 1
 
 # Water
 newmtl 8
 Kd 0.2392 0.4275 1.0000
+d 0.4980
+illum 1
 
 # Stationary water
 newmtl 9
 Kd 0.2392 0.4275 1.0000
+d 0.4980
+illum 1
 
 # Lava
 newmtl 10
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Stationary lava
 newmtl 11
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Sand
 newmtl 12
 Kd 0.7490 0.7216 0.5098
+d 1.0000
+illum 1
 
 # Gravel
 newmtl 13
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Gold ore
 newmtl 14
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Iron ore
 newmtl 15
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Coal ore
 newmtl 16
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Wood
 newmtl 17
 Kd 0.4039 0.3216 0.1922
+d 1.0000
+illum 1
 
 # Leaves
 newmtl 18
 Kd 0.3137 0.5647 0.1490
+d 1.0000
+illum 1
 
 # Sponge
 newmtl 19
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Glass
 newmtl 20
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Lapis Lazuli Ore
 newmtl 21
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Lapis Lazuli Block
 newmtl 22
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Dispenser
 newmtl 23
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Sandstone
 newmtl 24
 Kd 0.7490 0.7216 0.5098
+d 1.0000
+illum 1
 
 # Note Block
 newmtl 25
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Unknown
 newmtl 26
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 27
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 28
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 29
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 30
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 31
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 32
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 33
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 34
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Wool D B
 newmtl 35
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Unknown
 newmtl 36
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Yellow flower
 newmtl 37
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Red rose
 newmtl 38
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Brown Mushroom
 newmtl 39
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Red Mushroom
 newmtl 40
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Gold Block
 newmtl 41
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Iron Block
 newmtl 42
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Double Stone Slab
 newmtl 43
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Stone Slab
 newmtl 44
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Brick
 newmtl 45
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # TNT
 newmtl 46
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Bookshelf
 newmtl 47
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Moss Stone
 newmtl 48
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Obsidian
 newmtl 49
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Torch
 newmtl 50
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Fire
 newmtl 51
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Monster Spawner
 newmtl 52
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Wooden Stairs
 newmtl 53
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Chest
 newmtl 54
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Redstone Wire
 newmtl 55
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Diamond Ore
 newmtl 56
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Diamond Block
 newmtl 57
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Workbench
 newmtl 58
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Crops
 newmtl 59
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Soil
 newmtl 60
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Furnace
 newmtl 61
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Burning Furnace
 newmtl 62
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Sign Post
 newmtl 63
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Wooden Door
 newmtl 64
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Ladder
 newmtl 65
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Minecart Tracks
 newmtl 66
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Cobblestone Stairs
 newmtl 67
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Wall Sign
 newmtl 68
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Lever
 newmtl 69
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Stone Pressure Plate
 newmtl 70
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Iron Door
 newmtl 71
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Wooden Pressure Plate
 newmtl 72
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Redstone Ore
 newmtl 73
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Glowing Redstone Ore
 newmtl 74
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Redstone torch ("off" state)
 newmtl 75
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Redstone torch ("on" state)
 newmtl 76
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Stone Button
 newmtl 77
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Snow
 newmtl 78
-Kd 0.0000 0.0000 0.0000
+Kd 1.0000 1.0000 1.0000
+d 1.0000
+illum 1
 
 # Ice
 newmtl 79
 Kd 0.4392 0.6275 1.0000
+d 1.0000
+illum 1
 
 # Snow Block
 newmtl 80
-Kd 0.0000 0.0000 0.0000
+Kd 1.0000 1.0000 1.0000
+d 1.0000
+illum 1
 
 # Cactus
 newmtl 81
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Clay
 newmtl 82
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Sugar Cane
 newmtl 83
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Jukebox
 newmtl 84
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Fence
 newmtl 85
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Pumpkin
 newmtl 86
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Netherrack
 newmtl 87
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Soul Sand
 newmtl 88
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Glowstone
 newmtl 89
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Portal
 newmtl 90
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Jack-O-Lantern
 newmtl 91
 Kd 0.4980 0.4980 0.4980
+d 1.0000
+illum 1
 
 # Cake Block
 newmtl 92
 Kd 1.0000 1.0000 1.0000
+d 1.0000
+illum 1
 
 # Unknown
 newmtl 93
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 94
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 95
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 96
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 97
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 98
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 99
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 100
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 101
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 102
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 103
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 104
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 105
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 106
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 107
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 108
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 109
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 110
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 111
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 112
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 113
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 114
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 115
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 116
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 117
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 118
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 119
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 120
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 121
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 122
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 123
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 124
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 125
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 126
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 127
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 128
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 129
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 130
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 131
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 132
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 133
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 134
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 135
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 136
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 137
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 138
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 139
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 140
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 141
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 142
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 143
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 144
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 145
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 146
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 147
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 148
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 149
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 150
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 151
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 152
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 153
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 154
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 155
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 156
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 157
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 158
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 159
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 160
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 161
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 162
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 163
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 164
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 165
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 166
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 167
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 168
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 169
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 170
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 171
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 172
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 173
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 174
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 175
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 176
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 177
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 178
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 179
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 180
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 181
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 182
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 183
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 184
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 185
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 186
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 187
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 188
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 189
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 190
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 191
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 192
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 193
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 194
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 195
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 196
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 197
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 198
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 199
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 200
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 201
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 202
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 203
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 204
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 205
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 206
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 207
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 208
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 209
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 210
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 211
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 212
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 213
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 214
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 215
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 216
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 217
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 218
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 219
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 220
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 221
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 222
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 223
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 224
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 225
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 226
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 227
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 228
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 229
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 230
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 231
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 232
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 233
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 234
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 235
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 236
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 237
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 238
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 239
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 240
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 241
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 242
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 243
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 244
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 245
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 246
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 247
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 248
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 249
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 250
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 251
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 252
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 253
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 254
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 
 # Unknown
 newmtl 255
-Kd 0.4980 0.4980 0.4980
+Kd 0.0000 0.4980 0.4980
+d 0.4980
+illum 1
 

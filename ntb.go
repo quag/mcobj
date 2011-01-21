@@ -34,6 +34,7 @@ var (
 	yMin        int
 	blockFaces  bool
 	showTunnels bool
+	hideStone   bool
 )
 
 func main() {
@@ -41,6 +42,7 @@ func main() {
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&showTunnels, "t", false, "Show tunnels")
+	flag.BoolVar(&hideStone, "hs", false, "Hide stone")
 	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
 	flag.Parse()
 
@@ -393,17 +395,17 @@ func (b *Blocks) IsBoundary(x, y, z int, blockId byte) bool {
 		if showTunnels {
 			return blockId == 18 /* leaves */ || blockId == 17 /* wood */
 		} else {
-			return blockId != 0 && blockId != 9
+			return blockId != 0 && blockId != 9 && (!hideStone || blockId != 1)
 		}
 	}
 
 	var otherBlockId = b.Get(x, y, z)
 
-	if blockId == 9 && otherBlockId == 0 {
+	if (blockId == 9 || (hideStone && blockId == 1)) && otherBlockId == 0 {
 		return true
 	}
 
-	return (blockId != 0 && blockId != 9) && (otherBlockId == 0 || otherBlockId == 9)
+	return (blockId != 0 && blockId != 9 && (!hideStone || blockId != 1)) && (otherBlockId == 0 || otherBlockId == 9 || (hideStone && otherBlockId == 1))
 }
 
 func isEmptyBlockId(blockId byte) bool {

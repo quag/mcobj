@@ -138,22 +138,18 @@ func main() {
 						}
 						done <- true
 					}()
-					var v = &visitor{}
+					var v = &visitor{make(map[string]bool)}
 					path.Walk(filepath, v, errors)
 					close(errors)
 					<-done
 
-					var remaining = len(v.chunks)
-					fmt.Println("ho", remaining)
-
-					for i := 0; remaining > 0 && faceCount < faceLimit; i++ {
-						for x := 0; x < i && remaining > 0 && faceCount < faceLimit; x++ {
-							for z := 0; z < i && remaining > 0 && faceCount < faceLimit; z++ {
+					for i := 0; len(v.chunks) > 0 && faceCount < faceLimit; i++ {
+						for x := 0; x < i && len(v.chunks) > 0 && faceCount < faceLimit; x++ {
+							for z := 0; z < i && len(v.chunks) > 0 && faceCount < faceLimit; z++ {
 								var chunk = path.Join(filepath, chunkPath(cx+unzigzag(x), cz+unzigzag(z)))
-								for i, cn := range v.chunks {
+								for cn, _ := range v.chunks {
 									if cn == chunk {
-										v.chunks[i] = ""
-										remaining--
+										v.chunks[cn] = false, false
 										processChunk(chunk, faces)
 										break
 									}
@@ -168,7 +164,7 @@ func main() {
 }
 
 type visitor struct {
-	chunks []string // TODO: replace with map
+	chunks map[string]bool
 }
 
 func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
@@ -178,7 +174,7 @@ func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
 func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 	var match, err = path.Match("c.*.dat", path.Base(file))
 	if match && err == nil {
-		v.chunks = append(v.chunks, file)
+		v.chunks[file] = true
 	}
 }
 

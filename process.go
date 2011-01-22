@@ -1,15 +1,15 @@
 package main
 
 import (
-    "fmt"
-    "io"
-    "os"
+	"fmt"
+	"io"
+	"os"
 )
 
 func (fs *Faces) ProcessBlock(xPos, zPos int, bytes []byte) {
-    fs.Clean(xPos, zPos)
-    processBlocks(bytes, fs)
-    fs.Process()
+	fs.Clean(xPos, zPos)
+	processBlocks(bytes, fs)
+	fs.Process()
 }
 
 type Blocks []byte

@@ -1,9 +1,9 @@
 package main
 
 import (
-    "fmt"
-    "io"
-    "os"
+	"fmt"
+	"io"
+	"os"
 )
 
 func printMtl(w io.Writer, blockId byte) {
@@ -144,4 +144,3 @@ var (
 		MTL{92, 0xffffffff, "Cake Block"},
 	}
 )
-

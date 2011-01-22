@@ -187,7 +187,7 @@ func processXZChunk(worldPath string, x, z int) {
 }
 
 type ProcessBlocker interface {
-    ProcessBlock(xPos, zPos int, bytes []byte)
+	ProcessBlock(xPos, zPos int, bytes []byte)
 }
 
 func processChunk(filename string, processor ProcessBlocker) bool {
@@ -236,7 +236,7 @@ func processChunk(filename string, processor ProcessBlocker) bool {
 				fmt.Printf("%s bytes(%d) %v\n", name, len(bytes), bytes)
 			}
 			if name == "Blocks" {
-                processor.ProcessBlock(xPos, zPos, bytes)
+				processor.ProcessBlock(xPos, zPos, bytes)
 			}
 		case tagInt8:
 			var number, err2 = readInt8(br)
@@ -452,4 +452,3 @@ func readIntN(r *bufio.Reader, n int) (int, os.Error) {
 
 	return a, nil
 }
-

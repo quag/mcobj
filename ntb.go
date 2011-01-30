@@ -43,6 +43,9 @@ var (
 
 	faceCount int
 	faceLimit int
+
+	chunkCount int
+	chunkLimit int
 )
 
 func base36(i int) string {
@@ -67,6 +70,7 @@ func unzigzag(n int) int {
 
 func main() {
 	var cx, cz int
+	var square int
 
 	var filename string
 	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
@@ -79,10 +83,15 @@ func main() {
 	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
 	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
+	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
 	flag.Parse()
 
 	if faceLimit != math.MaxInt32 {
 		faceLimit *= 1000
+	}
+
+	if square != math.MaxInt32 {
+		chunkLimit = square * square
 	}
 
 	if flag.NArg() != 0 {
@@ -137,9 +146,11 @@ func main() {
 				close(errors)
 				<-done
 
-				for i := 0; len(v.chunks) > 0 && faceCount < faceLimit; i++ {
-					for x := 0; x < i && len(v.chunks) > 0 && faceCount < faceLimit; x++ {
-						for z := 0; z < i && len(v.chunks) > 0 && faceCount < faceLimit; z++ {
+				var total = len(v.chunks)
+
+				for i := 0; moreChunks(v.chunks); i++ {
+					for x := 0; x < i && moreChunks(v.chunks); x++ {
+						for z := 0; z < i && moreChunks(v.chunks); z++ {
 							var (
 								ax = cx + unzigzag(x)
 								az = cz + unzigzag(z)
@@ -154,7 +165,9 @@ func main() {
 								loadSide(sideCache, filepath, v.chunks, ax, az+1)
 
 								v.chunks[chunk] = false, false
+								fmt.Printf("%v/%v ", total-len(v.chunks), total)
 								processChunk(chunk, faces)
+								chunkCount++
 
 								if !cacheSides {
 									sideCache.Clear()
@@ -166,6 +179,10 @@ func main() {
 			}
 		}
 	}
+}
+
+func moreChunks(chunks map[string]bool) bool {
+	return len(chunks) > 0 && faceCount < faceLimit && chunkCount < chunkLimit
 }
 
 func loadSide(sideCache *SideCache, world string, chunks map[string]bool, x, z int) {

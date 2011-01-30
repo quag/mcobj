@@ -30,30 +30,34 @@ func (fs *Faces) ProcessBlock(xPos, zPos int, blocks Blocks) {
 		fs.sideCache.ProcessBlock(xPos, zPos, blocks)
 	}
 
-	fmt.Fprintf(os.Stderr, "(%3v,%3v) Faces: %v\n\n", xPos, zPos, len(fs.faces))
+	fmt.Fprintf(os.Stderr, "(%3v,%3v) Faces: %v\n", xPos, zPos, len(fs.faces))
 }
 
 func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId byte) bool {
-	var otherBlockId = b.Get(x, y, z)
-
 	var (
-		air   = (blockId == 0)
-		stone = (blockId == 1)
-		water = (blockId == 9)
-
-		otherAir   = (otherBlockId == 0)
-		otherStone = (otherBlockId == 1)
-		otherWater = (otherBlockId == 9)
-
-		hiddenStone      = (hideStone && stone)
-		otherHiddenStone = (hideStone && otherStone)
+		empty, air, water       = IsEmptyBlock(blockId)
+		otherEmpty, otherAir, _ = IsEmptyBlock(b.Get(x, y, z))
 	)
 
-	if otherAir && (water || hiddenStone) {
-		return true
-	}
+	return (empty && !air && otherAir) || (!empty && otherEmpty) || (water && otherAir)
+}
 
-	return (!air && !water && !hiddenStone) && (otherAir || otherWater || otherHiddenStone)
+func IsEmptyBlock(blockId byte) (isEmpty bool, isAir bool, isWater bool) {
+	isEmpty = false
+	isAir = false
+	isWater = false
+	switch {
+	case blockId == 0: // Air
+		isEmpty = true
+		isAir = true
+	case blockId == 9: // Water
+		isEmpty = true
+		isWater = true
+	case hideStone && blockId == 1: // Stone
+	case IsMeshBlockId(blockId): // Object that can't be represented as a voxel cube
+		isEmpty = true
+	}
+	return
 }
 
 type AddFacer interface {

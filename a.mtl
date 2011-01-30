@@ -49,13 +49,13 @@ illum 1
 # Water
 newmtl 8
 Kd 0.2392 0.4275 1.0000
-d 0.4980
+d 0.2471
 illum 1
 
 # Stationary water
 newmtl 9
 Kd 0.2392 0.4275 1.0000
-d 0.4980
+d 0.2471
 illum 1
 
 # Lava

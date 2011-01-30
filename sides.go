@@ -34,8 +34,6 @@ func (s *SideCache) ProcessBlock(xPos, zPos int, blocks Blocks) {
 	}
 
 	s.chunks[s.key(xPos, zPos)] = CalculateSides(blocks)
-
-	fmt.Fprintf(os.Stderr, "(%3v,%3v) Side\n", xPos, zPos)
 }
 
 func (s *SideCache) HasSide(x, z int) bool {
@@ -54,7 +52,7 @@ func (s *SideCache) GetSide(x, z int, side int) *ChunkSide {
 	}
 	var chunk, present = s.chunks[s.key(x, z)]
 	if !present {
-		fmt.Fprintln(os.Stderr, "Missing Side:", x, z) // TODO: Delete debugging print
+		fmt.Fprintf(os.Stderr, "(%3v,%3v) Missing Side\n", x, z)
 		return defaultSide
 	}
 

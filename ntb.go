@@ -92,6 +92,8 @@ func main() {
 
 	if square != math.MaxInt32 {
 		chunkLimit = square * square
+	} else {
+		chunkLimit = math.MaxInt32
 	}
 
 	if flag.NArg() != 0 {

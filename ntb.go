@@ -31,13 +31,15 @@ const (
 )
 
 var (
-	out         *bufio.Writer
-	faces       *Faces
-	yMin        int
-	blockFaces  bool
-	showTunnels bool
-	hideStone   bool
-	noColor     bool
+	out        *bufio.Writer
+	faces      *Faces
+	sideCache  *SideCache
+	yMin       int
+	blockFaces bool
+	hideBottom bool
+	hideStone  bool
+	noColor    bool
+	cacheSides bool
 
 	faceCount int
 	faceLimit int
@@ -51,8 +53,8 @@ func encodeFolder(i int) string {
 	return base36(((i % 64) + 64) % 64)
 }
 
-func chunkPath(x, z int) string {
-	return path.Join(encodeFolder(x), encodeFolder(z), "c."+base36(x)+"."+base36(z)+".dat")
+func chunkPath(world string, x, z int) string {
+	return path.Join(world, encodeFolder(x), encodeFolder(z), "c."+base36(x)+"."+base36(z)+".dat")
 }
 
 func zigzag(n int) int {
@@ -65,18 +67,17 @@ func unzigzag(n int) int {
 
 func main() {
 	var cx, cz int
-	var worldPath string
 
 	var filename string
 	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
-	flag.BoolVar(&showTunnels, "t", false, "Show tunnels")
+	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
 	flag.BoolVar(&hideStone, "hs", false, "Hide stone")
 	flag.BoolVar(&noColor, "g", false, "Omit materials")
+	flag.BoolVar(&cacheSides, "cs", false, "Cache sides. Memory usage will increase as chunks are processed")
 	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
 	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
-	flag.StringVar(&worldPath, "w", "", "World folder")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
 	flag.Parse()
 
@@ -84,7 +85,7 @@ func main() {
 		faceLimit *= 1000
 	}
 
-	if flag.NArg() != 0 || len(worldPath) != 0 {
+	if flag.NArg() != 0 {
 		var mtlFilename = fmt.Sprintf("%s.mtl", filename[:len(filename)-len(path.Ext(filename))])
 		var mtlErr = writeMtlFile(mtlFilename)
 		if mtlErr != nil {
@@ -106,59 +107,79 @@ func main() {
 		}
 		defer out.Flush()
 
-		faces = NewFaces()
+		sideCache = new(SideCache)
+		faces = NewFaces(sideCache)
 
 		fmt.Fprintln(out, "mtllib", path.Base(mtlFilename))
 
-		if len(worldPath) != 0 {
-			for i := 0; i < 100 && faceCount < faceLimit; i++ {
-				for x := 0; x < i && faceCount < faceLimit; x++ {
-					for z := 0; z < i && faceCount < faceLimit; z++ {
-						processXZChunk(worldPath, cx+unzigzag(x), cz+unzigzag(z))
-					}
-				}
+		for i := 0; i < flag.NArg(); i++ {
+			var filepath = flag.Arg(i)
+			var fi, err = os.Stat(filepath)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				continue
 			}
-		} else {
-			for i := 0; i < flag.NArg(); i++ {
-				var filepath = flag.Arg(i)
-				var fi, err = os.Stat(filepath)
-				if err != nil {
-					fmt.Fprintln(os.Stderr, err)
-				}
 
-				switch {
-				case fi.IsRegular():
-					processChunk(filepath, faces)
-				case fi.IsDirectory():
-					var errors = make(chan os.Error, 5)
-					var done = make(chan bool)
-					go func() {
-						for error := range errors {
-							fmt.Fprintln(os.Stderr, error)
-						}
-						done <- true
-					}()
-					var v = &visitor{make(map[string]bool)}
-					path.Walk(filepath, v, errors)
-					close(errors)
-					<-done
+			switch {
+			case fi.IsRegular():
+				processChunk(filepath, faces)
+			case fi.IsDirectory():
+				var errors = make(chan os.Error, 5)
+				var done = make(chan bool)
+				go func() {
+					for error := range errors {
+						fmt.Fprintln(os.Stderr, error)
+					}
+					done <- true
+				}()
+				var v = &visitor{make(map[string]bool)}
+				path.Walk(filepath, v, errors)
+				close(errors)
+				<-done
 
-					for i := 0; len(v.chunks) > 0 && faceCount < faceLimit; i++ {
-						for x := 0; x < i && len(v.chunks) > 0 && faceCount < faceLimit; x++ {
-							for z := 0; z < i && len(v.chunks) > 0 && faceCount < faceLimit; z++ {
-								var chunk = path.Join(filepath, chunkPath(cx+unzigzag(x), cz+unzigzag(z)))
-								for cn, _ := range v.chunks {
-									if cn == chunk {
-										v.chunks[cn] = false, false
-										processChunk(chunk, faces)
-										break
-									}
+				for i := 0; len(v.chunks) > 0 && faceCount < faceLimit; i++ {
+					for x := 0; x < i && len(v.chunks) > 0 && faceCount < faceLimit; x++ {
+						for z := 0; z < i && len(v.chunks) > 0 && faceCount < faceLimit; z++ {
+							var (
+								ax = cx + unzigzag(x)
+								az = cz + unzigzag(z)
+							)
+
+							var chunk = chunkPath(filepath, ax, az)
+							var _, exists = v.chunks[chunk]
+							if exists {
+								loadSide(sideCache, filepath, v.chunks, ax-1, az)
+								loadSide(sideCache, filepath, v.chunks, ax+1, az)
+								loadSide(sideCache, filepath, v.chunks, ax, az-1)
+								loadSide(sideCache, filepath, v.chunks, ax, az+1)
+
+								v.chunks[chunk] = false, false
+								processChunk(chunk, faces)
+
+								if !cacheSides {
+									sideCache.Clear()
 								}
 							}
 						}
 					}
 				}
 			}
+		}
+	}
+}
+
+func loadSide(sideCache *SideCache, world string, chunks map[string]bool, x, z int) {
+	if !sideCache.HasSide(x, z) {
+		var fileName = chunkPath(world, x, z)
+		var fileExists bool
+		if cacheSides {
+			_, fileExists = chunks[fileName]
+		} else {
+			var _, err = os.Stat(fileName)
+			fileExists = err == nil
+		}
+		if fileExists {
+			processChunk(fileName, sideCache)
 		}
 	}
 }
@@ -178,21 +199,26 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 	}
 }
 
-func processXZChunk(worldPath string, x, z int) {
-	var chunk = path.Join(worldPath, chunkPath(x, z))
-	var fi, statErr = os.Stat(chunk)
-	if fi != nil && statErr == nil {
-		processChunk(chunk, faces)
-	}
+type ProcessBlocker interface {
+	ProcessBlock(xPos, zPos int, blocks Blocks)
 }
 
-type ProcessBlocker interface {
-	ProcessBlock(xPos, zPos int, bytes []byte)
+type Blocks []byte
+
+type BlockColumn []byte
+
+func (b *Blocks) Get(x, y, z int) byte {
+	return (*b)[y+(z*128+(x*128*16))]
+}
+
+func (b *Blocks) Column(x, z int) BlockColumn {
+	var i = 128 * (z + x*16)
+	return BlockColumn((*b)[i : i+128])
 }
 
 func processChunk(filename string, processor ProcessBlocker) bool {
 	fmt.Fprintln(out, "#", filename)
-	fmt.Fprintln(os.Stderr, filename)
+	//fmt.Fprintln(os.Stderr, filename)
 	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
 	if fileErr != nil {
 		fmt.Println(fileErr)
@@ -236,7 +262,7 @@ func processChunk(filename string, processor ProcessBlocker) bool {
 				fmt.Printf("%s bytes(%d) %v\n", name, len(bytes), bytes)
 			}
 			if name == "Blocks" {
-				processor.ProcessBlock(xPos, zPos, bytes)
+				processor.ProcessBlock(xPos, zPos, Blocks(bytes))
 			}
 		case tagInt8:
 			var number, err2 = readInt8(br)

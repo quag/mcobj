@@ -6,66 +6,63 @@ import (
 	"os"
 )
 
-func (fs *Faces) ProcessBlock(xPos, zPos int, bytes []byte) {
-	fs.Clean(xPos, zPos)
-	processBlocks(bytes, fs)
-	fs.Process()
-}
-
-type Blocks []byte
-
-func (b *Blocks) Get(x, y, z int) byte {
-	return (*b)[y+(z*128+(x*128*16))]
-}
-
-func (b *Blocks) IsEmpty(x, y, z int) bool {
-	if x < 0 || y < 0 || z < 0 || x >= 16 || y >= 128 || z >= 16 {
-		return true
-	}
-	return isEmptyBlockId(b.Get(x, y, z))
-}
-
-func (b *Blocks) IsBoundary(x, y, z int, blockId byte) bool {
-	if x < 0 || y < 0 || z < 0 || x >= 16 || y >= 128 || z >= 16 {
-		if showTunnels {
-			return blockId == 18 /* leaves */ || blockId == 17 /* wood */
-		} else {
-			return blockId != 0 && blockId != 9 && (!hideStone || blockId != 1)
-		}
-	}
-
-	var otherBlockId = b.Get(x, y, z)
-
-	if (blockId == 9 || (hideStone && blockId == 1)) && otherBlockId == 0 {
-		return true
-	}
-
-	return (blockId != 0 && blockId != 9 && (!hideStone || blockId != 1)) && (otherBlockId == 0 || otherBlockId == 9 || (hideStone && otherBlockId == 1))
-}
-
-func isEmptyBlockId(blockId byte) bool {
-	return blockId == 0 || blockId == 1
-}
-
-type AddFacer interface {
-	AddFace(blockId byte, v1, v2, v3, v4 Vertex)
-}
-
 type Faces struct {
 	xPos, zPos int
 	count      int
 
 	vertexes Vertexes
 	faces    []Face
+
+	sideCache *SideCache
+}
+
+func NewFaces(sideCache *SideCache) *Faces {
+	return &Faces{0, 0, 0, make([]int16, (128+1)*(16+1)*(16+1)), make([]Face, 0, 8192), sideCache}
+}
+
+func (fs *Faces) ProcessBlock(xPos, zPos int, blocks Blocks) {
+	var enclosed = fs.sideCache.EncloseChunk(xPos, zPos, blocks)
+	fs.Clean(xPos, zPos)
+	processBlocks(enclosed, fs)
+	fs.Process()
+
+	if cacheSides {
+		fs.sideCache.ProcessBlock(xPos, zPos, blocks)
+	}
+
+	fmt.Fprintf(os.Stderr, "(%3v,%3v) Faces: %v\n\n", xPos, zPos, len(fs.faces))
+}
+
+func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId byte) bool {
+	var otherBlockId = b.Get(x, y, z)
+
+	var (
+		air   = (blockId == 0)
+		stone = (blockId == 1)
+		water = (blockId == 9)
+
+		otherAir   = (otherBlockId == 0)
+		otherStone = (otherBlockId == 1)
+		otherWater = (otherBlockId == 9)
+
+		hiddenStone      = (hideStone && stone)
+		otherHiddenStone = (hideStone && otherStone)
+	)
+
+	if otherAir && (water || hiddenStone) {
+		return true
+	}
+
+	return (!air && !water && !hiddenStone) && (otherAir || otherWater || otherHiddenStone)
+}
+
+type AddFacer interface {
+	AddFace(blockId byte, v1, v2, v3, v4 Vertex)
 }
 
 type Face struct {
 	blockId byte
 	indexes [4]int
-}
-
-func NewFaces() *Faces {
-	return &Faces{0, 0, 0, make([]int16, (128+1)*(16+1)*(16+1)), make([]Face, 0, 8192)}
 }
 
 func (fs *Faces) Clean(xPos, zPos int) {
@@ -108,8 +105,6 @@ func (fs *Faces) Process() {
 			}
 		}
 	}
-
-	fmt.Fprintln(os.Stderr, "Faces:", len(fs.faces))
 }
 
 type Vertexes []int16
@@ -161,7 +156,7 @@ func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
 		for y, offset := range column {
 			if offset != -1 {
 				count++
-				fmt.Fprintf(writer, "v %.2f %.2f %.2f\n", float64(x+xPos*16)*0.05, float64(y)*0.05, float64(z+zPos*16)*0.05)
+				fmt.Fprintf(writer, "v %.2f %.2f %.2f\n", float64(x+xPos*16)*0.05, float64(y-64)*0.05, float64(z+zPos*16)*0.05)
 			}
 		}
 	}
@@ -170,17 +165,6 @@ func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
 
 type Vertex struct {
 	x, y, z int
-}
-
-func printFace(xPos, zPos int, vertexes ...Vertex) {
-	for _, vertex := range vertexes {
-		fmt.Fprintf(out, "v %.2f %.2f %.2f\n", float64(vertex.x+xPos*16)*0.05, float64(vertex.y)*0.05, float64(vertex.z+zPos*16)*0.05)
-	}
-	fmt.Fprintf(out, "f")
-	for i, _ := range vertexes {
-		fmt.Fprintf(out, " -%d", len(vertexes)-i)
-	}
-	fmt.Fprintln(out)
 }
 
 type blockRun struct {
@@ -220,47 +204,45 @@ func (r *blockRun) Update(faces AddFacer, nr *blockRun, flag bool) {
 	}
 }
 
-func processBlocks(bytes []byte, faces AddFacer) {
-	var blocks = Blocks(bytes)
-
-	for i := 0; i < len(blocks); i += 128 {
+func processBlocks(enclosedChunk *EnclosedChunk, faces AddFacer) {
+	for i := 0; i < len(enclosedChunk.blocks); i += 128 {
 		var x, z = (i / 128) / 16, (i / 128) % 16
 
 		var r1, r2, r3, r4 blockRun
 
-		var column = blocks[i : i+128]
+		var column = BlockColumn(enclosedChunk.blocks[i : i+128])
 		for y, blockId := range column {
 			if y < yMin {
 				continue
 			}
 
-			if blocks.IsBoundary(x, y-1, z, blockId) {
+			if enclosedChunk.IsBoundary(x, y-1, z, blockId) {
 				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x + 1, y, z}, Vertex{x + 1, y, z + 1}, Vertex{x, y, z + 1})
 			}
 
-			if blocks.IsBoundary(x, y+1, z, blockId) {
+			if enclosedChunk.IsBoundary(x, y+1, z, blockId) {
 				faces.AddFace(blockId, Vertex{x, y + 1, z}, Vertex{x, y + 1, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y + 1, z})
 			}
 
-			if blocks.IsBoundary(x-1, y, z, blockId) {
+			if enclosedChunk.IsBoundary(x-1, y, z, blockId) {
 				r1.Update(faces, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true}, true)
 			} else {
 				r1.AddFace(faces)
 			}
 
-			if blocks.IsBoundary(x+1, y, z, blockId) {
+			if enclosedChunk.IsBoundary(x+1, y, z, blockId) {
 				r2.Update(faces, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true}, false)
 			} else {
 				r2.AddFace(faces)
 			}
 
-			if blocks.IsBoundary(x, y, z-1, blockId) {
+			if enclosedChunk.IsBoundary(x, y, z-1, blockId) {
 				r3.Update(faces, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true}, false)
 			} else {
 				r3.AddFace(faces)
 			}
 
-			if blocks.IsBoundary(x, y, z+1, blockId) {
+			if enclosedChunk.IsBoundary(x, y, z+1, blockId) {
 				r4.Update(faces, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true}, true)
 			} else {
 				r4.AddFace(faces)

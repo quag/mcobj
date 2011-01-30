@@ -85,7 +85,7 @@ var (
 		MTL{23, 0x7f7f7fff, "Dispenser"},
 		MTL{24, 0xbfb882ff, "Sandstone"},
 		MTL{25, 0x7f7f7fff, "Note Block"},
-		MTL{35, 0x7f7f7fff, "Wool D B"},
+		MTL{35, 0x7f7f7fff, "Wool"},
 		MTL{37, 0x7f7f7fff, "Yellow flower"},
 		MTL{38, 0x7f7f7fff, "Red rose"},
 		MTL{39, 0x7f7f7fff, "Brown Mushroom"},

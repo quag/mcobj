@@ -30,9 +30,7 @@ type ProcessBlocker interface {
 	ProcessBlock(xPos, zPos int, blocks []byte)
 }
 
-func ProcessChunk(out io.Writer, filename string, processor ProcessBlocker) bool {
-	fmt.Fprintln(out, "#", filename)
-	//fmt.Fprintln(os.Stderr, filename)
+func ProcessChunk(filename string, processor ProcessBlocker) bool {
 	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
 	if fileErr != nil {
 		fmt.Println(fileErr)
@@ -209,8 +207,6 @@ func ProcessChunk(out io.Writer, filename string, processor ProcessBlocker) bool
 			fmt.Printf("# %s todo(%d)\n", name, typeId)
 		}
 	}
-	fmt.Fprintln(out)
-
 	return abort
 }
 

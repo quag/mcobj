@@ -30,14 +30,8 @@ type ProcessBlocker interface {
 	ProcessBlock(xPos, zPos int, blocks []byte)
 }
 
-func ProcessChunk(filename string, processor ProcessBlocker) bool {
-	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
-	if fileErr != nil {
-		fmt.Println(fileErr)
-		return true
-	}
-
-	var r, rErr = gzip.NewReader(file)
+func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
+	var r, rErr = gzip.NewReader(reader)
 	if rErr != nil {
 		fmt.Println(rErr)
 		return true

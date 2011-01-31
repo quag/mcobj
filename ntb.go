@@ -214,7 +214,12 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 
 func processChunk(filename string, processor nbt.ProcessBlocker) bool {
 	fmt.Fprintln(out, "#", filename)
-	var abort = nbt.ProcessChunk(filename, processor)
+	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
+	if fileErr != nil {
+		fmt.Println(fileErr)
+		return true
+	}
+	var abort = nbt.ProcessChunk(file, processor)
 	fmt.Fprintln(out)
 	out.Flush()
 	return abort

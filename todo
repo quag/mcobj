@@ -1,0 +1,13 @@
+[x] fix bug: faces missing on chunk boundaries
+[x] do not output blocks for non-block blockIds (torches, flowers...)
+[x] show progress on chunks x/y chunks processed
+[ ] colors for all visible block types
+[ ] store EnclosingSides instead of ChunkSides. That way when the chunk is processed, the side information can be discarded immediately
+[ ] center on spawn point, not chunk (0,0)
+[ ] make processBlock() return the data rather than calling the process methods itself. Rename current method.
+[ ] add object that manages writing out the obj and mtl files
+[ ] unit tests
+[ ] godoc
+[ ] refactor: introduce a 'preferences' type
+[ ] refactor: tell the ntb file parser what it should extract and have it return that data (easy to pull out say, the spawn coords)
+[ ] add version number and scripts to bump the version number

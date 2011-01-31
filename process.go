@@ -20,7 +20,7 @@ func NewFaces(sideCache *SideCache) *Faces {
 	return &Faces{0, 0, 0, make([]int16, (128+1)*(16+1)*(16+1)), make([]Face, 0, 8192), sideCache}
 }
 
-func (fs *Faces) ProcessBlock(xPos, zPos int, blocks Blocks) {
+func (fs *Faces) ProcessBlock(xPos, zPos int, blocks []byte) {
 	var enclosed = fs.sideCache.EncloseChunk(xPos, zPos, blocks)
 	fs.Clean(xPos, zPos)
 	processBlocks(enclosed, fs)

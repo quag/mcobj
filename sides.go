@@ -24,7 +24,7 @@ func (s *SideCache) Clear() {
 	s.chunks = nil
 }
 
-func (s *SideCache) ProcessBlock(xPos, zPos int, blocks Blocks) {
+func (s *SideCache) ProcessBlock(xPos, zPos int, blocks []byte) {
 	if s.HasSide(xPos, zPos) {
 		return
 	}

@@ -26,27 +26,32 @@ const (
 	trace = false
 )
 
+var (
+	ErrListStruct  = os.NewError("Lists of structs aren't supported")
+	ErrListUnknown = os.NewError("Lists of unknown type aren't supported")
+)
+
 type ProcessBlocker interface {
 	ProcessBlock(xPos, zPos int, blocks []byte)
 }
 
-func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
+func ProcessChunk(reader io.Reader, processor ProcessBlocker) os.Error {
 	var r, rErr = gzip.NewReader(reader)
 	if rErr != nil {
-		fmt.Println(rErr)
-		return true
+		return rErr
 	}
 
-	var xPos, zPos int
-
-	var abort = false
-
 	var br = bufio.NewReader(r)
+	return processChunk(br, processor, false)
+}
+
+func processChunk(br *bufio.Reader, processor ProcessBlocker, readingStruct bool) os.Error {
+	var xPos, zPos int
 
 	for {
 		var typeId, name, err = readTag(br)
 		if err != nil {
-			break
+			return err
 		}
 
 		switch typeId {
@@ -58,11 +63,13 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 			if trace {
 				fmt.Printf("struct end\n")
 			}
+			if readingStruct {
+				return nil
+			}
 		case tagByteArray:
 			var bytes, err2 = readBytes(br)
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s bytes(%d) %v\n", name, len(bytes), bytes)
@@ -73,8 +80,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagInt8:
 			var number, err2 = readInt8(br)
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s int8 %v\n", name, number)
@@ -82,8 +88,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagInt16:
 			var number, err2 = readInt16(br)
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s int16 %v\n", name, number)
@@ -91,8 +96,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagInt32:
 			var number, err2 = readInt32(br)
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s int32 %v\n", name, number)
@@ -107,8 +111,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagInt64:
 			var number, err2 = readInt64(br)
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s int64 %v\n", name, number)
@@ -116,8 +119,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagFloat32:
 			var number, err2 = readInt32(br) // TODO(jw): read floats not ints
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s int32 %v\n", name, number)
@@ -125,8 +127,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagFloat64:
 			var number, err2 = readInt64(br) // TODO(jw): read floats not ints
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s int64 %v\n", name, number)
@@ -134,8 +135,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagString:
 			var s, err2 = readString(br)
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			if trace {
 				fmt.Printf("%s string \"%s\"", name, s)
@@ -143,8 +143,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 		case tagList:
 			var itemTypeId, length, err2 = readListHeader(br)
 			if err2 != nil {
-				fmt.Println(err2)
-				return true
+				return err2
 			}
 			switch itemTypeId {
 			case tagInt8:
@@ -154,8 +153,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 				for i := 0; i < length; i++ {
 					var v, err3 = readInt8(br)
 					if err3 != nil {
-						fmt.Println(err3)
-						return true
+						return err3
 					}
 					if trace {
 						fmt.Println("  ", v)
@@ -168,8 +166,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 				for i := 0; i < length; i++ {
 					var v, err3 = readInt32(br) // TODO(jw) read float32 instead of int32
 					if err3 != nil {
-						fmt.Println(err3)
-						return true
+						return err3
 					}
 					if trace {
 						fmt.Println("  ", v)
@@ -182,8 +179,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 				for i := 0; i < length; i++ {
 					var v, err3 = readInt64(br) // TODO(jw) read float64 instead of int64
 					if err3 != nil {
-						fmt.Println(err3)
-						return true
+						return err3
 					}
 					if trace {
 						fmt.Println("  ", v)
@@ -193,7 +189,10 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 				if trace {
 					fmt.Printf("%s list struct (%d)\n", name, length)
 				}
-				abort = true
+				var err3 = processChunk(br, processor, true)
+				if err3 != nil {
+					return err3
+				}
 			default:
 				fmt.Printf("# %s list todo(%v) %v\n", name, itemTypeId, length)
 			}
@@ -201,7 +200,7 @@ func ProcessChunk(reader io.Reader, processor ProcessBlocker) bool {
 			fmt.Printf("# %s todo(%d)\n", name, typeId)
 		}
 	}
-	return abort
+	return nil
 }
 
 func readTag(r *bufio.Reader) (byte, string, os.Error) {

@@ -22,10 +22,6 @@ const (
 	tagStruct    = 10 // { A sequential list of Named Tags. This array keeps going until a TAG_End is found.; TAG_End end } Notes: If there's a nested TAG_Compound within this tag, that one will also have a TAG_End, so simply reading until the next TAG_End will not work. The names of the named tags have to be unique within each TAG_Compound The order of the tags is not guaranteed.
 )
 
-const (
-	trace = false
-)
-
 var (
 	ErrListUnknown = os.NewError("Lists of unknown type aren't supported")
 )
@@ -55,13 +51,7 @@ func processChunk(br *bufio.Reader, processor ProcessBlocker, readingStruct bool
 
 		switch typeId {
 		case tagStruct:
-			if trace {
-				fmt.Printf("%s struct start\n", name)
-			}
 		case tagStructEnd:
-			if trace {
-				fmt.Printf("struct end\n")
-			}
 			if readingStruct {
 				return nil
 			}
@@ -70,35 +60,23 @@ func processChunk(br *bufio.Reader, processor ProcessBlocker, readingStruct bool
 			if err2 != nil {
 				return err2
 			}
-			if trace {
-				fmt.Printf("%s bytes(%d) %v\n", name, len(bytes), bytes)
-			}
 			if name == "Blocks" {
 				processor.ProcessBlock(xPos, zPos, bytes)
 			}
 		case tagInt8:
-			var number, err2 = readInt8(br)
+			var _, err2 = readInt8(br)
 			if err2 != nil {
 				return err2
-			}
-			if trace {
-				fmt.Printf("%s int8 %v\n", name, number)
 			}
 		case tagInt16:
-			var number, err2 = readInt16(br)
+			var _, err2 = readInt16(br)
 			if err2 != nil {
 				return err2
-			}
-			if trace {
-				fmt.Printf("%s int16 %v\n", name, number)
 			}
 		case tagInt32:
 			var number, err2 = readInt32(br)
 			if err2 != nil {
 				return err2
-			}
-			if trace {
-				fmt.Printf("%s int32 %v\n", name, number)
 			}
 
 			if name == "xPos" {
@@ -108,36 +86,24 @@ func processChunk(br *bufio.Reader, processor ProcessBlocker, readingStruct bool
 				zPos = number
 			}
 		case tagInt64:
-			var number, err2 = readInt64(br)
+			var _, err2 = readInt64(br)
 			if err2 != nil {
 				return err2
-			}
-			if trace {
-				fmt.Printf("%s int64 %v\n", name, number)
 			}
 		case tagFloat32:
-			var number, err2 = readInt32(br) // TODO(jw): read floats not ints
+			var _, err2 = readInt32(br) // TODO: read floats not ints
 			if err2 != nil {
 				return err2
-			}
-			if trace {
-				fmt.Printf("%s int32 %v\n", name, number)
 			}
 		case tagFloat64:
-			var number, err2 = readInt64(br) // TODO(jw): read floats not ints
+			var _, err2 = readInt64(br) // TODO: read floats not ints
 			if err2 != nil {
 				return err2
-			}
-			if trace {
-				fmt.Printf("%s int64 %v\n", name, number)
 			}
 		case tagString:
-			var s, err2 = readString(br)
+			var _, err2 = readString(br)
 			if err2 != nil {
 				return err2
-			}
-			if trace {
-				fmt.Printf("%s string \"%s\"", name, s)
 			}
 		case tagList:
 			var itemTypeId, length, err2 = readListHeader(br)
@@ -146,54 +112,34 @@ func processChunk(br *bufio.Reader, processor ProcessBlocker, readingStruct bool
 			}
 			switch itemTypeId {
 			case tagInt8:
-				if trace {
-					fmt.Printf("%s list int8 (%d)\n", name, length)
-				}
 				for i := 0; i < length; i++ {
-					var v, err3 = readInt8(br)
+					var _, err3 = readInt8(br)
 					if err3 != nil {
 						return err3
-					}
-					if trace {
-						fmt.Println("  ", v)
 					}
 				}
 			case tagFloat32:
-				if trace {
-					fmt.Printf("%s list float64 (%d)\n", name, length)
-				}
 				for i := 0; i < length; i++ {
-					var v, err3 = readInt32(br) // TODO(jw) read float32 instead of int32
+					var _, err3 = readInt32(br) // TODO: read float32 instead of int32
 					if err3 != nil {
 						return err3
-					}
-					if trace {
-						fmt.Println("  ", v)
 					}
 				}
 			case tagFloat64:
-				if trace {
-					fmt.Printf("%s list float64 (%d)\n", name, length)
-				}
 				for i := 0; i < length; i++ {
-					var v, err3 = readInt64(br) // TODO(jw) read float64 instead of int64
+					var _, err3 = readInt64(br) // TODO: read float64 instead of int64
 					if err3 != nil {
 						return err3
 					}
-					if trace {
-						fmt.Println("  ", v)
-					}
 				}
 			case tagStruct:
-				if trace {
-					fmt.Printf("%s list struct (%d)\n", name, length)
-				}
 				var err3 = processChunk(br, processor, true)
 				if err3 != nil {
 					return err3
 				}
 			default:
 				fmt.Printf("# %s list todo(%v) %v\n", name, itemTypeId, length)
+				return ErrListUnknown
 			}
 		default:
 			fmt.Printf("# %s todo(%d)\n", name, typeId)

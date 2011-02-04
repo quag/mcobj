@@ -27,7 +27,6 @@ const (
 )
 
 var (
-	ErrListStruct  = os.NewError("Lists of structs aren't supported")
 	ErrListUnknown = os.NewError("Lists of unknown type aren't supported")
 )
 

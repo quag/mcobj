@@ -21,10 +21,10 @@ func NewFaces(sideCache *SideCache) *Faces {
 }
 
 func (fs *Faces) ProcessBlock(xPos, zPos int, blocks []byte) {
-	var enclosed = fs.sideCache.EncloseChunk(xPos, zPos, blocks)
-	fs.Clean(xPos, zPos)
-	processBlocks(enclosed, fs)
-	fs.Process()
+	var enclosed = fs.sideCache.EncloseChunk(xPos, zPos, blocks) // 0.0s  0%
+	fs.Clean(xPos, zPos)                                         // 0.1s  4%
+	processBlocks(enclosed, fs)                                  // 1.7s 60%
+	fs.Process()                                                 // 1.0s 35%
 
 	if cacheSides {
 		fs.sideCache.ProcessBlock(xPos, zPos, blocks)

@@ -20,7 +20,6 @@ var (
 	hideBottom bool
 	hideStone  bool
 	noColor    bool
-	cacheSides bool
 
 	faceCount int
 	faceLimit int
@@ -40,7 +39,6 @@ func main() {
 	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
 	flag.BoolVar(&hideStone, "hs", false, "Hide stone")
 	flag.BoolVar(&noColor, "g", false, "Omit materials")
-	flag.BoolVar(&cacheSides, "cs", false, "Cache sides. Memory usage will increase as chunks are processed")
 	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
 	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
@@ -131,10 +129,6 @@ func main() {
 								fmt.Printf("%v/%v ", total-len(v.chunks), total)
 								processChunk(chunk, faces)
 								chunkCount++
-
-								if !cacheSides {
-									sideCache.Clear()
-								}
 							}
 						}
 					}
@@ -184,14 +178,8 @@ func moreChunks(chunks map[string]bool) bool {
 func loadSide(sideCache *SideCache, world string, chunks map[string]bool, x, z int) {
 	if !sideCache.HasSide(x, z) {
 		var fileName = chunkPath(world, x, z)
-		var fileExists bool
-		if cacheSides {
-			_, fileExists = chunks[fileName]
-		} else {
-			var _, err = os.Stat(fileName)
-			fileExists = err == nil
-		}
-		if fileExists {
+		var _, err = os.Stat(fileName)
+		if err == nil {
 			processChunk(fileName, sideCache)
 		}
 	}

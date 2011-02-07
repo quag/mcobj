@@ -12,10 +12,10 @@ func init() {
 }
 
 type ChunkSide [128 * 16]byte
-type ChunkSides [4]ChunkSide
+type ChunkSides [4]*ChunkSide
 
 func (s *ChunkSides) Side(i int) *ChunkSide {
-	return &((*s)[i])
+	return (*s)[i]
 }
 
 func (s *ChunkSide) Index(x, y int) int {

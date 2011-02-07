@@ -26,9 +26,7 @@ func (fs *Faces) ProcessBlock(xPos, zPos int, blocks []byte) {
 	processBlocks(enclosed, fs)                                  // 1.7s 60%
 	fs.Process()                                                 // 1.0s 35%
 
-	if cacheSides {
-		fs.sideCache.ProcessBlock(xPos, zPos, blocks)
-	}
+	fs.sideCache.ProcessBlock(xPos, zPos, blocks)
 
 	fmt.Fprintf(os.Stderr, "(%3v,%3v) Faces: %v\n", xPos, zPos, len(fs.faces))
 }

@@ -41,7 +41,7 @@ func (s *SideCache) EncloseChunk(x, z int, blocks Blocks) *EnclosedChunk {
 }
 
 func calculateSides(blocks Blocks) *ChunkSides {
-	var sides = &ChunkSides{}
+	var sides = &ChunkSides{&ChunkSide{}, &ChunkSide{}, &ChunkSide{}, &ChunkSide{}}
 	for i := 0; i < 16; i++ {
 		copy(sides[0].Column(i), blocks.Column(0, i))
 		copy(sides[1].Column(i), blocks.Column(15, i))
@@ -63,7 +63,15 @@ func (s *SideCache) getSide(x, z int, side int) *ChunkSide {
 		return defaultSide
 	}
 
-	return &chunk[side]
+	var chunkSide = chunk[side]
+
+	chunk[side] = nil
+
+	if chunk[0] == nil && chunk[1] == nil && chunk[2] == nil && chunk[3] == nil {
+		s.chunks[s.key(x, z)] = nil, false
+	}
+
+	return chunkSide
 }
 
 func (s *SideCache) key(x, z int) uint64 {

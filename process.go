@@ -43,20 +43,9 @@ func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId byte) bool {
 }
 
 func IsEmptyBlock(blockId byte) (isEmpty bool, isAir bool, isWater bool) {
-	isEmpty = false
-	isAir = false
-	isWater = false
-	switch {
-	case blockId == 0: // Air
-		isEmpty = true
-		isAir = true
-	case blockId == 9: // Water
-		isEmpty = true
-		isWater = true
-	case hideStone && blockId == 1: // Stone
-	case IsMeshBlockId(blockId): // Object that can't be represented as a voxel cube
-		isEmpty = true
-	}
+	isAir = (blockId == 0)
+	isWater = (blockId == 9)
+	isEmpty = isAir || isWater || (hideStone && blockId == 1) || IsMeshBlockId(blockId)
 	return
 }
 

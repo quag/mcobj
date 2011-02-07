@@ -141,6 +141,9 @@ func (vs *Vertexes) Number() {
 }
 
 func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
+	var buf = make([]byte, 64)
+	copy(buf[0:2], "v ")
+
 	count = 0
 	for i := 0; i < len(*vs); i += 129 {
 		var x, z = (i / 129) / 17, (i / 129) % 17
@@ -148,12 +151,74 @@ func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
 		var column = (*vs)[i : i+129]
 		for y, offset := range column {
 			if offset != -1 {
+
 				count++
-				fmt.Fprintf(writer, "v %.2f %.2f %.2f\n", float64(x+xPos*16)*0.05, float64(y-64)*0.05, float64(z+zPos*16)*0.05)
+
+				var (
+					xa = x + xPos*16
+					ya = y - 64
+					za = z + zPos*16
+				)
+
+				buf = buf[:2]
+				buf = appendCoord(buf, xa)
+				buf = append(buf, ' ')
+				buf = appendCoord(buf, ya)
+				buf = append(buf, ' ')
+				buf = appendCoord(buf, za)
+				buf = append(buf, '\n')
+
+				writer.Write(buf)
 			}
 		}
 	}
 	return
+}
+
+func appendCoord(buf []byte, x int) []byte {
+	var b [64]byte
+	var j = len(b)
+
+	var neg = x < 0
+	if neg {
+		x = -x
+	}
+
+	var (
+		high    = x / 20
+		low     = (x % 20) * 5
+		numbers = "0123456789"
+	)
+
+	for i := 0; i < 2; i++ {
+		j--
+		b[j] = numbers[low%10]
+		low /= 10
+	}
+
+	j--
+	b[j] = '.'
+
+	if high == 0 {
+		j--
+		b[j] = '0'
+	} else {
+		for high > 0 {
+			j--
+			b[j] = numbers[high%10]
+			high /= 10
+		}
+	}
+
+	if neg {
+		j--
+		b[j] = '-'
+	}
+
+	var end = len(buf) + len(b) - j
+	var d = buf[len(buf):end]
+	copy(d, b[j:])
+	return buf[:end]
 }
 
 type Vertex struct {

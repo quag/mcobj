@@ -12,23 +12,30 @@ type Faces struct {
 
 	vertexes Vertexes
 	faces    []Face
-
-	sideCache *SideCache
 }
 
-func NewFaces(sideCache *SideCache) *Faces {
-	return &Faces{0, 0, 0, make([]int16, (128+1)*(16+1)*(16+1)), make([]Face, 0, 8192), sideCache}
-}
-
-func (fs *Faces) ProcessBlock(xPos, zPos int, blocks []byte) {
-	var enclosed = fs.sideCache.EncloseChunk(xPos, zPos, blocks) // 0.0s  0%
-	fs.Clean(xPos, zPos)                                         // 0.1s  4%
-	processBlocks(enclosed, fs)                                  // 1.7s 60%
-	fs.Process()                                                 // 1.0s 35%
-
-	fs.sideCache.ProcessBlock(xPos, zPos, blocks)
-
+func (fs *Faces) ProcessChunk(xPos, zPos int, enclosed *EnclosedChunk) {
+	fs.Clean(xPos, zPos)
+	processBlocks(enclosed, fs)
+	fs.Process()
 	fmt.Fprintf(os.Stderr, "(%3v,%3v) Faces: %v\n", xPos, zPos, len(fs.faces))
+}
+
+func (fs *Faces) Clean(xPos, zPos int) {
+	fs.xPos = xPos
+	fs.zPos = zPos
+
+	if cap(fs.vertexes) == 0 {
+		fs.vertexes = make([]int16, (128+1)*(16+1)*(16+1))
+	} else {
+		fs.vertexes.Clear()
+	}
+
+	if cap(fs.faces) == 0 {
+		fs.faces = make([]Face, 0, 8192)
+	} else {
+		fs.faces = fs.faces[0:0]
+	}
 }
 
 func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId byte) bool {
@@ -54,13 +61,6 @@ type AddFacer interface {
 type Face struct {
 	blockId byte
 	indexes [4]int
-}
-
-func (fs *Faces) Clean(xPos, zPos int) {
-	fs.xPos = xPos
-	fs.zPos = zPos
-	fs.vertexes.Clear()
-	fs.faces = fs.faces[0:0]
 }
 
 func (fs *Faces) AddFace(blockId byte, v1, v2, v3, v4 Vertex) {

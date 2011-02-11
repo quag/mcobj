@@ -13,8 +13,8 @@ import (
 
 var (
 	out        *bufio.Writer
-	faces      *Faces
-	sideCache  *SideCache
+	faces      Faces
+	sideCache  SideCache
 	yMin       int
 	blockFaces bool
 	hideBottom bool
@@ -77,9 +77,6 @@ func main() {
 		}
 		defer out.Flush()
 
-		sideCache = new(SideCache)
-		faces = NewFaces(sideCache)
-
 		fmt.Fprintln(out, "mtllib", path.Base(mtlFilename))
 
 		for i := 0; i < flag.NArg(); i++ {
@@ -96,8 +93,10 @@ func main() {
 				if loadErr != nil {
 					fmt.Println(loadErr)
 				} else {
+					var enclosed = sideCache.EncloseChunk(chunk)
+					sideCache.AddChunk(chunk)
 					fmt.Fprintln(out, "#", filepath)
-					faces.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
+					faces.ProcessChunk(chunk.XPos, chunk.ZPos, enclosed)
 					fmt.Fprintln(out)
 					out.Flush()
 				}
@@ -128,10 +127,10 @@ func main() {
 							var chunkFilename = chunkPath(filepath, ax, az)
 							var _, exists = v.chunks[chunkFilename]
 							if exists {
-								loadSide(sideCache, filepath, v.chunks, ax-1, az)
-								loadSide(sideCache, filepath, v.chunks, ax+1, az)
-								loadSide(sideCache, filepath, v.chunks, ax, az-1)
-								loadSide(sideCache, filepath, v.chunks, ax, az+1)
+								loadSide(&sideCache, filepath, v.chunks, ax-1, az)
+								loadSide(&sideCache, filepath, v.chunks, ax+1, az)
+								loadSide(&sideCache, filepath, v.chunks, ax, az-1)
+								loadSide(&sideCache, filepath, v.chunks, ax, az+1)
 
 								v.chunks[chunkFilename] = false, false
 								fmt.Printf("%v/%v ", total-len(v.chunks), total)
@@ -139,8 +138,10 @@ func main() {
 								if loadErr != nil {
 									fmt.Println(loadErr)
 								} else {
-									fmt.Fprintln(out, "#", chunkFilename)
-									faces.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
+									var enclosed = sideCache.EncloseChunk(chunk)
+									sideCache.AddChunk(chunk)
+									fmt.Fprintln(out, "#", filepath)
+									faces.ProcessChunk(chunk.XPos, chunk.ZPos, enclosed)
 									fmt.Fprintln(out)
 									out.Flush()
 									chunkCount++
@@ -200,7 +201,7 @@ func loadSide(sideCache *SideCache, world string, chunks map[string]bool, x, z i
 			if loadErr != nil {
 				fmt.Println(loadErr)
 			} else {
-				sideCache.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
+				sideCache.AddChunk(chunk)
 			}
 		}
 	}

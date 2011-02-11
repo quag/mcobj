@@ -1,5 +1,9 @@
 package main
 
+import (
+	"nbt"
+)
+
 type SideCache struct {
 	chunks map[uint64]*ChunkSides
 }
@@ -8,8 +12,8 @@ func (s *SideCache) Clear() {
 	s.chunks = nil
 }
 
-func (s *SideCache) ProcessBlock(xPos, zPos int, blocks []byte) {
-	if s.HasSide(xPos, zPos) {
+func (s *SideCache) AddChunk(chunk *nbt.Chunk) {
+	if s.HasSide(chunk.XPos, chunk.ZPos) {
 		return
 	}
 
@@ -17,7 +21,7 @@ func (s *SideCache) ProcessBlock(xPos, zPos int, blocks []byte) {
 		s.chunks = make(map[uint64]*ChunkSides)
 	}
 
-	s.chunks[s.key(xPos, zPos)] = calculateSides(blocks)
+	s.chunks[s.key(chunk.XPos, chunk.ZPos)] = calculateSides(chunk.Blocks)
 }
 
 func (s *SideCache) HasSide(x, z int) bool {
@@ -28,14 +32,14 @@ func (s *SideCache) HasSide(x, z int) bool {
 	return present
 }
 
-func (s *SideCache) EncloseChunk(x, z int, blocks Blocks) *EnclosedChunk {
+func (s *SideCache) EncloseChunk(chunk *nbt.Chunk) *EnclosedChunk {
 	return &EnclosedChunk{
-		blocks,
+		chunk.Blocks,
 		EnclosingSides{
-			s.getSide(x-1, z, 1),
-			s.getSide(x+1, z, 0),
-			s.getSide(x, z-1, 3),
-			s.getSide(x, z+1, 2),
+			s.getSide(chunk.XPos-1, chunk.ZPos, 1),
+			s.getSide(chunk.XPos+1, chunk.ZPos, 0),
+			s.getSide(chunk.XPos, chunk.ZPos-1, 3),
+			s.getSide(chunk.XPos, chunk.ZPos+1, 2),
 		},
 	}
 }

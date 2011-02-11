@@ -92,7 +92,15 @@ func main() {
 
 			switch {
 			case fi.IsRegular():
-				processChunk(filepath, faces)
+				var loadErr, chunk = loadChunk(filepath)
+				if loadErr != nil {
+					fmt.Println(loadErr)
+				} else {
+					fmt.Fprintln(out, "#", filepath)
+					faces.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
+					fmt.Fprintln(out)
+					out.Flush()
+				}
 			case fi.IsDirectory():
 				var errors = make(chan os.Error, 5)
 				var done = make(chan bool)
@@ -117,18 +125,26 @@ func main() {
 								az = cz + unzigzag(z)
 							)
 
-							var chunk = chunkPath(filepath, ax, az)
-							var _, exists = v.chunks[chunk]
+							var chunkFilename = chunkPath(filepath, ax, az)
+							var _, exists = v.chunks[chunkFilename]
 							if exists {
 								loadSide(sideCache, filepath, v.chunks, ax-1, az)
 								loadSide(sideCache, filepath, v.chunks, ax+1, az)
 								loadSide(sideCache, filepath, v.chunks, ax, az-1)
 								loadSide(sideCache, filepath, v.chunks, ax, az+1)
 
-								v.chunks[chunk] = false, false
+								v.chunks[chunkFilename] = false, false
 								fmt.Printf("%v/%v ", total-len(v.chunks), total)
-								processChunk(chunk, faces)
-								chunkCount++
+								var loadErr, chunk = loadChunk(chunkFilename)
+								if loadErr != nil {
+									fmt.Println(loadErr)
+								} else {
+									fmt.Fprintln(out, "#", chunkFilename)
+									faces.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
+									fmt.Fprintln(out)
+									out.Flush()
+									chunkCount++
+								}
 							}
 						}
 					}
@@ -180,7 +196,12 @@ func loadSide(sideCache *SideCache, world string, chunks map[string]bool, x, z i
 		var fileName = chunkPath(world, x, z)
 		var _, err = os.Stat(fileName)
 		if err == nil {
-			processChunk(fileName, sideCache)
+			var loadErr, chunk = loadChunk(fileName)
+			if loadErr != nil {
+				fmt.Println(loadErr)
+			} else {
+				sideCache.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
+			}
 		}
 	}
 }
@@ -200,21 +221,14 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 	}
 }
 
-type ProcessBlocker interface {
-	ProcessBlock(xPos, zPos int, blocks []byte)
-}
-
-func processChunk(filename string, processor ProcessBlocker) {
-	fmt.Fprintln(out, "#", filename)
+func loadChunk(filename string) (os.Error, *nbt.Chunk) {
 	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
 	if fileErr != nil {
-		fmt.Println(fileErr)
+		return fileErr, nil
 	}
 	var err, chunk = nbt.ReadChunk(file)
-	if err != nil && err != os.EOF {
-		fmt.Println(err)
+	if err == os.EOF {
+		err = nil
 	}
-	processor.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
-	fmt.Fprintln(out)
-	out.Flush()
+	return err, chunk
 }

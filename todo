@@ -1,6 +1,7 @@
 [x] fix bug: faces missing on chunk boundaries
 [x] do not output blocks for non-block blockIds (torches, flowers...)
 [x] show progress on chunks x/y chunks processed
+[ ] run processing and enclosedBlock fetching in separate goroutines
 [ ] colors for all visible block types
 [ ] store EnclosingSides instead of ChunkSides. That way when the chunk is processed, the side information can be discarded immediately
 [ ] center on spawn point, not chunk (0,0)

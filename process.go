@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 )
 
 type Faces struct {
@@ -14,27 +13,27 @@ type Faces struct {
 	faces    []Face
 }
 
-func (fs *Faces) ProcessChunk(xPos, zPos int, enclosed *EnclosedChunk) {
-	fs.Clean(xPos, zPos)
+func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer) (count int) {
+	fs.Clean(enclosed.xPos, enclosed.zPos)
 	processBlocks(enclosed, fs)
-	fs.Process()
-	fmt.Fprintf(os.Stderr, "(%3v,%3v) Faces: %v\n", xPos, zPos, len(fs.faces))
+	fs.Write(w)
+	return len(fs.faces)
 }
 
 func (fs *Faces) Clean(xPos, zPos int) {
 	fs.xPos = xPos
 	fs.zPos = zPos
 
-	if cap(fs.vertexes) == 0 {
+	if fs.vertexes == nil {
 		fs.vertexes = make([]int16, (128+1)*(16+1)*(16+1))
 	} else {
 		fs.vertexes.Clear()
 	}
 
-	if cap(fs.faces) == 0 {
+	if fs.faces == nil {
 		fs.faces = make([]Face, 0, 8192)
 	} else {
-		fs.faces = fs.faces[0:0]
+		fs.faces = fs.faces[:0]
 	}
 }
 
@@ -68,9 +67,9 @@ func (fs *Faces) AddFace(blockId byte, v1, v2, v3, v4 Vertex) {
 	fs.faces = append(fs.faces, face)
 }
 
-func (fs *Faces) Process() {
+func (fs *Faces) Write(w io.Writer) {
 	fs.vertexes.Number()
-	var vc = int16(fs.vertexes.Print(out, fs.xPos, fs.zPos))
+	var vc = int16(fs.vertexes.Print(w, fs.xPos, fs.zPos))
 
 	var blockIds = make([]byte, 0, 16)
 	for _, face := range fs.faces {
@@ -88,10 +87,10 @@ func (fs *Faces) Process() {
 	}
 
 	for _, blockId := range blockIds {
-		printMtl(out, blockId)
+		printMtl(w, blockId)
 		for _, face := range fs.faces {
 			if face.blockId == blockId {
-				fmt.Fprintln(out, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
+				fmt.Fprintln(w, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
 				faceCount++
 			}
 		}
@@ -138,7 +137,7 @@ func (vs *Vertexes) Number() {
 	}
 }
 
-func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
+func (vs *Vertexes) Print(w io.Writer, xPos, zPos int) (count int) {
 	var buf = make([]byte, 64)
 	copy(buf[0:2], "v ")
 
@@ -166,7 +165,7 @@ func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
 				buf = appendCoord(buf, za)
 				buf = append(buf, '\n')
 
-				writer.Write(buf)
+				w.Write(buf)
 			}
 		}
 	}

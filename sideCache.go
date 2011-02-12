@@ -34,6 +34,8 @@ func (s *SideCache) HasSide(x, z int) bool {
 
 func (s *SideCache) EncloseChunk(chunk *nbt.Chunk) *EnclosedChunk {
 	return &EnclosedChunk{
+		chunk.XPos,
+		chunk.ZPos,
 		chunk.Blocks,
 		EnclosingSides{
 			s.getSide(chunk.XPos-1, chunk.ZPos, 1),

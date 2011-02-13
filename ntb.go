@@ -200,16 +200,21 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 	}
 }
 
-func processChunk(filename string, processor nbt.ProcessBlocker) {
+type ProcessBlocker interface {
+	ProcessBlock(xPos, zPos int, blocks []byte)
+}
+
+func processChunk(filename string, processor ProcessBlocker) {
 	fmt.Fprintln(out, "#", filename)
 	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
 	if fileErr != nil {
 		fmt.Println(fileErr)
 	}
-	var err = nbt.ProcessChunk(file, processor)
+	var err, chunk = nbt.ReadChunk(file)
 	if err != nil && err != os.EOF {
 		fmt.Println(err)
 	}
+	processor.ProcessBlock(chunk.XPos, chunk.ZPos, chunk.Blocks)
 	fmt.Fprintln(out)
 	out.Flush()
 }

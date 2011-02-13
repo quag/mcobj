@@ -1,9 +1,12 @@
 *.8
 *.a
 *.exe
+*.mtl
+*.obj
+*.zip
+*.7z
 
-a.mtl
-a.obj
+version.go
 
 c.0.0.dat
 c.4.4.dat

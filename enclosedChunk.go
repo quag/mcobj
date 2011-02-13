@@ -2,8 +2,9 @@ package main
 
 type EnclosingSides [4]*ChunkSide
 type EnclosedChunk struct {
-	blocks    Blocks
-	enclosing EnclosingSides
+	xPos, zPos int
+	blocks     Blocks
+	enclosing  EnclosingSides
 }
 
 func (s *EnclosingSides) side(i int) *ChunkSide {

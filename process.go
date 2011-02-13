@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
 )
 
 type Faces struct {
@@ -12,23 +11,30 @@ type Faces struct {
 
 	vertexes Vertexes
 	faces    []Face
-
-	sideCache *SideCache
 }
 
-func NewFaces(sideCache *SideCache) *Faces {
-	return &Faces{0, 0, 0, make([]int16, (128+1)*(16+1)*(16+1)), make([]Face, 0, 8192), sideCache}
+func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer) (count int) {
+	fs.Clean(enclosed.xPos, enclosed.zPos)
+	processBlocks(enclosed, fs)
+	fs.Write(w)
+	return len(fs.faces)
 }
 
-func (fs *Faces) ProcessBlock(xPos, zPos int, blocks []byte) {
-	var enclosed = fs.sideCache.EncloseChunk(xPos, zPos, blocks) // 0.0s  0%
-	fs.Clean(xPos, zPos)                                         // 0.1s  4%
-	processBlocks(enclosed, fs)                                  // 1.7s 60%
-	fs.Process()                                                 // 1.0s 35%
+func (fs *Faces) Clean(xPos, zPos int) {
+	fs.xPos = xPos
+	fs.zPos = zPos
 
-	fs.sideCache.ProcessBlock(xPos, zPos, blocks)
+	if fs.vertexes == nil {
+		fs.vertexes = make([]int16, (128+1)*(16+1)*(16+1))
+	} else {
+		fs.vertexes.Clear()
+	}
 
-	fmt.Fprintf(os.Stderr, "(%3v,%3v) Faces: %v\n", xPos, zPos, len(fs.faces))
+	if fs.faces == nil {
+		fs.faces = make([]Face, 0, 8192)
+	} else {
+		fs.faces = fs.faces[:0]
+	}
 }
 
 func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId byte) bool {
@@ -56,21 +62,14 @@ type Face struct {
 	indexes [4]int
 }
 
-func (fs *Faces) Clean(xPos, zPos int) {
-	fs.xPos = xPos
-	fs.zPos = zPos
-	fs.vertexes.Clear()
-	fs.faces = fs.faces[0:0]
-}
-
 func (fs *Faces) AddFace(blockId byte, v1, v2, v3, v4 Vertex) {
 	var face = Face{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}}
 	fs.faces = append(fs.faces, face)
 }
 
-func (fs *Faces) Process() {
+func (fs *Faces) Write(w io.Writer) {
 	fs.vertexes.Number()
-	var vc = int16(fs.vertexes.Print(out, fs.xPos, fs.zPos))
+	var vc = int16(fs.vertexes.Print(w, fs.xPos, fs.zPos))
 
 	var blockIds = make([]byte, 0, 16)
 	for _, face := range fs.faces {
@@ -88,10 +87,10 @@ func (fs *Faces) Process() {
 	}
 
 	for _, blockId := range blockIds {
-		printMtl(out, blockId)
+		printMtl(w, blockId)
 		for _, face := range fs.faces {
 			if face.blockId == blockId {
-				fmt.Fprintln(out, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
+				fmt.Fprintln(w, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
 				faceCount++
 			}
 		}
@@ -138,7 +137,7 @@ func (vs *Vertexes) Number() {
 	}
 }
 
-func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
+func (vs *Vertexes) Print(w io.Writer, xPos, zPos int) (count int) {
 	var buf = make([]byte, 64)
 	copy(buf[0:2], "v ")
 
@@ -166,7 +165,7 @@ func (vs *Vertexes) Print(writer io.Writer, xPos, zPos int) (count int) {
 				buf = appendCoord(buf, za)
 				buf = append(buf, '\n')
 
-				writer.Write(buf)
+				w.Write(buf)
 			}
 		}
 	}

@@ -50,6 +50,7 @@ func main() {
 
 	var filename string
 	flag.IntVar(&maxProcs, "cpu", maxProcs, "Number of cores to use")
+	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
 	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
@@ -59,10 +60,19 @@ func main() {
 	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
 	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
-	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
+	var showHelp = flag.Bool("h", false, "Show Help")
 	flag.Parse()
 
 	runtime.GOMAXPROCS(maxProcs)
+	fmt.Printf("mcobj %v (cpu: %d)\n", version, runtime.GOMAXPROCS(0))
+
+	if *showHelp || flag.NArg() == 0 {
+		fmt.Fprintln(os.Stderr)
+		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj %AppData%\\.minecraft\\saves\\World1")
+		fmt.Fprintln(os.Stderr)
+		flag.PrintDefaults()
+		return
+	}
 
 	if faceLimit != math.MaxInt32 {
 		faceLimit *= 1000

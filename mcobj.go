@@ -324,6 +324,7 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 
 func loadChunk(filename string) (os.Error, *nbt.Chunk) {
 	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
+	defer file.Close()
 	if fileErr != nil {
 		return fileErr, nil
 	}

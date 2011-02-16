@@ -13,10 +13,12 @@ type Faces struct {
 	faces    []Face
 }
 
-func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer) (count int) {
+func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk) {
 	fs.Clean(enclosed.xPos, enclosed.zPos)
 	processBlocks(enclosed, fs)
-	fs.Write(w)
+}
+
+func (fs *Faces) FaceCount() int {
 	return len(fs.faces)
 }
 
@@ -67,9 +69,12 @@ func (fs *Faces) AddFace(blockId byte, v1, v2, v3, v4 Vertex) {
 	fs.faces = append(fs.faces, face)
 }
 
-func (fs *Faces) Write(w io.Writer) {
+func (fs *Faces) Write(w io.Writer, voffsetChan chan int) {
 	fs.vertexes.Number()
-	var vc = int16(fs.vertexes.Print(w, fs.xPos, fs.zPos))
+
+	var vc = fs.vertexes.Write(w, fs.xPos, fs.zPos)
+	var voffset = <-voffsetChan
+	voffsetChan <- voffset+vc
 
 	var blockIds = make([]byte, 0, 16)
 	for _, face := range fs.faces {
@@ -90,7 +95,7 @@ func (fs *Faces) Write(w io.Writer) {
 		printMtl(w, blockId)
 		for _, face := range fs.faces {
 			if face.blockId == blockId {
-				fmt.Fprintln(w, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
+				fmt.Fprintln(w, "f", fs.vertexes.Get(face.indexes[0])+voffset, fs.vertexes.Get(face.indexes[1])+voffset, fs.vertexes.Get(face.indexes[2])+voffset, fs.vertexes.Get(face.indexes[3])+voffset)
 				faceCount++
 			}
 		}
@@ -115,8 +120,8 @@ func (vs *Vertexes) Release(v Vertex) int {
 	return i
 }
 
-func (vs *Vertexes) Get(i int) int16 {
-	return (*vs)[i]
+func (vs *Vertexes) Get(i int) int {
+	return int((*vs)[i])
 }
 
 func (vs *Vertexes) Clear() {
@@ -137,7 +142,7 @@ func (vs *Vertexes) Number() {
 	}
 }
 
-func (vs *Vertexes) Print(w io.Writer, xPos, zPos int) (count int) {
+func (vs *Vertexes) Write(w io.Writer, xPos, zPos int) (count int) {
 	var buf = make([]byte, 64)
 	copy(buf[0:2], "v ")
 

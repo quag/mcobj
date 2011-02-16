@@ -91,9 +91,10 @@ func main() {
 	}
 
 	type facesDoneJob struct {
-		xPos, zPos, faceCount int
-		b                     *MemoryWriter
-		last                  bool
+		xPos, zPos int
+		last       bool
+		job        *facesJob
+		faces      *Faces
 	}
 
 	var total = 0
@@ -102,30 +103,23 @@ func main() {
 		facesChan        = make(chan *facesJob, maxProcs*2)
 		facesJobDoneChan = make(chan *facesDoneJob, maxProcs*2)
 		faceDoneChan     = make(chan bool)
+		voffsetChan      = make(chan int, 1)
 
-		freelist = make(chan *MemoryWriter, maxProcs*2)
-		started  = false
+		bufferFreelist = make(chan *MemoryWriter, maxProcs*2)
+		facesFreelist  = make(chan *Faces, maxProcs)
+		started        = false
 	)
 
+	voffsetChan <- 0
+
 	for i := 0; i < maxProcs; i++ {
+		facesFreelist <- new(Faces)
 		go func() {
-			var faces Faces
 			for {
+				var faces = <-facesFreelist
 				var job = <-facesChan
-
-				var b *MemoryWriter
-				select {
-				case b = <-freelist:
-					// Got a buffer
-				default:
-					b = &MemoryWriter{make([]byte, 0, 128*1024)}
-				}
-
-				fmt.Fprintln(b, "#", job.filepath)
-				var faceCount = faces.ProcessChunk(job.enclosed, b)
-				fmt.Fprintln(b)
-
-				facesJobDoneChan <- &facesDoneJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, b, job.last}
+				faces.ProcessChunk(job.enclosed)
+				facesJobDoneChan <- &facesDoneJob{job.enclosed.xPos, job.enclosed.zPos, job.last, job, faces}
 			}
 		}()
 	}
@@ -135,16 +129,35 @@ func main() {
 		var size = 0
 		for {
 			var job = <-facesJobDoneChan
+
+			var (
+				faces = job.faces
+			)
 			chunkCount++
-			out.Write(job.b.buf)
+
+			var b *MemoryWriter
+			select {
+			case b = <-bufferFreelist:
+				// Got a buffer
+			default:
+				b = &MemoryWriter{make([]byte, 0, 128*1024)}
+			}
+
+			fmt.Fprintln(b, "#", job.job.filepath)
+			faces.Write(b, voffsetChan)
+			var faceCount = faces.FaceCount()
+			fmt.Fprintln(b)
+			facesFreelist <- faces
+
+			out.Write(b.buf)
 			out.Flush()
 
-			size += len(job.b.buf)
-			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, total, job.xPos, job.zPos, job.faceCount, float64(size)/1024/1024)
+			size += len(b.buf)
+			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, total, job.xPos, job.zPos, faceCount, float64(size)/1024/1024)
 
-			job.b.Clean()
+			b.Clean()
 			select {
-			case freelist <- job.b:
+			case bufferFreelist <- b:
 				// buffer added to free list
 			default:
 				// free list is full, discard the buffer

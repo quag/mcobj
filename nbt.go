@@ -33,6 +33,7 @@ type Chunk struct {
 
 func ReadChunk(reader io.Reader) (os.Error, *Chunk) {
 	var r, rErr = gzip.NewReader(reader)
+	defer r.Close()
 	if rErr != nil {
 		return rErr, nil
 	}

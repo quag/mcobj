@@ -37,7 +37,7 @@ func (fs *Faces) Clean(xPos, zPos int) {
 	}
 }
 
-func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId byte) bool {
+func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId uint16) bool {
 	var (
 		empty, air, water       = IsEmptyBlock(blockId)
 		otherEmpty, otherAir, _ = IsEmptyBlock(b.Get(x, y, z))
@@ -46,7 +46,7 @@ func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId byte) bool {
 	return (empty && !air && otherAir) || (!empty && otherEmpty) || (water && otherAir)
 }
 
-func IsEmptyBlock(blockId byte) (isEmpty bool, isAir bool, isWater bool) {
+func IsEmptyBlock(blockId uint16) (isEmpty bool, isAir bool, isWater bool) {
 	isAir = (blockId == 0)
 	isWater = (blockId == 9)
 	isEmpty = isAir || isWater || (hideStone && blockId == 1) || IsMeshBlockId(blockId)
@@ -54,15 +54,15 @@ func IsEmptyBlock(blockId byte) (isEmpty bool, isAir bool, isWater bool) {
 }
 
 type AddFacer interface {
-	AddFace(blockId byte, v1, v2, v3, v4 Vertex)
+	AddFace(blockId uint16, v1, v2, v3, v4 Vertex)
 }
 
 type Face struct {
-	blockId byte
+	blockId uint16
 	indexes [4]int
 }
 
-func (fs *Faces) AddFace(blockId byte, v1, v2, v3, v4 Vertex) {
+func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
 	var face = Face{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}}
 	fs.faces = append(fs.faces, face)
 }
@@ -71,7 +71,7 @@ func (fs *Faces) Write(w io.Writer) {
 	fs.vertexes.Number()
 	var vc = int16(fs.vertexes.Print(w, fs.xPos, fs.zPos))
 
-	var blockIds = make([]byte, 0, 16)
+	var blockIds = make([]uint16, 0, 16)
 	for _, face := range fs.faces {
 		var found = false
 		for _, id := range blockIds {
@@ -223,7 +223,7 @@ type Vertex struct {
 }
 
 type blockRun struct {
-	blockId        byte
+	blockId        uint16
 	v1, v2, v3, v4 Vertex
 	dirty          bool
 }

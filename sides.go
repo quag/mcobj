@@ -11,7 +11,7 @@ func init() {
 	}
 }
 
-type ChunkSide [128 * 16]byte
+type ChunkSide [128 * 16]uint16
 type ChunkSides [4]*ChunkSide
 
 func (s *ChunkSides) Side(i int) *ChunkSide {
@@ -22,7 +22,7 @@ func (s *ChunkSide) Index(x, y int) int {
 	return y + (x * 128)
 }
 
-func (s *ChunkSide) BlockId(x, y int) byte {
+func (s *ChunkSide) BlockId(x, y int) uint16 {
 	return (*s)[s.Index(x, y)]
 }
 
@@ -31,6 +31,6 @@ func (s *ChunkSide) Column(x int) BlockColumn {
 	return BlockColumn((*s)[i : i+128])
 }
 
-func (s *ChunkSide) SetBlockId(x, y int, blockId byte) {
+func (s *ChunkSide) SetBlockId(x, y int, blockId uint16) {
 	(*s)[s.Index(x, y)] = blockId
 }

@@ -28,7 +28,9 @@ var (
 
 type Chunk struct {
 	XPos, ZPos int
-	Blocks     []byte
+	blocks     []byte
+	data       []byte
+	Blocks     []uint16
 }
 
 func ReadChunk(reader io.Reader) (os.Error, *Chunk) {
@@ -48,6 +50,9 @@ func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
 	for {
 		var typeId, name, err = readTag(br)
 		if err != nil {
+			if err == os.EOF {
+				break
+			}
 			return err, chunk
 		}
 
@@ -66,7 +71,12 @@ func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
 				if chunk == nil {
 					chunk = new(Chunk)
 				}
-				chunk.Blocks = bytes
+				chunk.blocks = bytes
+			} else if name == "Data" {
+				if chunk == nil {
+					chunk = new(Chunk)
+				}
+				chunk.data = bytes
 			}
 		case tagInt8:
 			var _, err2 = readInt8(br)
@@ -156,6 +166,20 @@ func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
 			fmt.Printf("# %s todo(%d)\n", name, typeId)
 		}
 	}
+
+	if chunk != nil {
+		chunk.Blocks = make([]uint16, len(chunk.blocks))
+		for i, blockId := range chunk.blocks {
+			var metadata byte
+			if i&1 == 1 {
+				metadata = chunk.data[i/2] >> 4
+			} else {
+				metadata = chunk.data[i/2] & 0xf
+			}
+			chunk.Blocks[i] = uint16(blockId) + (uint16(metadata) << 8)
+		}
+	}
+
 	return nil, chunk
 }
 

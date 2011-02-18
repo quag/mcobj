@@ -11,7 +11,7 @@ func (s *EnclosingSides) side(i int) *ChunkSide {
 	return (*s)[i]
 }
 
-func (e *EnclosedChunk) Get(x, y, z int) (blockId byte) {
+func (e *EnclosedChunk) Get(x, y, z int) (blockId uint16) {
 	switch {
 	case y < 0 && hideBottom:
 		blockId = 7 // Bedrock

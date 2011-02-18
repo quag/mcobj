@@ -268,11 +268,11 @@ func main() {
 	}
 }
 
-type Blocks []byte
+type Blocks []uint16
 
-type BlockColumn []byte
+type BlockColumn []uint16
 
-func (b *Blocks) Get(x, y, z int) byte {
+func (b *Blocks) Get(x, y, z int) uint16 {
 	return (*b)[y+(z*128+(x*128*16))]
 }
 

@@ -8,8 +8,8 @@ import (
 	"nbt"
 	"os"
 	"path"
-	"strconv"
 	"runtime"
+	"strconv"
 )
 
 var (
@@ -86,7 +86,6 @@ func main() {
 
 	type facesJob struct {
 		last     bool
-		filepath string
 		enclosed *EnclosedChunk
 	}
 
@@ -121,7 +120,6 @@ func main() {
 					b = &MemoryWriter{make([]byte, 0, 128*1024)}
 				}
 
-				fmt.Fprintln(b, "#", job.filepath)
 				var faceCount = faces.ProcessChunk(job.enclosed, b)
 				fmt.Fprintln(b)
 
@@ -190,56 +188,48 @@ func main() {
 
 			switch {
 			case fi.IsRegular():
-				var loadErr, chunk = loadChunk(filepath)
+				var chunk, loadErr = loadChunk(filepath)
 				if loadErr != nil {
 					fmt.Println(loadErr)
 				} else {
 					var enclosed = sideCache.EncloseChunk(chunk)
 					sideCache.AddChunk(chunk)
-					facesChan <- &facesJob{true, filepath, enclosed}
+					facesChan <- &facesJob{true, enclosed}
 					<-faceDoneChan
 				}
 			case fi.IsDirectory():
-				var errors = make(chan os.Error, 5)
-				var done = make(chan bool)
-				go func() {
-					for error := range errors {
-						fmt.Fprintln(os.Stderr, error)
-					}
-					done <- true
-				}()
-				var v = &visitor{make(map[string]bool)}
-				path.Walk(filepath, v, errors)
-				close(errors)
-				<-done
+				var worldDir = filepath
+				var world = OpenWorld(worldDir)
+				var pool, poolErr = world.ChunkPool()
+				if poolErr != nil {
+					fmt.Println(poolErr)
+					continue
+				}
 
-				total = len(v.chunks)
+				total = pool.Remaining()
 
-				for i := 0; moreChunks(v.chunks); i++ {
-					for x := 0; x < i && moreChunks(v.chunks); x++ {
-						for z := 0; z < i && moreChunks(v.chunks); z++ {
+				for i := 0; moreChunks(pool.Remaining()); i++ {
+					for x := 0; x < i && moreChunks(pool.Remaining()); x++ {
+						for z := 0; z < i && moreChunks(pool.Remaining()); z++ {
 							var (
 								ax = cx + unzigzag(x)
 								az = cz + unzigzag(z)
 							)
 
-							var chunkFilename = chunkPath(filepath, ax, az)
-							var _, exists = v.chunks[chunkFilename]
-							if exists {
-								loadSide(&sideCache, filepath, v.chunks, ax-1, az)
-								loadSide(&sideCache, filepath, v.chunks, ax+1, az)
-								loadSide(&sideCache, filepath, v.chunks, ax, az-1)
-								loadSide(&sideCache, filepath, v.chunks, ax, az+1)
+							if pool.Pop(ax, az) {
+								loadSide(&sideCache, world, ax-1, az)
+								loadSide(&sideCache, world, ax+1, az)
+								loadSide(&sideCache, world, ax, az-1)
+								loadSide(&sideCache, world, ax, az+1)
 
-								v.chunks[chunkFilename] = false, false
-								var loadErr, chunk = loadChunk(chunkFilename)
+								var chunk, loadErr = loadChunk2(world, ax, az)
 								if loadErr != nil {
 									fmt.Println(loadErr)
 								} else {
 									var enclosed = sideCache.EncloseChunk(chunk)
 									sideCache.AddChunk(chunk)
 									chunkCount++
-									facesChan <- &facesJob{!moreChunks(v.chunks), chunkFilename, enclosed}
+									facesChan <- &facesJob{!moreChunks(pool.Remaining()), enclosed}
 									started = true
 								}
 							}
@@ -288,49 +278,44 @@ func unzigzag(n int) int {
 	return (n >> 1) ^ (-(n & 1))
 }
 
-func moreChunks(chunks map[string]bool) bool {
-	return len(chunks) > 0 && faceCount < faceLimit && chunkCount < chunkLimit
+func moreChunks(unprocessedCount int) bool {
+	return unprocessedCount > 0 && faceCount < faceLimit && chunkCount < chunkLimit
 }
 
-func loadSide(sideCache *SideCache, world string, chunks map[string]bool, x, z int) {
-	if !sideCache.HasSide(x, z) {
-		var fileName = chunkPath(world, x, z)
-		var _, err = os.Stat(fileName)
-		if err == nil {
-			var loadErr, chunk = loadChunk(fileName)
-			if loadErr != nil {
-				fmt.Println(loadErr)
-			} else {
-				sideCache.AddChunk(chunk)
-			}
-		}
-	}
-}
-
-type visitor struct {
-	chunks map[string]bool
-}
-
-func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
-	return true
-}
-
-func (v *visitor) VisitFile(file string, f *os.FileInfo) {
-	var match, err = path.Match("c.*.dat", path.Base(file))
-	if match && err == nil {
-		v.chunks[file] = true
-	}
-}
-
-func loadChunk(filename string) (os.Error, *nbt.Chunk) {
+func loadChunk(filename string) (*nbt.Chunk, os.Error) {
 	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
 	defer file.Close()
 	if fileErr != nil {
-		return fileErr, nil
+		return nil, fileErr
 	}
-	var err, chunk = nbt.ReadChunk(file)
+	var chunk, err = nbt.ReadDat(file)
 	if err == os.EOF {
 		err = nil
 	}
-	return err, chunk
+	return chunk, err
+}
+
+func loadChunk2(world World, x, z int) (*nbt.Chunk, os.Error) {
+	var r, openErr = world.OpenChunk(x, z)
+	if openErr != nil {
+		return nil, openErr
+	}
+	defer r.Close()
+
+	var chunk, nbtErr = nbt.ReadNbt(r)
+	if nbtErr != nil {
+		return nil, nbtErr
+	}
+	return chunk, nil
+}
+
+func loadSide(sideCache *SideCache, world World, x, z int) {
+	if !sideCache.HasSide(x, z) {
+		var chunk, loadErr = loadChunk2(world, x, z)
+		if loadErr != nil {
+			fmt.Println(loadErr)
+		} else {
+			sideCache.AddChunk(chunk)
+		}
+	}
 }

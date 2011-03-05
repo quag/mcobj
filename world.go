@@ -6,9 +6,17 @@ import (
 	"path"
 )
 
-type World interface {
+type ChunkOpener interface {
 	OpenChunk(x, z int) (io.ReadCloser, os.Error)
+}
+
+type ChunkPooler interface {
 	ChunkPool() (ChunkPool, os.Error)
+}
+
+type World interface {
+	ChunkOpener
+	ChunkPooler
 }
 
 type ChunkPool interface {

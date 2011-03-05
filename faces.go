@@ -37,15 +37,6 @@ func (fs *Faces) Clean(xPos, zPos int) {
 	}
 }
 
-func (b *EnclosedChunk) IsBoundary(x, y, z int, blockId uint16) bool {
-	var (
-		empty, air, water       = IsEmptyBlock(blockId)
-		otherEmpty, otherAir, _ = IsEmptyBlock(b.Get(x, y, z))
-	)
-
-	return (empty && !air && otherAir) || (!empty && otherEmpty) || (water && otherAir)
-}
-
 func IsEmptyBlock(blockId uint16) (isEmpty bool, isAir bool, isWater bool) {
 	isAir = (blockId == 0)
 	isWater = (blockId == 9)

@@ -15,6 +15,9 @@ type ObjGenerator struct {
 	freelist chan *MemoryWriter
 
 	total int
+
+	outFile *os.File
+	out     *bufio.Writer
 }
 
 func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int) {
@@ -53,8 +56,8 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int) {
 		for {
 			var job = <-o.writeFacesChan
 			chunkCount++
-			out.Write(job.b.buf)
-			out.Flush()
+			o.out.Write(job.b.buf)
+			o.out.Flush()
 
 			size += len(job.b.buf)
 			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, o.total, job.xPos, job.zPos, job.faceCount, float64(size)/1024/1024)
@@ -85,16 +88,21 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int) {
 		fmt.Fprintln(os.Stderr, outErr)
 		return
 	}
-	defer outFile.Close()
+	defer func() {
+		if outFile != nil {
+			outFile.Close()
+		}
+	}()
 	var bufErr os.Error
-	out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
+	o.out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
 	if bufErr != nil {
 		fmt.Fprintln(os.Stderr, bufErr)
 		return
 	}
-	defer out.Flush()
 
-	fmt.Fprintln(out, "mtllib", path.Base(mtlFilename))
+	fmt.Fprintln(o.out, "mtllib", path.Base(mtlFilename))
+
+	o.outFile, outFile = outFile, nil
 }
 
 func (o *ObjGenerator) GetEnclosedJobsChan() chan *EnclosedChunkJob {
@@ -106,6 +114,8 @@ func (o *ObjGenerator) GetCompleteChan() chan bool {
 }
 
 func (o *ObjGenerator) Close() {
+	o.out.Flush()
+	o.outFile.Close()
 }
 
 type WriteFacesJob struct {

@@ -33,10 +33,13 @@ func main() {
 	var maxProcs = runtime.GOMAXPROCS(0)
 	var prt bool
 
+	var defaultObjOutFilename = "a.obj"
+	var defaultPrtOutFilename = "a.prt"
+
 	var outFilename string
 	flag.IntVar(&maxProcs, "cpu", maxProcs, "Number of cores to use")
 	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
-	flag.StringVar(&outFilename, "o", "a.obj", "Name for output file")
+	flag.StringVar(&outFilename, "o", defaultObjOutFilename, "Name for output file")
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
@@ -68,6 +71,10 @@ func main() {
 		chunkLimit = square * square
 	} else {
 		chunkLimit = math.MaxInt32
+	}
+
+	if prt && outFilename == defaultObjOutFilename {
+		outFilename = defaultPrtOutFilename
 	}
 
 	for i := 0; i < flag.NArg(); i++ {

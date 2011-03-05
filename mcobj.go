@@ -14,7 +14,6 @@ import (
 
 var (
 	out        *bufio.Writer
-	sideCache  SideCache
 	yMin       int
 	blockFaces bool
 	hideBottom bool
@@ -28,30 +27,15 @@ var (
 	chunkLimit int
 )
 
-type MemoryWriter struct {
-	buf []byte
-}
-
-func (m *MemoryWriter) Clean() {
-	if m.buf != nil {
-		m.buf = m.buf[:0]
-	}
-}
-
-func (m *MemoryWriter) Write(p []byte) (n int, err os.Error) {
-	m.buf = append(m.buf, p...)
-	return len(p), nil
-}
-
 func main() {
 	var cx, cz int
 	var square int
 	var maxProcs = runtime.GOMAXPROCS(0)
 
-	var filename string
+	var outFilename string
 	flag.IntVar(&maxProcs, "cpu", maxProcs, "Number of cores to use")
 	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
-	flag.StringVar(&filename, "o", "a.obj", "Name for output file")
+	flag.StringVar(&outFilename, "o", "a.obj", "Name for output file")
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
@@ -84,165 +68,68 @@ func main() {
 		chunkLimit = math.MaxInt32
 	}
 
-	type facesJob struct {
-		last     bool
-		enclosed *EnclosedChunk
+	for i := 0; i < flag.NArg(); i++ {
+		var dirpath = flag.Arg(i)
+		var fi, err = os.Stat(dirpath)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			continue
+		} else if !fi.IsDirectory() {
+			fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
+		}
+
+		var world = OpenWorld(dirpath)
+		var pool, poolErr = world.ChunkPool()
+		if poolErr != nil {
+			fmt.Println(poolErr)
+			continue
+		}
+
+		GenerateObj(maxProcs, outFilename, pool, world, cx, cz)
 	}
+}
 
-	type facesDoneJob struct {
-		xPos, zPos, faceCount int
-		b                     *MemoryWriter
-		last                  bool
-	}
+type EnclosedChunkJob struct {
+	last     bool
+	enclosed *EnclosedChunk
+}
 
-	var total = 0
-
+func WalkEnclosedChunks(pool ChunkPool, opener ChunkOpener, cx, cz int, enclosedsChan chan *EnclosedChunkJob) bool {
 	var (
-		facesChan        = make(chan *facesJob, maxProcs*2)
-		facesJobDoneChan = make(chan *facesDoneJob, maxProcs*2)
-		faceDoneChan     = make(chan bool)
-
-		freelist = make(chan *MemoryWriter, maxProcs*2)
-		started  = false
+		sideCache = new(SideCache)
+		started   = false
 	)
 
-	for i := 0; i < maxProcs; i++ {
-		go func() {
-			var faces Faces
-			for {
-				var job = <-facesChan
+	for i := 0; moreChunks(pool.Remaining()); i++ {
+		for x := 0; x < i && moreChunks(pool.Remaining()); x++ {
+			for z := 0; z < i && moreChunks(pool.Remaining()); z++ {
+				var (
+					ax = cx + unzigzag(x)
+					az = cz + unzigzag(z)
+				)
 
-				var b *MemoryWriter
-				select {
-				case b = <-freelist:
-					// Got a buffer
-				default:
-					b = &MemoryWriter{make([]byte, 0, 128*1024)}
-				}
+				if pool.Pop(ax, az) {
+					loadSide(sideCache, opener, ax-1, az)
+					loadSide(sideCache, opener, ax+1, az)
+					loadSide(sideCache, opener, ax, az-1)
+					loadSide(sideCache, opener, ax, az+1)
 
-				var faceCount = faces.ProcessChunk(job.enclosed, b)
-				fmt.Fprintln(b)
-
-				facesJobDoneChan <- &facesDoneJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, b, job.last}
-			}
-		}()
-	}
-
-	go func() {
-		var chunkCount = 0
-		var size = 0
-		for {
-			var job = <-facesJobDoneChan
-			chunkCount++
-			out.Write(job.b.buf)
-			out.Flush()
-
-			size += len(job.b.buf)
-			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, total, job.xPos, job.zPos, job.faceCount, float64(size)/1024/1024)
-
-			job.b.Clean()
-			select {
-			case freelist <- job.b:
-				// buffer added to free list
-			default:
-				// free list is full, discard the buffer
-			}
-
-			if job.last {
-				faceDoneChan <- true
-			}
-		}
-	}()
-
-	if flag.NArg() != 0 {
-		var mtlFilename = fmt.Sprintf("%s.mtl", filename[:len(filename)-len(path.Ext(filename))])
-		var mtlErr = writeMtlFile(mtlFilename)
-		if mtlErr != nil {
-			fmt.Fprintln(os.Stderr, mtlErr)
-			return
-		}
-
-		var outFile, outErr = os.Open(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		if outErr != nil {
-			fmt.Fprintln(os.Stderr, outErr)
-			return
-		}
-		defer outFile.Close()
-		var bufErr os.Error
-		out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
-		if bufErr != nil {
-			fmt.Fprintln(os.Stderr, bufErr)
-			return
-		}
-		defer out.Flush()
-
-		fmt.Fprintln(out, "mtllib", path.Base(mtlFilename))
-
-		for i := 0; i < flag.NArg(); i++ {
-			var filepath = flag.Arg(i)
-			var fi, err = os.Stat(filepath)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				continue
-			}
-
-			switch {
-			case fi.IsRegular():
-				var chunk, loadErr = loadChunk(filepath)
-				if loadErr != nil {
-					fmt.Println(loadErr)
-				} else {
-					var enclosed = sideCache.EncloseChunk(chunk)
-					sideCache.AddChunk(chunk)
-					facesChan <- &facesJob{true, enclosed}
-					<-faceDoneChan
-				}
-			case fi.IsDirectory():
-				var worldDir = filepath
-				var world = OpenWorld(worldDir)
-				var pool, poolErr = world.ChunkPool()
-				if poolErr != nil {
-					fmt.Println(poolErr)
-					continue
-				}
-
-				total = pool.Remaining()
-
-				for i := 0; moreChunks(pool.Remaining()); i++ {
-					for x := 0; x < i && moreChunks(pool.Remaining()); x++ {
-						for z := 0; z < i && moreChunks(pool.Remaining()); z++ {
-							var (
-								ax = cx + unzigzag(x)
-								az = cz + unzigzag(z)
-							)
-
-							if pool.Pop(ax, az) {
-								loadSide(&sideCache, world, ax-1, az)
-								loadSide(&sideCache, world, ax+1, az)
-								loadSide(&sideCache, world, ax, az-1)
-								loadSide(&sideCache, world, ax, az+1)
-
-								var chunk, loadErr = loadChunk2(world, ax, az)
-								if loadErr != nil {
-									fmt.Println(loadErr)
-								} else {
-									var enclosed = sideCache.EncloseChunk(chunk)
-									sideCache.AddChunk(chunk)
-									chunkCount++
-									facesChan <- &facesJob{!moreChunks(pool.Remaining()), enclosed}
-									started = true
-								}
-							}
-						}
+					var chunk, loadErr = loadChunk2(opener, ax, az)
+					if loadErr != nil {
+						fmt.Println(loadErr)
+					} else {
+						var enclosed = sideCache.EncloseChunk(chunk)
+						sideCache.AddChunk(chunk)
+						chunkCount++
+						enclosedsChan <- &EnclosedChunkJob{!moreChunks(pool.Remaining()), enclosed}
+						started = true
 					}
 				}
 			}
 		}
 	}
 
-	if started {
-		<-faceDoneChan
-	}
+	return started
 }
 
 type Blocks []uint16
@@ -295,8 +182,8 @@ func loadChunk(filename string) (*nbt.Chunk, os.Error) {
 	return chunk, err
 }
 
-func loadChunk2(world World, x, z int) (*nbt.Chunk, os.Error) {
-	var r, openErr = world.OpenChunk(x, z)
+func loadChunk2(opener ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
+	var r, openErr = opener.OpenChunk(x, z)
 	if openErr != nil {
 		return nil, openErr
 	}
@@ -309,9 +196,9 @@ func loadChunk2(world World, x, z int) (*nbt.Chunk, os.Error) {
 	return chunk, nil
 }
 
-func loadSide(sideCache *SideCache, world World, x, z int) {
+func loadSide(sideCache *SideCache, opener ChunkOpener, x, z int) {
 	if !sideCache.HasSide(x, z) {
-		var chunk, loadErr = loadChunk2(world, x, z)
+		var chunk, loadErr = loadChunk2(opener, x, z)
 		if loadErr != nil {
 			fmt.Println(loadErr)
 		} else {

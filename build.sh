@@ -9,5 +9,5 @@ gofmt.exe -w *.go || exit
 8g nbt.go || exit
 gopack grc nbt.a nbt.8 || exit
 
-8g -I. mcobj.go version.go mtl.go faces.go sides.go sideCache.go enclosedChunk.go world.go alphaworld.go betaworld.go || exit
+8g -I. mcobj.go version.go obj.go mtl.go faces.go sides.go sideCache.go enclosedChunk.go world.go alphaworld.go betaworld.go || exit
 8l -L. -o mcobj.exe mcobj.8

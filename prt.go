@@ -79,9 +79,14 @@ func (o *PrtGenerator) chunkProcessor() {
 					fallthrough
 				case e.IsBoundary(x, y, z+1, blockId):
 					o.particleCount++
-					binary.Write(o.zw, binary.LittleEndian, float32(x*2))
-					binary.Write(o.zw, binary.LittleEndian, float32(z*2))
-					binary.Write(o.zw, binary.LittleEndian, float32(y*2))
+					var (
+						xa = x + e.xPos*16
+						ya = y - 64
+						za = z + e.zPos*16
+					)
+					binary.Write(o.zw, binary.LittleEndian, float32(xa*2))
+					binary.Write(o.zw, binary.LittleEndian, float32(za*2))
+					binary.Write(o.zw, binary.LittleEndian, float32(ya*2))
 					binary.Write(o.zw, binary.LittleEndian, int32(blockId))
 				}
 			}

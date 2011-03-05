@@ -31,6 +31,7 @@ func main() {
 	var cx, cz int
 	var square int
 	var maxProcs = runtime.GOMAXPROCS(0)
+	var prt bool
 
 	var outFilename string
 	flag.IntVar(&maxProcs, "cpu", maxProcs, "Number of cores to use")
@@ -44,6 +45,7 @@ func main() {
 	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
 	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
+	flag.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
 	var showHelp = flag.Bool("h", false, "Show Help")
 	flag.Parse()
 
@@ -85,18 +87,23 @@ func main() {
 			continue
 		}
 
-		var format = new(ObjGenerator)
-		format.Start(outFilename, pool.Remaining(), maxProcs)
+		var generator OutputGenerator
+		if prt {
+			generator = new(PrtGenerator)
+		} else {
+			generator = new(ObjGenerator)
+		}
+		generator.Start(outFilename, pool.Remaining(), maxProcs)
 
-		if walkEnclosedChunks(pool, world, cx, cz, format.GetEnclosedJobsChan()) {
-			<-format.GetCompleteChan()
+		if walkEnclosedChunks(pool, world, cx, cz, generator.GetEnclosedJobsChan()) {
+			<-generator.GetCompleteChan()
 		}
 
-		format.Close()
+		generator.Close()
 	}
 }
 
-type Format interface {
+type OutputGenerator interface {
 	Start(outFilename string, total int, maxProcs int)
 	GetEnclosedJobsChan() chan *EnclosedChunkJob
 	GetCompleteChan() chan bool

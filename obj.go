@@ -18,7 +18,6 @@ type ObjGenerator struct {
 }
 
 func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int) {
-	// TODO
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
 	o.completeChan = make(chan bool)

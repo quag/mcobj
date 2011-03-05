@@ -7,26 +7,34 @@ import (
 	"path"
 )
 
-func GenerateObj(maxProcs int, outFilename string, pool ChunkPool, opener ChunkOpener, cx, cz int) {
-	var total = 0
+type ObjGenerator struct {
+	enclosedsChan  chan *EnclosedChunkJob
+	writeFacesChan chan *WriteFacesJob
+	completeChan   chan bool
 
-	var (
-		enclosedsChan  = make(chan *EnclosedChunkJob, maxProcs*2)
-		writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
-		completeChan   = make(chan bool)
+	freelist chan *MemoryWriter
 
-		freelist = make(chan *MemoryWriter, maxProcs*2)
-	)
+	total int
+}
+
+func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int) {
+	// TODO
+	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
+	o.writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
+	o.completeChan = make(chan bool)
+
+	o.freelist = make(chan *MemoryWriter, maxProcs*2)
+	o.total = total
 
 	for i := 0; i < maxProcs; i++ {
 		go func() {
 			var faces Faces
 			for {
-				var job = <-enclosedsChan
+				var job = <-o.enclosedsChan
 
 				var b *MemoryWriter
 				select {
-				case b = <-freelist:
+				case b = <-o.freelist:
 					// Got a buffer
 				default:
 					b = &MemoryWriter{make([]byte, 0, 128*1024)}
@@ -35,7 +43,7 @@ func GenerateObj(maxProcs int, outFilename string, pool ChunkPool, opener ChunkO
 				var faceCount = faces.ProcessChunk(job.enclosed, b)
 				fmt.Fprintln(b)
 
-				writeFacesChan <- &WriteFacesJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, b, job.last}
+				o.writeFacesChan <- &WriteFacesJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, b, job.last}
 			}
 		}()
 	}
@@ -44,24 +52,24 @@ func GenerateObj(maxProcs int, outFilename string, pool ChunkPool, opener ChunkO
 		var chunkCount = 0
 		var size = 0
 		for {
-			var job = <-writeFacesChan
+			var job = <-o.writeFacesChan
 			chunkCount++
 			out.Write(job.b.buf)
 			out.Flush()
 
 			size += len(job.b.buf)
-			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, total, job.xPos, job.zPos, job.faceCount, float64(size)/1024/1024)
+			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, o.total, job.xPos, job.zPos, job.faceCount, float64(size)/1024/1024)
 
 			job.b.Clean()
 			select {
-			case freelist <- job.b:
+			case o.freelist <- job.b:
 				// buffer added to free list
 			default:
 				// free list is full, discard the buffer
 			}
 
 			if job.last {
-				completeChan <- true
+				o.completeChan <- true
 			}
 		}
 	}()
@@ -88,12 +96,17 @@ func GenerateObj(maxProcs int, outFilename string, pool ChunkPool, opener ChunkO
 	defer out.Flush()
 
 	fmt.Fprintln(out, "mtllib", path.Base(mtlFilename))
+}
 
-	total = pool.Remaining()
+func (o *ObjGenerator) GetEnclosedJobsChan() chan *EnclosedChunkJob {
+	return o.enclosedsChan
+}
 
-	if WalkEnclosedChunks(pool, opener, cx, cz, enclosedsChan) {
-		<-completeChan
-	}
+func (o *ObjGenerator) GetCompleteChan() chan bool {
+	return o.completeChan
+}
+
+func (o *ObjGenerator) Close() {
 }
 
 type WriteFacesJob struct {

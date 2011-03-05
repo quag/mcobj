@@ -85,8 +85,22 @@ func main() {
 			continue
 		}
 
-		GenerateObj(maxProcs, outFilename, pool, world, cx, cz)
+		var format = new(ObjGenerator)
+		format.Start(outFilename, pool.Remaining(), maxProcs)
+
+		if walkEnclosedChunks(pool, world, cx, cz, format.GetEnclosedJobsChan()) {
+			<-format.GetCompleteChan()
+		}
+
+		format.Close()
 	}
+}
+
+type Format interface {
+	Start(outFilename string, total int, maxProcs int)
+	GetEnclosedJobsChan() chan *EnclosedChunkJob
+	GetCompleteChan() chan bool
+	Close()
 }
 
 type EnclosedChunkJob struct {
@@ -94,7 +108,7 @@ type EnclosedChunkJob struct {
 	enclosed *EnclosedChunk
 }
 
-func WalkEnclosedChunks(pool ChunkPool, opener ChunkOpener, cx, cz int, enclosedsChan chan *EnclosedChunkJob) bool {
+func walkEnclosedChunks(pool ChunkPool, opener ChunkOpener, cx, cz int, enclosedsChan chan *EnclosedChunkJob) bool {
 	var (
 		sideCache = new(SideCache)
 		started   = false

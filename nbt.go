@@ -33,18 +33,21 @@ type Chunk struct {
 	Blocks     []uint16
 }
 
-func ReadChunk(reader io.Reader) (os.Error, *Chunk) {
+func ReadDat(reader io.Reader) (*Chunk, os.Error) {
 	var r, rErr = gzip.NewReader(reader)
 	defer r.Close()
 	if rErr != nil {
-		return rErr, nil
+		return nil, rErr
 	}
 
-	var br = bufio.NewReader(r)
-	return processChunk(br, false)
+	return ReadNbt(r)
 }
 
-func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
+func ReadNbt(reader io.Reader) (*Chunk, os.Error) {
+	return processChunk(bufio.NewReader(reader), false)
+}
+
+func processChunk(br *bufio.Reader, readingStruct bool) (*Chunk, os.Error) {
 	var chunk *Chunk = nil
 
 	for {
@@ -53,19 +56,19 @@ func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
 			if err == os.EOF {
 				break
 			}
-			return err, chunk
+			return chunk, err
 		}
 
 		switch typeId {
 		case tagStruct:
 		case tagStructEnd:
 			if readingStruct {
-				return nil, chunk
+				return chunk, nil
 			}
 		case tagByteArray:
 			var bytes, err2 = readBytes(br)
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 			if name == "Blocks" {
 				if chunk == nil {
@@ -81,17 +84,17 @@ func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
 		case tagInt8:
 			var _, err2 = readInt8(br)
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 		case tagInt16:
 			var _, err2 = readInt16(br)
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 		case tagInt32:
 			var number, err2 = readInt32(br)
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 
 			if chunk == nil {
@@ -106,61 +109,61 @@ func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
 		case tagInt64:
 			var _, err2 = readInt64(br)
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 		case tagFloat32:
 			var _, err2 = readInt32(br) // TODO: read floats not ints
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 		case tagFloat64:
 			var _, err2 = readInt64(br) // TODO: read floats not ints
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 		case tagString:
 			var _, err2 = readString(br)
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 		case tagList:
 			var itemTypeId, length, err2 = readListHeader(br)
 			if err2 != nil {
-				return err2, chunk
+				return chunk, err2
 			}
 			switch itemTypeId {
 			case tagInt8:
 				for i := 0; i < length; i++ {
 					var _, err3 = readInt8(br)
 					if err3 != nil {
-						return err3, chunk
+						return chunk, err3
 					}
 				}
 			case tagFloat32:
 				for i := 0; i < length; i++ {
 					var _, err3 = readInt32(br) // TODO: read float32 instead of int32
 					if err3 != nil {
-						return err3, chunk
+						return chunk, err3
 					}
 				}
 			case tagFloat64:
 				for i := 0; i < length; i++ {
 					var _, err3 = readInt64(br) // TODO: read float64 instead of int64
 					if err3 != nil {
-						return err3, chunk
+						return chunk, err3
 					}
 				}
 			case tagStruct:
-				var err3, chunk2 = processChunk(br, true)
+				var chunk2, err3 = processChunk(br, true)
 				if chunk == nil {
 					chunk = chunk2
 				}
 				if err3 != nil {
-					return err3, chunk
+					return chunk, err3
 				}
 			default:
 				fmt.Printf("# %s list todo(%v) %v\n", name, itemTypeId, length)
-				return ErrListUnknown, chunk
+				return chunk, ErrListUnknown
 			}
 		default:
 			fmt.Printf("# %s todo(%d)\n", name, typeId)
@@ -180,7 +183,7 @@ func processChunk(br *bufio.Reader, readingStruct bool) (os.Error, *Chunk) {
 		}
 	}
 
-	return nil, chunk
+	return chunk, nil
 }
 
 func readTag(r *bufio.Reader) (byte, string, os.Error) {

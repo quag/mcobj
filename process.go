@@ -74,7 +74,7 @@ func (fs *Faces) Write(w io.Writer, voffsetChan chan int) {
 
 	var vc = fs.vertexes.Write(w, fs.xPos, fs.zPos)
 	var voffset = <-voffsetChan
-	voffsetChan <- voffset+vc
+	voffsetChan <- voffset + vc
 
 	var blockIds = make([]uint16, 0, 16)
 	for _, face := range fs.faces {

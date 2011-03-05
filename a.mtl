@@ -12,7 +12,7 @@ illum 1
 
 # Grass
 newmtl 2
-Kd 0.1804 0.4275 0.0196
+Kd 0.3137 0.5647 0.1490
 d 1.0000
 illum 1
 
@@ -30,7 +30,7 @@ illum 1
 
 # Wooden Plank
 newmtl 5
-Kd 0.7373 0.5961 0.3843
+Kd 0.6196 0.5020 0.3216
 d 1.0000
 illum 1
 
@@ -49,7 +49,7 @@ illum 1
 # Water
 newmtl 8
 Kd 0.0000 0.6039 1.0000
-d 1.0000
+d 0.6667
 illum 1
 
 # Stationary water
@@ -72,7 +72,7 @@ illum 1
 
 # Sand
 newmtl 12
-Kd 0.9490 0.9059 0.7333
+Kd 0.8118 0.7647 0.5765
 d 1.0000
 illum 1
 
@@ -108,7 +108,7 @@ illum 1
 
 # Leaves
 newmtl 18
-Kd 0.3137 0.5647 0.1490
+Kd 0.1804 0.4275 0.0196
 d 1.0000
 illum 1
 

@@ -40,7 +40,7 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int) {
 	}
 
 	o.w = bufio.NewWriter(o.outFile)
-	WriteHeader(o.w, -1, []ChannelDefinition{{"Position", 4, 3, 0}, {"MtlIndex", 1, 1, 12}})
+	WriteHeader(o.w, -1, []ChannelDefinition{{"Position", 4, 3, 0}, {"BlockID", 1, 1, 12}})
 
 	var zErr os.Error
 	o.zw, zErr = zlib.NewWriterLevel(o.w, zlib.NoCompression)

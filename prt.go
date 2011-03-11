@@ -80,7 +80,7 @@ func (o *PrtGenerator) chunkProcessor() {
 				case e.IsBoundary(x, y, z+1, blockId):
 					o.particleCount++
 					var (
-						xa = x + e.xPos*16
+						xa = -(x + e.xPos*16)
 						ya = y - 64
 						za = z + e.zPos*16
 					)

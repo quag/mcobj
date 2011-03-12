@@ -37,13 +37,6 @@ func (fs *Faces) Clean(xPos, zPos int) {
 	}
 }
 
-func IsEmptyBlock(blockId uint16) (isEmpty bool, isAir bool, isWater bool) {
-	isAir = (blockId == 0)
-	isWater = (blockId == 9)
-	isEmpty = isAir || isWater || (hideStone && blockId == 1) || IsMeshBlockId(blockId)
-	return
-}
-
 type AddFacer interface {
 	AddFace(blockId uint16, v1, v2, v3, v4 Vertex)
 }

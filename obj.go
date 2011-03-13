@@ -20,7 +20,7 @@ type ObjGenerator struct {
 	out     *bufio.Writer
 }
 
-func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int) {
+func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
 	o.completeChan = make(chan bool)
@@ -31,6 +31,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int) {
 	for i := 0; i < maxProcs; i++ {
 		go func() {
 			var faces Faces
+			faces.boundary = boundary
 			for {
 				var job = <-o.enclosedsChan
 

@@ -100,7 +100,9 @@ func main() {
 		} else {
 			generator = new(ObjGenerator)
 		}
-		generator.Start(outFilename, pool.Remaining(), maxProcs)
+		var boundary = new(BoundaryLocator)
+		boundary.Init()
+		generator.Start(outFilename, pool.Remaining(), maxProcs, boundary)
 
 		if walkEnclosedChunks(pool, world, cx, cz, generator.GetEnclosedJobsChan()) {
 			<-generator.GetCompleteChan()
@@ -111,7 +113,7 @@ func main() {
 }
 
 type OutputGenerator interface {
-	Start(outFilename string, total int, maxProcs int)
+	Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator)
 	GetEnclosedJobsChan() chan *EnclosedChunkJob
 	GetCompleteChan() chan bool
 	Close()

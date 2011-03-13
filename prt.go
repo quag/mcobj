@@ -19,12 +19,14 @@ type PrtGenerator struct {
 
 	particleCount int64
 	total         int
+	boundary      *BoundaryLocator
 }
 
-func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int) {
+func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.completeChan = make(chan bool)
 	o.total = total
+	o.boundary = boundary
 
 	maxProcs = 1
 	for i := 0; i < maxProcs; i++ {
@@ -67,22 +69,22 @@ func (o *PrtGenerator) chunkProcessor() {
 				}
 
 				switch {
-				case e.IsBoundary(x, y-1, z, blockId):
+				case o.boundary.IsBoundary(blockId, e.Get(x, y-1, z)):
 					fallthrough
-				case e.IsBoundary(x, y+1, z, blockId):
+				case o.boundary.IsBoundary(blockId, e.Get(x, y+1, z)):
 					fallthrough
-				case e.IsBoundary(x-1, y, z, blockId):
+				case o.boundary.IsBoundary(blockId, e.Get(x-1, y, z)):
 					fallthrough
-				case e.IsBoundary(x+1, y, z, blockId):
+				case o.boundary.IsBoundary(blockId, e.Get(x+1, y, z)):
 					fallthrough
-				case e.IsBoundary(x, y, z-1, blockId):
+				case o.boundary.IsBoundary(blockId, e.Get(x, y, z-1)):
 					fallthrough
-				case e.IsBoundary(x, y, z+1, blockId):
+				case o.boundary.IsBoundary(blockId, e.Get(x, y, z+1)):
 					o.particleCount++
 					var (
 						xa = -(x + e.xPos*16)
 						ya = y - 64
-						za = z + e.zPos*16
+						za = -(z + e.zPos*16)
 					)
 					binary.Write(o.zw, binary.LittleEndian, float32(xa*2))
 					binary.Write(o.zw, binary.LittleEndian, float32(za*2))

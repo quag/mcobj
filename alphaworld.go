@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 type AlphaWorld struct {
@@ -51,7 +52,7 @@ func (w *AlphaWorld) ChunkPool() (ChunkPool, os.Error) {
 		done <- true
 	}()
 	var v = &visitor{make(map[string]bool)}
-	path.Walk(w.worldDir, v, errors)
+	filepath.Walk(w.worldDir, v, errors)
 	close(errors)
 	<-done
 	return &AlphaChunkPool{v.chunks, w.worldDir}, nil

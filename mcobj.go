@@ -53,7 +53,7 @@ func main() {
 	flag.Parse()
 
 	runtime.GOMAXPROCS(maxProcs)
-	fmt.Printf("mcobj %v (cpu: %d)\n", version, runtime.GOMAXPROCS(0))
+	fmt.Printf("mcobj %v (cpu: %d) Copyright (c) 2011 Jonathan Wright\n", version, runtime.GOMAXPROCS(0))
 
 	if *showHelp || flag.NArg() == 0 {
 		fmt.Fprintln(os.Stderr)

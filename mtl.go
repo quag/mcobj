@@ -8,10 +8,12 @@ import (
 
 func printMtl(w io.Writer, blockId uint16) {
 	if !noColor {
-		if blockId&0xff == blockId {
-			fmt.Fprintln(w, "usemtl", blockId)
+		var idByte = byte(blockId & 0xff)
+		var extraValue, extraPresent = extraData[idByte]
+		if extraValue && extraPresent {
+			fmt.Fprintf(w, "usemtl %d_%d", idByte, blockId>>8)
 		} else {
-			fmt.Fprintf(w, "usemtl %d_%d", blockId&0xff, blockId>>8)
+			fmt.Fprintln(w, "usemtl", idByte)
 		}
 	}
 }
@@ -77,7 +79,18 @@ func (mtl *MTL) colorId() uint16 {
 	return id
 }
 
+func init() {
+	extraData = make(map[byte]bool)
+	for _, mtl := range colors {
+		if mtl.metadata != 255 {
+			extraData[mtl.blockId] = true
+		}
+	}
+}
+
 var (
+	extraData map[byte]bool
+
 	colors = []MTL{
 		MTL{0, 255, 0xff0000ff, "Air"},
 		MTL{1, 255, 0x7f7f7fff, "Stone"},
@@ -151,7 +164,7 @@ var (
 		MTL{64, 255, 0x82592cff, "Wooden Door"},
 		MTL{65, 255, 0xab8944ff, "Ladder"},
 		MTL{66, 255, 0xc7c7c7ff, "Minecart Tracks"},
-		MTL{67, 255, 0x919191ff, "Cobblestone Stairs"}, // Should be Mesh
+		MTL{67, 255, 0x919191ff, "Cobblestone Stairs"},
 		MTL{68, 255, 0xd6b88bff, "Wall Sign"},
 		MTL{69, 255, 0xd6b88bff, "Lever"},
 		MTL{70, 255, 0x919191ff, "Stone Pressure Plate"},

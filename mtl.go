@@ -118,6 +118,14 @@ var (
 		MTL{23, 255, 0x7f7f7fff, "Dispenser"},
 		MTL{24, 255, 0xdad2abff, "Sandstone"},
 		MTL{25, 255, 0x9b664bff, "Note Block"},
+		MTL{26, 0, 0x8f1717ff, "Foot of bed pointing West"},
+		MTL{26, 1, 0x8f1717ff, "Foot of bed pointing North"},
+		MTL{26, 2, 0x8f1717ff, "Foot of bed pointing East"},
+		MTL{26, 3, 0x8f1717ff, "Foot of bed pointing South"},
+		MTL{26, 8, 0xaf7475ff, "Head of bed pointing West"},
+		MTL{26, 9, 0xaf7475ff, "Head of bed pointing North"},
+		MTL{26, 10, 0xaf7475ff, "Head of bed pointing East"},
+		MTL{26, 11, 0xaf7475ff, "Head of bed pointing South"},
 		MTL{35, 0, 0xd1d1d1ff, "Wool - White"},
 		MTL{35, 1, 0xe97a2eff, "Wool - Orange"},
 		MTL{35, 2, 0xbc3ec7ff, "Wool - Magenta"},
@@ -190,5 +198,7 @@ var (
 		MTL{90, 255, 0x381d55ff, "Portal"},
 		MTL{91, 255, 0xe9b416ff, "Jack-O-Lantern"},
 		MTL{92, 255, 0xbd9075ff, "Cake Block"},
+		MTL{93, 255, 0x989494ff, "Redstone Repeater (\"off\" state)"},
+		MTL{94, 255, 0xa19494ff, "Redstone Repeater (\"on\" state)"},
 	}
 )

@@ -17,3 +17,4 @@
 
 [ ] transparent blocks (torches, glass, redstone paths...) aren't part of the 'surface' and must include the blocks under them
 [ ] write out txt file with mcobjBlockIds, blockIds, data values, and interpretation of those values IOT make it easy for prt users to create meshes
+[ ] read mtl and blocktypes data from txt files (means I don't have to do a new release to keep up with minecraft)

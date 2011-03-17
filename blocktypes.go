@@ -155,6 +155,7 @@ var (
 		&BlockType{23, "Dispenser", Mass, Opaque},
 		&BlockType{24, "Sandstone", Mass, Opaque},
 		&BlockType{25, "Note Block", Mass, Opaque},
+		&BlockType{26, "Bed", Item, Transparent},
 		&BlockType{35, "Wool", Mass, Opaque},
 		&BlockType{37, "Yellow flower", Item, Transparent},
 		&BlockType{38, "Red rose", Item, Transparent},
@@ -212,5 +213,7 @@ var (
 		&BlockType{90, "Portal", Mass, Opaque},
 		&BlockType{91, "Jack-O-Lantern", Mass, Opaque},
 		&BlockType{92, "Cake Block", Item, Transparent},
+		&BlockType{93, "Redstone Repeater (\"off\" state)", Item, Transparent},
+		&BlockType{94, "Redstone Repeater (\"on\" state)", Item, Transparent},
 	}
 )

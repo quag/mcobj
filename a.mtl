@@ -154,52 +154,10 @@ Kd 0.3961 0.2667 0.2000
 d 1.0000
 illum 1
 
-# Foot of bed pointing West
-newmtl 26_0
-Kd 0.5608 0.0902 0.0902
-d 1.0000
-illum 1
-
-# Foot of bed pointing North
-newmtl 26_1
-Kd 0.5608 0.0902 0.0902
-d 1.0000
-illum 1
-
-# Foot of bed pointing East
-newmtl 26_2
-Kd 0.5608 0.0902 0.0902
-d 1.0000
-illum 1
-
-# Foot of bed pointing South
-newmtl 26_3
-Kd 0.5608 0.0902 0.0902
-d 1.0000
-illum 1
-
-# Head of bed pointing West
-newmtl 26_8
-Kd 0.6863 0.4549 0.4588
-d 1.0000
-illum 1
-
-# Head of bed pointing North
-newmtl 26_9
-Kd 0.6863 0.4549 0.4588
-d 1.0000
-illum 1
-
-# Head of bed pointing East
-newmtl 26_10
-Kd 0.6863 0.4549 0.4588
-d 1.0000
-illum 1
-
-# Head of bed pointing South
-newmtl 26_11
-Kd 0.6863 0.4549 0.4588
-d 1.0000
+# Unknown
+newmtl 26
+Kd 0.0000 0.4980 0.4980
+d 0.4980
 illum 1
 
 # Unknown
@@ -250,100 +208,10 @@ Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
-# Wool - White
-newmtl 35_0
-Kd 0.8706 0.8706 0.8706
-d 1.0000
-illum 1
-
-# Wool - Orange
-newmtl 35_1
-Kd 0.9176 0.5020 0.2157
-d 1.0000
-illum 1
-
-# Wool - Magenta
-newmtl 35_2
-Kd 0.7490 0.2980 0.7882
-d 1.0000
-illum 1
-
-# Wool - Light Blue
-newmtl 35_3
-Kd 0.4078 0.5451 0.8314
-d 1.0000
-illum 1
-
-# Wool - Yellow
-newmtl 35_4
-Kd 0.7608 0.7098 0.1098
-d 1.0000
-illum 1
-
-# Wool - Light Green
-newmtl 35_5
-Kd 0.2314 0.7412 0.1882
-d 1.0000
-illum 1
-
-# Wool - Pink
-newmtl 35_6
-Kd 0.8510 0.5176 0.6078
-d 1.0000
-illum 1
-
-# Wool - Gray
-newmtl 35_7
-Kd 0.2627 0.2627 0.2627
-d 1.0000
-illum 1
-
-# Wool - Light Gray
-newmtl 35_8
-Kd 0.6196 0.6510 0.6510
-d 1.0000
-illum 1
-
-# Wool - Cyan
-newmtl 35_9
-Kd 0.1529 0.4588 0.5882
-d 1.0000
-illum 1
-
-# Wool - Purple
-newmtl 35_10
-Kd 0.5059 0.2118 0.7686
-d 1.0000
-illum 1
-
-# Wool - Blue
-newmtl 35_11
-Kd 0.1529 0.2000 0.6039
-d 1.0000
-illum 1
-
-# Wool - Brown
-newmtl 35_12
-Kd 0.3373 0.2000 0.1098
-d 1.0000
-illum 1
-
-# Wool - Dark Green
-newmtl 35_13
-Kd 0.2196 0.3020 0.0941
-d 1.0000
-illum 1
-
-# Wool - Red
-newmtl 35_14
-Kd 0.6431 0.1765 0.1608
-d 1.0000
-illum 1
-
-# Wool - Black
-newmtl 35_15
-Kd 0.1059 0.0902 0.0902
-d 1.0000
+# Unknown
+newmtl 35
+Kd 0.0000 0.4980 0.4980
+d 0.4980
 illum 1
 
 # Unknown
@@ -1664,5 +1532,149 @@ illum 1
 newmtl 255
 Kd 0.0000 0.4980 0.4980
 d 0.4980
+illum 1
+
+# Foot of bed pointing West
+newmtl 26_0
+Kd 0.5608 0.0902 0.0902
+d 1.0000
+illum 1
+
+# Foot of bed pointing North
+newmtl 26_1
+Kd 0.5608 0.0902 0.0902
+d 1.0000
+illum 1
+
+# Foot of bed pointing East
+newmtl 26_2
+Kd 0.5608 0.0902 0.0902
+d 1.0000
+illum 1
+
+# Foot of bed pointing South
+newmtl 26_3
+Kd 0.5608 0.0902 0.0902
+d 1.0000
+illum 1
+
+# Head of bed pointing West
+newmtl 26_8
+Kd 0.6863 0.4549 0.4588
+d 1.0000
+illum 1
+
+# Head of bed pointing North
+newmtl 26_9
+Kd 0.6863 0.4549 0.4588
+d 1.0000
+illum 1
+
+# Head of bed pointing East
+newmtl 26_10
+Kd 0.6863 0.4549 0.4588
+d 1.0000
+illum 1
+
+# Head of bed pointing South
+newmtl 26_11
+Kd 0.6863 0.4549 0.4588
+d 1.0000
+illum 1
+
+# Wool - White
+newmtl 35_0
+Kd 0.8706 0.8706 0.8706
+d 1.0000
+illum 1
+
+# Wool - Orange
+newmtl 35_1
+Kd 0.9176 0.5020 0.2157
+d 1.0000
+illum 1
+
+# Wool - Magenta
+newmtl 35_2
+Kd 0.7490 0.2980 0.7882
+d 1.0000
+illum 1
+
+# Wool - Light Blue
+newmtl 35_3
+Kd 0.4078 0.5451 0.8314
+d 1.0000
+illum 1
+
+# Wool - Yellow
+newmtl 35_4
+Kd 0.7608 0.7098 0.1098
+d 1.0000
+illum 1
+
+# Wool - Light Green
+newmtl 35_5
+Kd 0.2314 0.7412 0.1882
+d 1.0000
+illum 1
+
+# Wool - Pink
+newmtl 35_6
+Kd 0.8510 0.5176 0.6078
+d 1.0000
+illum 1
+
+# Wool - Gray
+newmtl 35_7
+Kd 0.2627 0.2627 0.2627
+d 1.0000
+illum 1
+
+# Wool - Light Gray
+newmtl 35_8
+Kd 0.6196 0.6510 0.6510
+d 1.0000
+illum 1
+
+# Wool - Cyan
+newmtl 35_9
+Kd 0.1529 0.4588 0.5882
+d 1.0000
+illum 1
+
+# Wool - Purple
+newmtl 35_10
+Kd 0.5059 0.2118 0.7686
+d 1.0000
+illum 1
+
+# Wool - Blue
+newmtl 35_11
+Kd 0.1529 0.2000 0.6039
+d 1.0000
+illum 1
+
+# Wool - Brown
+newmtl 35_12
+Kd 0.3373 0.2000 0.1098
+d 1.0000
+illum 1
+
+# Wool - Dark Green
+newmtl 35_13
+Kd 0.2196 0.3020 0.0941
+d 1.0000
+illum 1
+
+# Wool - Red
+newmtl 35_14
+Kd 0.6431 0.1765 0.1608
+d 1.0000
+illum 1
+
+# Wool - Black
+newmtl 35_15
+Kd 0.1059 0.0902 0.0902
+d 1.0000
 illum 1
 

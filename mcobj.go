@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"json"
 	"math"
 	"nbt"
 	"os"
 	"path"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -75,6 +78,15 @@ func main() {
 
 	if prt && outFilename == defaultObjOutFilename {
 		outFilename = defaultPrtOutFilename
+	}
+
+	{
+		var dir, _ = path.Split(strings.Replace(os.Args[0], "\\", "/", -1))
+		var jsonError = loadBlockTypesJson(path.Join(dir, "blocks.json"))
+		if jsonError != nil {
+			fmt.Fprintln(os.Stderr, jsonError)
+			return
+		}
 	}
 
 	for i := 0; i < flag.NArg(); i++ {
@@ -235,4 +247,80 @@ func loadSide(sideCache *SideCache, opener ChunkOpener, x, z int) {
 			sideCache.AddChunk(chunk)
 		}
 	}
+}
+
+func loadBlockTypesJson(filename string) os.Error {
+	var jsonBytes, jsonIoError = ioutil.ReadFile(filename)
+
+	if jsonIoError != nil {
+		return jsonIoError
+	}
+
+	var f interface{}
+	var unmarshalError = json.Unmarshal(jsonBytes, &f)
+	if unmarshalError != nil {
+		return unmarshalError
+	}
+
+	var lines, linesOk = f.([]interface{})
+	if linesOk {
+		for _, line := range lines {
+			var fields, fieldsOk = line.(map[string]interface{})
+			if fieldsOk {
+				var (
+					blockId      byte
+					data         byte = 255
+					name         string
+					mass         SingularOrAggregate = Mass
+					transparency Transparency        = Opaque
+					color        uint32
+				)
+				for k, v := range fields {
+					switch k {
+					case "name":
+						name = v.(string)
+					case "color":
+						switch len(v.(string)) {
+						case 7:
+							var n, numErr = strconv.Btoui64(v.(string)[1:], 16)
+							if numErr == nil {
+								color = uint32(n*0x100 + 0xff)
+							}
+						case 9:
+							var n, numErr = strconv.Btoui64(v.(string)[1:], 16)
+							if numErr == nil {
+								color = uint32(n)
+							}
+						}
+					case "blockId":
+						blockId = byte(v.(float64))
+					case "data":
+						data = byte(v.(float64))
+					case "item":
+						if v.(bool) {
+							mass = Item
+						} else {
+							mass = Mass
+						}
+					case "transparent":
+						if v.(bool) {
+							transparency = Transparent
+						} else {
+							transparency = Opaque
+						}
+					}
+				}
+
+				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency}
+				if data != 255 {
+					extraData[blockId] = true
+					colors = append(colors, MTL{blockId, data, color, name})
+				} else {
+					colors[blockId] = MTL{blockId, data, color, name}
+				}
+			}
+		}
+	}
+
+	return nil
 }

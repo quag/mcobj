@@ -17,4 +17,26 @@
 
 [ ] transparent blocks (torches, glass, redstone paths...) aren't part of the 'surface' and must include the blocks under them
 [ ] write out txt file with mcobjBlockIds, blockIds, data values, and interpretation of those values IOT make it easy for prt users to create meshes
-[ ] read mtl and blocktypes data from txt files (means I don't have to do a new release to keep up with minecraft)
+[x] read mtl and blocktypes data from txt files (means I don't have to do a new release to keep up with minecraft)
+
+---
+
+[x] Move block Id's, colours, etc. into external text file so you dont have to recompile to tweak something :P
+
+ - black glass (try removing glass faces adjacent with other faces)
+ - compile as separate units (private stuff can only be seen when compiled at the same time)
+
+ - Non-cubed blocks
+    - crosses for saplings, sugar cane, fire, red/yellow flowers, red/brown shrooms, wheat
+    - snow blocks are 1/8th height (Full height and 1/8th height snow blocks have the same ID)
+    - calculate water/lava heights
+    - farm land is 7/8th height
+    - cake, half-blocks, pressure plates (stone, wood), fence posts, doors (wood, metal), ladder, tracks, redstone wire, signs, wall signs, steps, buttons, beds, redstone repeaters
+ - Calculate data for grass, fenses, restone wire, chests, water/lava, portals
+ - 64-bit Linux builds
+ - 3DSMax output or 3DSMax fixer
+ - Center on spawn location
+ - Center on player location
+ - open source mcobj
+ - 'chunk slice' renders
+ - add FBX output format (http://usa.autodesk.com/adsk/servlet/pc/index?id=6837478&siteID=123112)

@@ -1,14 +1,17 @@
 package main
 
 var (
-	emptySide ChunkSide
-	solidSide ChunkSide
+	emptySide   ChunkSide
+	solidSide   ChunkSide
+	defaultSide *ChunkSide
 )
 
 func init() {
 	for i, _ := range solidSide {
 		solidSide[i] = 1
 	}
+
+	defaultSide = &solidSide
 }
 
 type ChunkSide [128 * 16]uint16

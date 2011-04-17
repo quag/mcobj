@@ -1,5 +1,5 @@
 [
-{"blockId": 0,  "color": "#fefeff01", "name": "Air",                                    "transparent": true},
+{"blockId": 0,  "color": "#fefeff01", "name": "Air",                                    "empty": true      },
 {"blockId": 1,  "color": "#7d7d7d",   "name": "Stone"                                                      },
 {"blockId": 2,  "color": "#52732c",   "name": "Grass"                                                      },
 {"blockId": 3,  "color": "#866043",   "name": "Dirt"                                                       },

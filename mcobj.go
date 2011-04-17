@@ -20,7 +20,6 @@ var (
 	yMin       int
 	blockFaces bool
 	hideBottom bool
-	hideStone  bool
 	noColor    bool
 
 	faceCount int
@@ -46,7 +45,6 @@ func main() {
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
-	flag.BoolVar(&hideStone, "hs", false, "Hide stone")
 	flag.BoolVar(&noColor, "g", false, "Omit materials")
 	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
 	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
@@ -273,6 +271,7 @@ func loadBlockTypesJson(filename string) os.Error {
 					name         string
 					mass         SingularOrAggregate = Mass
 					transparency Transparency        = Opaque
+					empty        bool                = false
 					color        uint32
 				)
 				for k, v := range fields {
@@ -299,8 +298,10 @@ func loadBlockTypesJson(filename string) os.Error {
 					case "item":
 						if v.(bool) {
 							mass = Item
+							transparency = Transparent
 						} else {
 							mass = Mass
+							transparency = Opaque
 						}
 					case "transparent":
 						if v.(bool) {
@@ -308,10 +309,18 @@ func loadBlockTypesJson(filename string) os.Error {
 						} else {
 							transparency = Opaque
 						}
+					case "empty":
+						if v.(bool) {
+							empty = true
+							transparency = Transparent
+							mass = Mass
+						} else {
+							empty = false
+						}
 					}
 				}
 
-				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency}
+				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty}
 				if data != 255 {
 					extraData[blockId] = true
 					colors = append(colors, MTL{blockId, data, color, name})

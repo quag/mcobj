@@ -17,6 +17,7 @@ var (
 
 type BetaWorld struct {
 	worldDir string
+	mask     ChunkMask
 }
 
 type McrFile struct {
@@ -144,7 +145,14 @@ func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
 							return nil, readErr
 						}
 						if location != 0 {
-							pool.chunkMap[betaChunkPoolKey(rx*32+cx, rz*32+cz)] = true
+							var (
+								x = rx*32 + cx
+								z = rz*32 + cz
+							)
+
+							if !w.mask.IsMasked(x, z) {
+								pool.chunkMap[betaChunkPoolKey(x, z)] = true
+							}
 						}
 					}
 				}

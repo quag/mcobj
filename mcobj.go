@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"json"
 	"math"
 	"nbt"
 	"os"
 	"path"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -17,7 +20,6 @@ var (
 	yMin       int
 	blockFaces bool
 	hideBottom bool
-	hideStone  bool
 	noColor    bool
 
 	faceCount int
@@ -25,28 +27,34 @@ var (
 
 	chunkCount int
 	chunkLimit int
+
+	chunkMask ChunkMask
 )
 
 func main() {
 	var cx, cz int
 	var square int
+	var rectx, rectz int
 	var maxProcs = runtime.GOMAXPROCS(0)
 	var prt bool
+	var solidSides bool
 
 	var defaultObjOutFilename = "a.obj"
 	var defaultPrtOutFilename = "a.prt"
 
 	var outFilename string
 	flag.IntVar(&maxProcs, "cpu", maxProcs, "Number of cores to use")
-	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
 	flag.StringVar(&outFilename, "o", defaultObjOutFilename, "Name for output file")
 	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
+	flag.BoolVar(&solidSides, "sides", false, "Solid sides, rather than showing underground")
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
-	flag.BoolVar(&hideStone, "hs", false, "Hide stone")
 	flag.BoolVar(&noColor, "g", false, "Omit materials")
 	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
 	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
+	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
+	flag.IntVar(&rectx, "rx", math.MaxInt32, "Width(x) of rectangle size")
+	flag.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
 	flag.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
 	var showHelp = flag.Bool("h", false, "Show Help")
@@ -69,12 +77,46 @@ func main() {
 
 	if square != math.MaxInt32 {
 		chunkLimit = square * square
+		var h = square / 2
+		chunkMask = &RectangeChunkMask{cx - h, cz - h, cx - h + square, cz - h + square}
+	} else if rectx != math.MaxInt32 || rectz != math.MaxInt32 {
+		switch {
+		case rectx != math.MaxInt32 && rectz != math.MaxInt32:
+			chunkLimit = rectx * rectz
+			var (
+				hx = rectx / 2
+				hz = rectz / 2
+			)
+			chunkMask = &RectangeChunkMask{cx - hx, cz - hz, cx - hx + rectx, cz - hz + rectz}
+		case rectx != math.MaxInt32:
+			chunkLimit = math.MaxInt32
+			var hx = rectx / 2
+			chunkMask = &RectangeChunkMask{cx - hx, math.MinInt32, cx - hx + rectx, math.MaxInt32}
+		case rectz != math.MaxInt32:
+			chunkLimit = math.MaxInt32
+			var hz = rectz / 2
+			chunkMask = &RectangeChunkMask{math.MinInt32, cz - hz, math.MaxInt32, cz - hz + rectz}
+		}
 	} else {
 		chunkLimit = math.MaxInt32
+		chunkMask = &AllChunksMask{}
 	}
 
 	if prt && outFilename == defaultObjOutFilename {
 		outFilename = defaultPrtOutFilename
+	}
+
+	if solidSides {
+		defaultSide = &emptySide
+	}
+
+	{
+		var dir, _ = path.Split(strings.Replace(os.Args[0], "\\", "/", -1))
+		var jsonError = loadBlockTypesJson(path.Join(dir, "blocks.json"))
+		if jsonError != nil {
+			fmt.Fprintln(os.Stderr, jsonError)
+			return
+		}
 	}
 
 	for i := 0; i < flag.NArg(); i++ {
@@ -87,7 +129,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
 		}
 
-		var world = OpenWorld(dirpath)
+		var world = OpenWorld(dirpath, chunkMask)
 		var pool, poolErr = world.ChunkPool()
 		if poolErr != nil {
 			fmt.Println(poolErr)
@@ -175,18 +217,6 @@ func (b *Blocks) Column(x, z int) BlockColumn {
 	return BlockColumn((*b)[i : i+128])
 }
 
-func base36(i int) string {
-	return strconv.Itob(i, 36)
-}
-
-func encodeFolder(i int) string {
-	return base36(((i % 64) + 64) % 64)
-}
-
-func chunkPath(world string, x, z int) string {
-	return path.Join(world, encodeFolder(x), encodeFolder(z), "c."+base36(x)+"."+base36(z)+".dat")
-}
-
 func zigzag(n int) int {
 	return (n << 1) ^ (n >> 31)
 }
@@ -227,7 +257,7 @@ func loadChunk2(opener ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
 }
 
 func loadSide(sideCache *SideCache, opener ChunkOpener, x, z int) {
-	if !sideCache.HasSide(x, z) {
+	if !sideCache.HasSide(x, z) && !chunkMask.IsMasked(x, z) {
 		var chunk, loadErr = loadChunk2(opener, x, z)
 		if loadErr != nil {
 			fmt.Println(loadErr)
@@ -235,4 +265,91 @@ func loadSide(sideCache *SideCache, opener ChunkOpener, x, z int) {
 			sideCache.AddChunk(chunk)
 		}
 	}
+}
+
+func loadBlockTypesJson(filename string) os.Error {
+	var jsonBytes, jsonIoError = ioutil.ReadFile(filename)
+
+	if jsonIoError != nil {
+		return jsonIoError
+	}
+
+	var f interface{}
+	var unmarshalError = json.Unmarshal(jsonBytes, &f)
+	if unmarshalError != nil {
+		return unmarshalError
+	}
+
+	var lines, linesOk = f.([]interface{})
+	if linesOk {
+		for _, line := range lines {
+			var fields, fieldsOk = line.(map[string]interface{})
+			if fieldsOk {
+				var (
+					blockId      byte
+					data         byte = 255
+					name         string
+					mass         SingularOrAggregate = Mass
+					transparency Transparency        = Opaque
+					empty        bool                = false
+					color        uint32
+				)
+				for k, v := range fields {
+					switch k {
+					case "name":
+						name = v.(string)
+					case "color":
+						switch len(v.(string)) {
+						case 7:
+							var n, numErr = strconv.Btoui64(v.(string)[1:], 16)
+							if numErr == nil {
+								color = uint32(n*0x100 + 0xff)
+							}
+						case 9:
+							var n, numErr = strconv.Btoui64(v.(string)[1:], 16)
+							if numErr == nil {
+								color = uint32(n)
+							}
+						}
+					case "blockId":
+						blockId = byte(v.(float64))
+					case "data":
+						data = byte(v.(float64))
+					case "item":
+						if v.(bool) {
+							mass = Item
+							transparency = Transparent
+						} else {
+							mass = Mass
+							transparency = Opaque
+						}
+					case "transparent":
+						if v.(bool) {
+							transparency = Transparent
+						} else {
+							transparency = Opaque
+						}
+					case "empty":
+						if v.(bool) {
+							empty = true
+							transparency = Transparent
+							mass = Mass
+						} else {
+							empty = false
+						}
+					}
+				}
+
+				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty}
+				if data != 255 {
+					extraData[blockId] = true
+					colors = append(colors, MTL{blockId, data, color, name})
+				} else {
+					colors[blockId] = MTL{blockId, data, color, name}
+				}
+			}
+		}
+	}
+
+	return nil
 }

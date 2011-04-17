@@ -24,12 +24,12 @@ type ChunkPool interface {
 	Remaining() int
 }
 
-func OpenWorld(worldDir string) World {
+func OpenWorld(worldDir string, mask ChunkMask) World {
 	var _, err = os.Stat(path.Join(worldDir, "region"))
 	if err != nil {
-		return &AlphaWorld{worldDir}
+		return &AlphaWorld{worldDir, mask}
 	}
-	return &BetaWorld{worldDir}
+	return &BetaWorld{worldDir, mask}
 }
 
 type ReadCloserPair struct {

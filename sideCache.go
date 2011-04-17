@@ -59,8 +59,6 @@ func calculateSides(blocks Blocks) *ChunkSides {
 }
 
 func (s *SideCache) getSide(x, z int, side int) *ChunkSide {
-	var defaultSide = &solidSide
-
 	if s.chunks == nil {
 		return defaultSide
 	}

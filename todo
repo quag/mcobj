@@ -23,6 +23,8 @@
 
 [x] Move block Id's, colours, etc. into external text file so you dont have to recompile to tweak something :P
 
+[x] Remove specific check for (blockId == 0) for empty. Also remove "hide stone" flag. Do both through special empty flag in json
+
  - black glass (try removing glass faces adjacent with other faces)
  - compile as separate units (private stuff can only be seen when compiled at the same time)
 

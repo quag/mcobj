@@ -50,7 +50,7 @@ func (d *Describer) Init() {
 			if blockType.transparency == Transparent {
 				value += 2
 			}
-			if blockType.blockId == 0 || (hideStone && blockType.blockId == 1) {
+			if blockType.empty {
 				value += 4
 			}
 		} else {
@@ -82,6 +82,7 @@ type BlockType struct {
 	blockId      byte
 	mass         SingularOrAggregate
 	transparency Transparency
+	empty        bool
 }
 
 type Transparency bool

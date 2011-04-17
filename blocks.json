@@ -1,5 +1,5 @@
 [
-{"blockId": 0,  "color": "#fefeff01", "name": "Air",                                    "transparent": true},
+{"blockId": 0,  "color": "#fefeff01", "name": "Air",                                    "empty": true      },
 {"blockId": 1,  "color": "#7d7d7d",   "name": "Stone"                                                      },
 {"blockId": 2,  "color": "#52732c",   "name": "Grass"                                                      },
 {"blockId": 3,  "color": "#866043",   "name": "Dirt"                                                       },
@@ -19,7 +19,7 @@
 {"blockId": 17, "color": "#665132",   "name": "Wood"                                                       },
 {"blockId": 18, "color": "#1c4705",   "name": "Leaves",                                 "transparent": true},
 {"blockId": 19, "color": "#b7b739",   "name": "Sponge",                                 "item": true       },
-{"blockId": 20, "color": "#ffffff01", "name": "Glass",                                  "transparent": true},
+{"blockId": 20, "color": "#ffffff33", "name": "Glass",                                  "transparent": true},
 {"blockId": 21, "color": "#667087",   "name": "Lapis Lazuli Ore"                                           },
 {"blockId": 22, "color": "#1d47a6",   "name": "Lapis Lazuli Block"                                         },
 {"blockId": 23, "color": "#6c6c6c",   "name": "Dispenser"                                                  },

@@ -7,10 +7,13 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 type AlphaWorld struct {
 	worldDir string
+	mask     ChunkMask
 }
 
 func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
@@ -51,7 +54,7 @@ func (w *AlphaWorld) ChunkPool() (ChunkPool, os.Error) {
 		}
 		done <- true
 	}()
-	var v = &visitor{make(map[string]bool)}
+	var v = &visitor{make(map[string]bool), w.mask}
 	filepath.Walk(w.worldDir, v, errors)
 	close(errors)
 	<-done
@@ -60,6 +63,7 @@ func (w *AlphaWorld) ChunkPool() (ChunkPool, os.Error) {
 
 type visitor struct {
 	chunks map[string]bool
+	mask   ChunkMask
 }
 
 func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
@@ -67,8 +71,27 @@ func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
 }
 
 func (v *visitor) VisitFile(file string, f *os.FileInfo) {
-	var match, err = path.Match("c.*.dat", path.Base(file))
+	var match, err = path.Match("c.*.*.dat", path.Base(file))
 	if match && err == nil {
-		v.chunks[file] = true
+		var (
+			s       = strings.Split(path.Base(file), ".", 4)
+			x, xErr = strconv.Btoi64(s[1], 36)
+			z, zErr = strconv.Btoi64(s[2], 36)
+		)
+		if xErr == nil && zErr == nil && !v.mask.IsMasked(int(x), int(z)) {
+			v.chunks[file] = true
+		}
 	}
+}
+
+func chunkPath(world string, x, z int) string {
+	return path.Join(world, encodeFolder(x), encodeFolder(z), "c."+base36(x)+"."+base36(z)+".dat")
+}
+
+func base36(i int) string {
+	return strconv.Itob(i, 36)
+}
+
+func encodeFolder(i int) string {
+	return base36(((i % 64) + 64) % 64)
 }

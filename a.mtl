@@ -121,7 +121,7 @@ illum 1
 # Glass
 newmtl 20
 Kd 1.0000 1.0000 1.0000
-d 0.0039
+d 0.2000
 illum 1
 
 # Lapis Lazuli Ore

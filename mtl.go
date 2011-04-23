@@ -11,7 +11,7 @@ func printMtl(w io.Writer, blockId uint16) {
 		var idByte = byte(blockId & 0xff)
 		var extraValue, extraPresent = extraData[idByte]
 		if extraValue && extraPresent {
-			fmt.Fprintf(w, "usemtl %d_%d", idByte, blockId>>8)
+			fmt.Fprintf(w, "usemtl %d_%d\n", idByte, blockId>>8)
 		} else {
 			fmt.Fprintln(w, "usemtl", idByte)
 		}

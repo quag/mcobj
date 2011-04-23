@@ -32,6 +32,7 @@ var (
 )
 
 func main() {
+	var bx, bz float64
 	var cx, cz int
 	var square int
 	var rectx, rectz int
@@ -51,8 +52,10 @@ func main() {
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
 	flag.BoolVar(&noColor, "g", false, "Omit materials")
-	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
-	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
+	flag.Float64Var(&bx, "x", 0, "Center x coordinate in blocks")
+	flag.Float64Var(&bz, "z", 0, "Center z coordinate in blocks")
+	flag.IntVar(&cx, "cx", 0, "Center x coordinate in chunks")
+	flag.IntVar(&cz, "cz", 0, "Center z coordinate in chunks")
 	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
 	flag.IntVar(&rectx, "rx", math.MaxInt32, "Width(x) of rectangle size")
 	flag.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
@@ -81,6 +84,20 @@ func main() {
 		MaterialNamer = new(NumberBlockIdNamer)
 	} else {
 		MaterialNamer = new(NameBlockIdNamer)
+	}
+
+	switch {
+	case bx == 0 && cx == 0:
+		cx = 0
+	case cx == 0:
+		cx = int(bx / 16)
+	}
+
+	switch {
+	case bz == 0 && cz == 0:
+		cz = 0
+	case cz == 0:
+		cz = int(bz / 16)
 	}
 
 	if square != math.MaxInt32 {

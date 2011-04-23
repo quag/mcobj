@@ -8,13 +8,7 @@ import (
 
 func printMtl(w io.Writer, blockId uint16) {
 	if !noColor {
-		var idByte = byte(blockId & 0xff)
-		var extraValue, extraPresent = extraData[idByte]
-		if extraValue && extraPresent {
-			fmt.Fprintf(w, "usemtl %d_%d\n", idByte, blockId>>8)
-		} else {
-			fmt.Fprintln(w, "usemtl", idByte)
-		}
+		fmt.Fprintln(w, "usemtl", MaterialNamer.NameBlockId(blockId))
 	}
 }
 
@@ -51,11 +45,7 @@ func (mtl *MTL) Print(w io.Writer) {
 		a = mtl.color & 0xff
 	)
 
-	if mtl.metadata == 255 {
-		fmt.Fprintf(w, "# %s\nnewmtl %d\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\n\n", mtl.name, mtl.blockId, float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
-	} else {
-		fmt.Fprintf(w, "# %s\nnewmtl %d_%d\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\n\n", mtl.name, mtl.blockId, mtl.metadata, float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
-	}
+	fmt.Fprintf(w, "# %s\nnewmtl %s\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\n\n", mtl.name, MaterialNamer.NameBlockId(uint16(mtl.blockId)+uint16(mtl.metadata)*256), float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
 }
 
 func (mtl *MTL) colorId() uint16 {
@@ -79,4 +69,44 @@ var (
 	extraData map[byte]bool
 
 	colors []MTL
+
+	MaterialNamer BlockIdNamer
 )
+
+type BlockIdNamer interface {
+	NameBlockId(blockId uint16) string
+}
+
+type NumberBlockIdNamer struct{}
+
+func (n *NumberBlockIdNamer) NameBlockId(blockId uint16) (name string) {
+	var idByte = byte(blockId & 0xff)
+	var extraValue, extraPresent = extraData[idByte]
+	if extraValue && extraPresent {
+		name = fmt.Sprintf("%d_%d", idByte, blockId>>8)
+	} else {
+		name = fmt.Sprintf("%d", idByte)
+	}
+	return
+}
+
+type NameBlockIdNamer struct{}
+
+func (n *NameBlockIdNamer) NameBlockId(blockId uint16) (name string) {
+	var idByte = byte(blockId & 0xff)
+	var extraValue, extraPresent = extraData[idByte]
+	if extraValue && extraPresent {
+		for _, color := range colors {
+			if color.blockId == idByte && color.metadata == uint8(blockId>>8) {
+				return color.name
+			}
+		}
+	} else {
+		for _, color := range colors {
+			if color.blockId == idByte {
+				return color.name
+			}
+		}
+	}
+	return
+}

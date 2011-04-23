@@ -38,6 +38,7 @@ func main() {
 	var maxProcs = runtime.GOMAXPROCS(0)
 	var prt bool
 	var solidSides bool
+	var mtlNumber bool
 
 	var defaultObjOutFilename = "a.obj"
 	var defaultPrtOutFilename = "a.prt"
@@ -57,6 +58,7 @@ func main() {
 	flag.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
 	flag.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
+	flag.BoolVar(&mtlNumber, "mtlnum", false, "Number materials instead of using names")
 	var showHelp = flag.Bool("h", false, "Show Help")
 	flag.Parse()
 
@@ -73,6 +75,12 @@ func main() {
 
 	if faceLimit != math.MaxInt32 {
 		faceLimit *= 1000
+	}
+
+	if mtlNumber {
+		MaterialNamer = new(NumberBlockIdNamer)
+	} else {
+		MaterialNamer = new(NameBlockIdNamer)
 	}
 
 	if square != math.MaxInt32 {
@@ -360,7 +368,7 @@ func loadBlockTypesJson(filename string) os.Error {
 				} else {
 					extraData[blockId] = true
 					for _, data = range dataArray {
-						colors = append(colors, MTL{blockId, data, color, fmt.Sprintf("%s - %d", name, data)})
+						colors = append(colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data)})
 					}
 				}
 			}

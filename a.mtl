@@ -1,1829 +1,1829 @@
 # Air
-newmtl 0
+newmtl Air
 Kd 0.9961 0.9961 1.0000
 d 0.0039
 illum 1
 
 # Stone
-newmtl 1
+newmtl Stone
 Kd 0.4902 0.4902 0.4902
 d 1.0000
 illum 1
 
 # Grass
-newmtl 2
+newmtl Grass
 Kd 0.3216 0.4510 0.1725
 d 1.0000
 illum 1
 
 # Dirt
-newmtl 3
+newmtl Dirt
 Kd 0.5255 0.3765 0.2627
 d 1.0000
 illum 1
 
 # Cobblestone
-newmtl 4
+newmtl Cobblestone
 Kd 0.4588 0.4588 0.4588
 d 1.0000
 illum 1
 
-# Wooden Plank
-newmtl 5
+# WoodenPlank
+newmtl WoodenPlank
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
 # Unknown
-newmtl 6
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Bedrock
-newmtl 7
+newmtl Bedrock
 Kd 0.3294 0.3294 0.3294
 d 1.0000
 illum 1
 
 # Water
-newmtl 8
+newmtl Water
 Kd 0.0000 0.6039 1.0000
 d 0.3137
 illum 1
 
-# Stationary water
-newmtl 9
+# WaterStationary
+newmtl WaterStationary
 Kd 0.0000 0.6039 1.0000
 d 0.3137
 illum 1
 
 # Lava
-newmtl 10
+newmtl Lava
 Kd 0.9608 0.2588 0.0000
 d 1.0000
 illum 1
 
-# Stationary lava
-newmtl 11
+# LavaStationary
+newmtl LavaStationary
 Kd 0.9608 0.2588 0.0000
 d 1.0000
 illum 1
 
 # Sand
-newmtl 12
+newmtl Sand
 Kd 0.8549 0.8235 0.6196
 d 1.0000
 illum 1
 
 # Gravel
-newmtl 13
+newmtl Gravel
 Kd 0.5333 0.4980 0.4941
 d 1.0000
 illum 1
 
-# Gold ore
-newmtl 14
+# GoldOre
+newmtl GoldOre
 Kd 0.5647 0.5490 0.4902
 d 1.0000
 illum 1
 
-# Iron ore
-newmtl 15
+# IronOre
+newmtl IronOre
 Kd 0.5333 0.5137 0.4980
 d 1.0000
 illum 1
 
-# Coal ore
-newmtl 16
+# CoalOre
+newmtl CoalOre
 Kd 0.4510 0.4510 0.4510
 d 1.0000
 illum 1
 
-# Unknown
-newmtl 17
-Kd 0.0000 0.4980 0.4980
-d 0.4980
+# Wood
+newmtl Wood
+Kd 0.4000 0.3176 0.1961
+d 1.0000
 illum 1
 
-# Unknown
-newmtl 18
-Kd 0.0000 0.4980 0.4980
-d 0.4980
+# Leaves
+newmtl Leaves
+Kd 0.1098 0.2784 0.0196
+d 1.0000
 illum 1
 
 # Sponge
-newmtl 19
+newmtl Sponge
 Kd 0.7176 0.7176 0.2235
 d 1.0000
 illum 1
 
 # Glass
-newmtl 20
+newmtl Glass
 Kd 1.0000 1.0000 1.0000
 d 0.2000
 illum 1
 
-# Lapis Lazuli Ore
-newmtl 21
+# LapisLazuliOre
+newmtl LapisLazuliOre
 Kd 0.4000 0.4392 0.5294
 d 1.0000
 illum 1
 
-# Lapis Lazuli Block
-newmtl 22
+# LapisLazuliBlock
+newmtl LapisLazuliBlock
 Kd 0.1137 0.2784 0.6510
 d 1.0000
 illum 1
 
 # Dispenser
-newmtl 23
+newmtl Dispenser
 Kd 0.4235 0.4235 0.4235
 d 1.0000
 illum 1
 
 # Sandstone
-newmtl 24
+newmtl Sandstone
 Kd 0.8353 0.8039 0.5804
 d 1.0000
 illum 1
 
-# Note Block
-newmtl 25
+# NoteBlock
+newmtl NoteBlock
 Kd 0.3961 0.2667 0.2000
 d 1.0000
 illum 1
 
 # Unknown
-newmtl 26
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 27
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
-# Detector Rail
-newmtl 28
+# DetectorRail
+newmtl DetectorRail
 Kd 0.4627 0.3843 0.3176
 d 1.0000
 illum 1
 
 # Unknown
-newmtl 29
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Web
-newmtl 30
+newmtl Web
 Kd 0.8549 0.8549 0.8549
 d 0.6000
 illum 1
 
 # Unknown
-newmtl 31
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 32
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 33
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 34
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 35
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 36
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
-# Yellow flower
-newmtl 37
+# FlowerYellow
+newmtl FlowerYellow
 Kd 0.7569 0.7804 0.0078
 d 1.0000
 illum 1
 
-# Red rose
-newmtl 38
+# FlowerRed
+newmtl FlowerRed
 Kd 0.7961 0.0235 0.0392
 d 1.0000
 illum 1
 
-# Brown Mushroom
-newmtl 39
+# MushroomBrown
+newmtl MushroomBrown
 Kd 0.5882 0.4431 0.3451
 d 1.0000
 illum 1
 
-# Red Mushroom
-newmtl 40
+# MushroomRed
+newmtl MushroomRed
 Kd 0.7725 0.2353 0.2471
 d 1.0000
 illum 1
 
-# Gold Block
-newmtl 41
+# GoldBlock
+newmtl GoldBlock
 Kd 0.9804 0.9255 0.3059
 d 1.0000
 illum 1
 
-# Iron Block
-newmtl 42
+# IronBlock
+newmtl IronBlock
 Kd 0.9020 0.9020 0.9020
 d 1.0000
 illum 1
 
-# Double Stone Slab
-newmtl 43
+# StoneSlabDouble
+newmtl StoneSlabDouble
 Kd 0.6549 0.6549 0.6549
 d 1.0000
 illum 1
 
-# Stone Slab
-newmtl 44
+# StoneSlab
+newmtl StoneSlab
 Kd 0.6549 0.6549 0.6549
 d 1.0000
 illum 1
 
 # Brick
-newmtl 45
+newmtl Brick
 Kd 0.6118 0.4314 0.3843
 d 1.0000
 illum 1
 
 # TNT
-newmtl 46
+newmtl TNT
 Kd 0.6510 0.3333 0.2471
 d 1.0000
 illum 1
 
 # Bookshelf
-newmtl 47
+newmtl Bookshelf
 Kd 0.4235 0.3451 0.2275
 d 1.0000
 illum 1
 
-# Moss Stone
-newmtl 48
+# StoneMoss
+newmtl StoneMoss
 Kd 0.3569 0.4235 0.3569
 d 1.0000
 illum 1
 
 # Obsidian
-newmtl 49
+newmtl Obsidian
 Kd 0.0784 0.0706 0.1176
 d 1.0000
 illum 1
 
 # Torch
-newmtl 50
+newmtl Torch
 Kd 1.0000 0.8549 0.4000
 d 0.6000
 illum 1
 
 # Fire
-newmtl 51
+newmtl Fire
 Kd 1.0000 0.4667 0.0000
 d 0.6000
 illum 1
 
-# Monster Spawner
-newmtl 52
+# MonsterSpawner
+newmtl MonsterSpawner
 Kd 0.1137 0.3098 0.4471
 d 1.0000
 illum 1
 
-# Wooden Stairs
-newmtl 53
+# StairsWooden
+newmtl StairsWooden
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
 # Chest
-newmtl 54
+newmtl Chest
 Kd 0.5137 0.3686 0.1451
 d 1.0000
 illum 1
 
-# Redstone Wire
-newmtl 55
+# RedstoneWire
+newmtl RedstoneWire
 Kd 0.7961 0.0000 0.0000
 d 1.0000
 illum 1
 
-# Diamond Ore
-newmtl 56
+# DiamondOre
+newmtl DiamondOre
 Kd 0.5098 0.5490 0.5608
 d 1.0000
 illum 1
 
-# Diamond Block
-newmtl 57
+# DiamondBlock
+newmtl DiamondBlock
 Kd 0.3922 0.8627 0.8392
 d 1.0000
 illum 1
 
 # Workbench
-newmtl 58
+newmtl Workbench
 Kd 0.4196 0.2784 0.1686
 d 1.0000
 illum 1
 
 # Crops
-newmtl 59
+newmtl Crops
 Kd 0.5137 0.7569 0.2667
 d 1.0000
 illum 1
 
 # Soil
-newmtl 60
+newmtl Soil
 Kd 0.2941 0.1608 0.0549
 d 1.0000
 illum 1
 
 # Furnace
-newmtl 61
+newmtl Furnace
 Kd 0.3059 0.3059 0.3059
 d 1.0000
 illum 1
 
-# Burning Furnace
-newmtl 62
+# FurnaceBurning
+newmtl FurnaceBurning
 Kd 0.4902 0.4000 0.3333
 d 1.0000
 illum 1
 
-# Sign Post
-newmtl 63
+# SignPost
+newmtl SignPost
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
-# Wooden Door
-newmtl 64
+# DoorWooden
+newmtl DoorWooden
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
 # Ladder
-newmtl 65
+newmtl Ladder
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
 # Minecart Tracks
-newmtl 66
+newmtl Minecart Tracks
 Kd 0.4588 0.4000 0.2980
 d 1.0000
 illum 1
 
-# Cobblestone Stairs
-newmtl 67
+# StairsCobblestone
+newmtl StairsCobblestone
 Kd 0.4588 0.4588 0.4588
 d 1.0000
 illum 1
 
-# Wall Sign
-newmtl 68
+# SignWall
+newmtl SignWall
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
 # Lever
-newmtl 69
+newmtl Lever
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
-# Stone Pressure Plate
-newmtl 70
+# PressurePlateStone
+newmtl PressurePlateStone
 Kd 0.4902 0.4902 0.4902
 d 1.0000
 illum 1
 
-# Iron Door
-newmtl 71
+# DoorIron
+newmtl DoorIron
 Kd 0.6980 0.6980 0.6980
 d 1.0000
 illum 1
 
-# Wooden Pressure Plate
-newmtl 72
+# PressurePlateWooden
+newmtl PressurePlateWooden
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
-# Redstone Ore
-newmtl 73
+# RedstoneOre
+newmtl RedstoneOre
 Kd 0.5216 0.4196 0.4196
 d 1.0000
 illum 1
 
-# Glowing Redstone Ore
-newmtl 74
+# RedstoneOreGlowing
+newmtl RedstoneOreGlowing
 Kd 0.7412 0.4196 0.4196
 d 1.0000
 illum 1
 
-# Redstone torch - Off
-newmtl 75
+# RedstoneTorch.Off
+newmtl RedstoneTorch.Off
 Kd 0.2667 0.0000 0.0000
 d 0.6000
 illum 1
 
-# Redstone torch - On
-newmtl 76
+# RedstoneTorch.On
+newmtl RedstoneTorch.On
 Kd 0.9961 0.0000 0.0000
 d 0.6000
 illum 1
 
-# Stone Button
-newmtl 77
+# ButtonStone
+newmtl ButtonStone
 Kd 0.4902 0.4902 0.4902
 d 1.0000
 illum 1
 
 # Snow
-newmtl 78
+newmtl Snow
 Kd 0.9412 0.9843 0.9843
 d 1.0000
 illum 1
 
 # Ice
-newmtl 79
+newmtl Ice
 Kd 0.4902 0.6824 1.0000
 d 0.4667
 illum 1
 
-# Snow Block
-newmtl 80
+# SnowBlock
+newmtl SnowBlock
 Kd 0.9412 0.9843 0.9843
 d 1.0000
 illum 1
 
 # Cactus
-newmtl 81
+newmtl Cactus
 Kd 0.0510 0.3922 0.0941
 d 1.0000
 illum 1
 
 # Clay
-newmtl 82
+newmtl Clay
 Kd 0.6235 0.6471 0.6941
 d 1.0000
 illum 1
 
-# Sugar Cane
-newmtl 83
+# SugarCane
+newmtl SugarCane
 Kd 0.5137 0.7686 0.2784
 d 1.0000
 illum 1
 
 # Jukebox
-newmtl 84
+newmtl Jukebox
 Kd 0.4196 0.2863 0.2157
 d 1.0000
 illum 1
 
 # Fence
-newmtl 85
+newmtl Fence
 Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
 # Pumpkin
-newmtl 86
+newmtl Pumpkin
 Kd 0.7725 0.4745 0.0941
 d 1.0000
 illum 1
 
 # Netherrack
-newmtl 87
+newmtl Netherrack
 Kd 0.4314 0.2078 0.2000
 d 1.0000
 illum 1
 
-# Soul Sand
-newmtl 88
+# SoulSand
+newmtl SoulSand
 Kd 0.3333 0.2549 0.2039
 d 1.0000
 illum 1
 
 # Glowstone
-newmtl 89
+newmtl Glowstone
 Kd 0.5373 0.4431 0.2549
 d 1.0000
 illum 1
 
 # Portal
-newmtl 90
+newmtl Portal
 Kd 0.2196 0.1137 0.3333
 d 0.7333
 illum 1
 
-# Jack-O-Lantern
-newmtl 91
+# JackOLantern
+newmtl JackOLantern
 Kd 0.7255 0.5255 0.1137
 d 1.0000
 illum 1
 
-# Cake Block
-newmtl 92
+# CakeBlock
+newmtl CakeBlock
 Kd 0.8980 0.8078 0.8118
 d 1.0000
 illum 1
 
-# Redstone Repeater - Off
-newmtl 93
+# RedstoneRepeater.Off
+newmtl RedstoneRepeater.Off
 Kd 0.5961 0.5804 0.5804
 d 1.0000
 illum 1
 
-# Redstone Repeater - On
-newmtl 94
+# RedstoneRepeater.On
+newmtl RedstoneRepeater.On
 Kd 0.6314 0.5804 0.5804
 d 1.0000
 illum 1
 
-# Locked Chest
-newmtl 95
+# LockedChest
+newmtl LockedChest
 Kd 0.5137 0.3686 0.1451
 d 1.0000
 illum 1
 
 # Unknown
-newmtl 96
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 97
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 98
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 99
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 100
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 101
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 102
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 103
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 104
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 105
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 106
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 107
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 108
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 109
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 110
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 111
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 112
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 113
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 114
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 115
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 116
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 117
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 118
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 119
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 120
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 121
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 122
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 123
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 124
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 125
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 126
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 127
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 128
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 129
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 130
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 131
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 132
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 133
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 134
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 135
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 136
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 137
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 138
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 139
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 140
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 141
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 142
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 143
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 144
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 145
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 146
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 147
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 148
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 149
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 150
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 151
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 152
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 153
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 154
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 155
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 156
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 157
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 158
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 159
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 160
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 161
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 162
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 163
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 164
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 165
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 166
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 167
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 168
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 169
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 170
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 171
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 172
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 173
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 174
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 175
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 176
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 177
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 178
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 179
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 180
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 181
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 182
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 183
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 184
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 185
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 186
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 187
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 188
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 189
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 190
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 191
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 192
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 193
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 194
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 195
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 196
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 197
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 198
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 199
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 200
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 201
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 202
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 203
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 204
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 205
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 206
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 207
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 208
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 209
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 210
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 211
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 212
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 213
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 214
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 215
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 216
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 217
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 218
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 219
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 220
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 221
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 222
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 223
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 224
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 225
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 226
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 227
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 228
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 229
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 230
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 231
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 232
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 233
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 234
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 235
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 236
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 237
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 238
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 239
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 240
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 241
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 242
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 243
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 244
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 245
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 246
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 247
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 248
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 249
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 250
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 251
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 252
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 253
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 254
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
 # Unknown
-newmtl 255
+newmtl Unknown
 Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
-# Sapling - Default - 0
-newmtl 6_0
+# Sapling.Default_0
+newmtl Sapling.Default_0
 Kd 0.3647 0.4941 0.1176
 d 1.0000
 illum 1
 
-# Sapling - Default - 4
-newmtl 6_4
+# Sapling.Default_4
+newmtl Sapling.Default_4
 Kd 0.3647 0.4941 0.1176
 d 1.0000
 illum 1
 
-# Sapling - Default - 8
-newmtl 6_8
+# Sapling.Default_8
+newmtl Sapling.Default_8
 Kd 0.3647 0.4941 0.1176
 d 1.0000
 illum 1
 
-# Sapling - Default - 12
-newmtl 6_12
+# Sapling.Default_12
+newmtl Sapling.Default_12
 Kd 0.3647 0.4941 0.1176
 d 1.0000
 illum 1
 
-# Sapling - Spruce - 1
-newmtl 6_1
+# Sapling.Spruce_1
+newmtl Sapling.Spruce_1
 Kd 0.4667 0.5882 0.3373
 d 1.0000
 illum 1
 
-# Sapling - Spruce - 5
-newmtl 6_5
+# Sapling.Spruce_5
+newmtl Sapling.Spruce_5
 Kd 0.4667 0.5882 0.3373
 d 1.0000
 illum 1
 
-# Sapling - Spruce - 9
-newmtl 6_9
+# Sapling.Spruce_9
+newmtl Sapling.Spruce_9
 Kd 0.4667 0.5882 0.3373
 d 1.0000
 illum 1
 
-# Sapling - Spruce - 13
-newmtl 6_13
+# Sapling.Spruce_13
+newmtl Sapling.Spruce_13
 Kd 0.4667 0.5882 0.3373
 d 1.0000
 illum 1
 
-# Sapling - Birch - 2
-newmtl 6_2
+# Sapling.Birch_2
+newmtl Sapling.Birch_2
 Kd 0.1882 0.2039 0.1176
 d 1.0000
 illum 1
 
-# Sapling - Birch - 6
-newmtl 6_6
+# Sapling.Birch_6
+newmtl Sapling.Birch_6
 Kd 0.1882 0.2039 0.1176
 d 1.0000
 illum 1
 
-# Sapling - Birch - 10
-newmtl 6_10
+# Sapling.Birch_10
+newmtl Sapling.Birch_10
 Kd 0.1882 0.2039 0.1176
 d 1.0000
 illum 1
 
-# Sapling - Birch - 14
-newmtl 6_14
+# Sapling.Birch_14
+newmtl Sapling.Birch_14
 Kd 0.1882 0.2039 0.1176
 d 1.0000
 illum 1
 
-# Wood - Default
-newmtl 17_0
+# Wood.Default
+newmtl Wood.Default
 Kd 0.4000 0.3176 0.1961
 d 1.0000
 illum 1
 
-# Wood - Spruce
-newmtl 17_1
+# Wood.Spruce
+newmtl Wood.Spruce
 Kd 0.4000 0.3176 0.1961
 d 1.0000
 illum 1
 
-# Wood - Birch
-newmtl 17_2
+# Wood.Birch
+newmtl Wood.Birch
 Kd 0.4000 0.3176 0.1961
 d 1.0000
 illum 1
 
-# Leaves - Default - 0
-newmtl 18_0
+# Leaves.Default_0
+newmtl Leaves.Default_0
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Default - 8
-newmtl 18_8
+# Leaves.Default_8
+newmtl Leaves.Default_8
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Spruce - 1
-newmtl 18_1
+# Leaves.Spruce_1
+newmtl Leaves.Spruce_1
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Spruce - 9
-newmtl 18_9
+# Leaves.Spruce_9
+newmtl Leaves.Spruce_9
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Birch - 2
-newmtl 18_2
+# Leaves.Birch_2
+newmtl Leaves.Birch_2
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Birch - 10
-newmtl 18_10
+# Leaves.Birch_10
+newmtl Leaves.Birch_10
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Default - 3
-newmtl 18_3
+# Leaves.Default_3
+newmtl Leaves.Default_3
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Default - 11
-newmtl 18_11
+# Leaves.Default_11
+newmtl Leaves.Default_11
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Bed - Foot - 0
-newmtl 26_0
+# Bed.Foot_0
+newmtl Bed.Foot_0
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Bed - Foot - 1
-newmtl 26_1
+# Bed.Foot_1
+newmtl Bed.Foot_1
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Bed - Foot - 2
-newmtl 26_2
+# Bed.Foot_2
+newmtl Bed.Foot_2
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Bed - Foot - 3
-newmtl 26_3
+# Bed.Foot_3
+newmtl Bed.Foot_3
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Bed - Head - 8
-newmtl 26_8
+# Bed.Head_8
+newmtl Bed.Head_8
 Kd 0.6863 0.4549 0.4588
 d 1.0000
 illum 1
 
-# Bed - Head - 9
-newmtl 26_9
+# Bed.Head_9
+newmtl Bed.Head_9
 Kd 0.6863 0.4549 0.4588
 d 1.0000
 illum 1
 
-# Bed - Head - 10
-newmtl 26_10
+# Bed.Head_10
+newmtl Bed.Head_10
 Kd 0.6863 0.4549 0.4588
 d 1.0000
 illum 1
 
-# Bed - Head - 11
-newmtl 26_11
+# Bed.Head_11
+newmtl Bed.Head_11
 Kd 0.6863 0.4549 0.4588
 d 1.0000
 illum 1
 
-# Powered Rail - Off
-newmtl 27_0
+# PoweredRail.Off
+newmtl PoweredRail.Off
 Kd 0.5294 0.4431 0.3059
 d 1.0000
 illum 1
 
-# Powered Rail - On
-newmtl 27_1
+# PoweredRail.On
+newmtl PoweredRail.On
 Kd 0.5843 0.4039 0.2745
 d 1.0000
 illum 1
 
-# Wool - White
-newmtl 35_0
+# Wool.White
+newmtl Wool.White
 Kd 0.8706 0.8706 0.8706
 d 1.0000
 illum 1
 
-# Wool - Orange
-newmtl 35_1
+# Wool.Orange
+newmtl Wool.Orange
 Kd 0.9176 0.5020 0.2157
 d 1.0000
 illum 1
 
-# Wool - Magenta
-newmtl 35_2
+# Wool.Magenta
+newmtl Wool.Magenta
 Kd 0.7490 0.2980 0.7882
 d 1.0000
 illum 1
 
-# Wool - Light Blue
-newmtl 35_3
+# Wool.Light Blue
+newmtl Wool.Light Blue
 Kd 0.4078 0.5451 0.8314
 d 1.0000
 illum 1
 
-# Wool - Yellow
-newmtl 35_4
+# Wool.Yellow
+newmtl Wool.Yellow
 Kd 0.7608 0.7098 0.1098
 d 1.0000
 illum 1
 
-# Wool - Light Green
-newmtl 35_5
+# Wool.Light Green
+newmtl Wool.Light Green
 Kd 0.2314 0.7412 0.1882
 d 1.0000
 illum 1
 
-# Wool - Pink
-newmtl 35_6
+# Wool.Pink
+newmtl Wool.Pink
 Kd 0.8510 0.5176 0.6078
 d 1.0000
 illum 1
 
-# Wool - Gray
-newmtl 35_7
+# Wool.Gray
+newmtl Wool.Gray
 Kd 0.2627 0.2627 0.2627
 d 1.0000
 illum 1
 
-# Wool - Light Gray
-newmtl 35_8
+# Wool.Light Gray
+newmtl Wool.Light Gray
 Kd 0.6196 0.6510 0.6510
 d 1.0000
 illum 1
 
-# Wool - Cyan
-newmtl 35_9
+# Wool.Cyan
+newmtl Wool.Cyan
 Kd 0.1529 0.4588 0.5882
 d 1.0000
 illum 1
 
-# Wool - Purple
-newmtl 35_10
+# Wool.Purple
+newmtl Wool.Purple
 Kd 0.5059 0.2118 0.7686
 d 1.0000
 illum 1
 
-# Wool - Blue
-newmtl 35_11
+# Wool.Blue
+newmtl Wool.Blue
 Kd 0.1529 0.2000 0.6039
 d 1.0000
 illum 1
 
-# Wool - Brown
-newmtl 35_12
+# Wool.Brown
+newmtl Wool.Brown
 Kd 0.3373 0.2000 0.1098
 d 1.0000
 illum 1
 
-# Wool - Dark Green
-newmtl 35_13
+# Wool.Dark Green
+newmtl Wool.Dark Green
 Kd 0.2196 0.3020 0.0941
 d 1.0000
 illum 1
 
-# Wool - Red
-newmtl 35_14
+# Wool.Red
+newmtl Wool.Red
 Kd 0.6431 0.1765 0.1608
 d 1.0000
 illum 1
 
-# Wool - Black
-newmtl 35_15
+# Wool.Black
+newmtl Wool.Black
 Kd 0.1059 0.0902 0.0902
 d 1.0000
 illum 1

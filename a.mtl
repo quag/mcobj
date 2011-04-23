@@ -100,16 +100,16 @@ Kd 0.4510 0.4510 0.4510
 d 1.0000
 illum 1
 
-# Wood
+# Unknown
 newmtl 17
-Kd 0.4000 0.3176 0.1961
-d 1.0000
+Kd 0.0000 0.4980 0.4980
+d 0.4980
 illum 1
 
-# Leaves
+# Unknown
 newmtl 18
-Kd 0.1098 0.2784 0.0196
-d 1.0000
+Kd 0.0000 0.4980 0.4980
+d 0.4980
 illum 1
 
 # Sponge
@@ -1624,20 +1624,50 @@ Kd 0.4000 0.3176 0.1961
 d 1.0000
 illum 1
 
-# Leaves - Default
+# Leaves - Default - 0
 newmtl 18_0
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Spruce
+# Leaves - Default - 8
+newmtl 18_8
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Leaves - Spruce - 1
 newmtl 18_1
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1
 
-# Leaves - Birch
+# Leaves - Spruce - 9
+newmtl 18_9
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Leaves - Birch - 2
 newmtl 18_2
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Leaves - Birch - 10
+newmtl 18_10
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Leaves - Default - 3
+newmtl 18_3
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Leaves - Default - 11
+newmtl 18_11
 Kd 0.1098 0.2784 0.0196
 d 1.0000
 illum 1

@@ -25,6 +25,16 @@
 
 [x] Remove specific check for (blockId == 0) for empty. Also remove "hide stone" flag. Do both through special empty flag in json
 
+ 1. 3DSMax .obj support
+ 2. use block units for -cx and -cz (-x and -z?)
+ 3. update build system to handle the three different platforms automatically
+ 4. instead of showing 'cubes' for flat files (tracks, pressure plates, ...) change the face they sit on. (Same for buttons and torches on walls)
+ 5. add FAQ (and try to make those questions not happen)
+ 6. -s 10 is no longer centered
+ 7. luxrender output
+ 8. use materal names instead of numbers
+ 9. only write out the materials actually used
+
  - black glass (try removing glass faces adjacent with other faces)
  - compile as separate units (private stuff can only be seen when compiled at the same time)
 

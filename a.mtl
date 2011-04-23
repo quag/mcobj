@@ -34,10 +34,10 @@ Kd 0.6157 0.5020 0.3098
 d 1.0000
 illum 1
 
-# Sapling
+# Unknown
 newmtl 6
-Kd 0.3647 0.4941 0.1176
-d 1.0000
+Kd 0.0000 0.4980 0.4980
+d 0.4980
 illum 1
 
 # Bedrock
@@ -166,10 +166,10 @@ Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
-# Unknown
+# Detector Rail
 newmtl 28
-Kd 0.0000 0.4980 0.4980
-d 0.4980
+Kd 0.4627 0.3843 0.3176
+d 1.0000
 illum 1
 
 # Unknown
@@ -178,10 +178,10 @@ Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
-# Unknown
+# Web
 newmtl 30
-Kd 0.0000 0.4980 0.4980
-d 0.4980
+Kd 0.8549 0.8549 0.8549
+d 0.6000
 illum 1
 
 # Unknown
@@ -448,13 +448,13 @@ Kd 0.7412 0.4196 0.4196
 d 1.0000
 illum 1
 
-# Redstone torch ("off" state)
+# Redstone torch - Off
 newmtl 75
 Kd 0.2667 0.0000 0.0000
 d 0.6000
 illum 1
 
-# Redstone torch ("on" state)
+# Redstone torch - On
 newmtl 76
 Kd 0.9961 0.0000 0.0000
 d 0.6000
@@ -556,22 +556,22 @@ Kd 0.8980 0.8078 0.8118
 d 1.0000
 illum 1
 
-# Redstone Repeater ("off" state)
+# Redstone Repeater - Off
 newmtl 93
 Kd 0.5961 0.5804 0.5804
 d 1.0000
 illum 1
 
-# Redstone Repeater ("on" state)
+# Redstone Repeater - On
 newmtl 94
 Kd 0.6314 0.5804 0.5804
 d 1.0000
 illum 1
 
-# Unknown
+# Locked Chest
 newmtl 95
-Kd 0.0000 0.4980 0.4980
-d 0.4980
+Kd 0.5137 0.3686 0.1451
+d 1.0000
 illum 1
 
 # Unknown
@@ -1534,51 +1534,171 @@ Kd 0.0000 0.4980 0.4980
 d 0.4980
 illum 1
 
-# Foot of bed pointing West
+# Sapling - Default - 0
+newmtl 6_0
+Kd 0.3647 0.4941 0.1176
+d 1.0000
+illum 1
+
+# Sapling - Default - 4
+newmtl 6_4
+Kd 0.3647 0.4941 0.1176
+d 1.0000
+illum 1
+
+# Sapling - Default - 8
+newmtl 6_8
+Kd 0.3647 0.4941 0.1176
+d 1.0000
+illum 1
+
+# Sapling - Default - 12
+newmtl 6_12
+Kd 0.3647 0.4941 0.1176
+d 1.0000
+illum 1
+
+# Sapling - Spruce - 1
+newmtl 6_1
+Kd 0.4667 0.5882 0.3373
+d 1.0000
+illum 1
+
+# Sapling - Spruce - 5
+newmtl 6_5
+Kd 0.4667 0.5882 0.3373
+d 1.0000
+illum 1
+
+# Sapling - Spruce - 9
+newmtl 6_9
+Kd 0.4667 0.5882 0.3373
+d 1.0000
+illum 1
+
+# Sapling - Spruce - 13
+newmtl 6_13
+Kd 0.4667 0.5882 0.3373
+d 1.0000
+illum 1
+
+# Sapling - Birch - 2
+newmtl 6_2
+Kd 0.1882 0.2039 0.1176
+d 1.0000
+illum 1
+
+# Sapling - Birch - 6
+newmtl 6_6
+Kd 0.1882 0.2039 0.1176
+d 1.0000
+illum 1
+
+# Sapling - Birch - 10
+newmtl 6_10
+Kd 0.1882 0.2039 0.1176
+d 1.0000
+illum 1
+
+# Sapling - Birch - 14
+newmtl 6_14
+Kd 0.1882 0.2039 0.1176
+d 1.0000
+illum 1
+
+# Wood - Default
+newmtl 17_0
+Kd 0.4000 0.3176 0.1961
+d 1.0000
+illum 1
+
+# Wood - Spruce
+newmtl 17_1
+Kd 0.4000 0.3176 0.1961
+d 1.0000
+illum 1
+
+# Wood - Birch
+newmtl 17_2
+Kd 0.4000 0.3176 0.1961
+d 1.0000
+illum 1
+
+# Leaves - Default
+newmtl 18_0
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Leaves - Spruce
+newmtl 18_1
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Leaves - Birch
+newmtl 18_2
+Kd 0.1098 0.2784 0.0196
+d 1.0000
+illum 1
+
+# Bed - Foot - 0
 newmtl 26_0
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Foot of bed pointing North
+# Bed - Foot - 1
 newmtl 26_1
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Foot of bed pointing East
+# Bed - Foot - 2
 newmtl 26_2
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Foot of bed pointing South
+# Bed - Foot - 3
 newmtl 26_3
 Kd 0.5608 0.0902 0.0902
 d 1.0000
 illum 1
 
-# Head of bed pointing West
+# Bed - Head - 8
 newmtl 26_8
 Kd 0.6863 0.4549 0.4588
 d 1.0000
 illum 1
 
-# Head of bed pointing North
+# Bed - Head - 9
 newmtl 26_9
 Kd 0.6863 0.4549 0.4588
 d 1.0000
 illum 1
 
-# Head of bed pointing East
+# Bed - Head - 10
 newmtl 26_10
 Kd 0.6863 0.4549 0.4588
 d 1.0000
 illum 1
 
-# Head of bed pointing South
+# Bed - Head - 11
 newmtl 26_11
 Kd 0.6863 0.4549 0.4588
+d 1.0000
+illum 1
+
+# Powered Rail - Off
+newmtl 27_0
+Kd 0.5294 0.4431 0.3059
+d 1.0000
+illum 1
+
+# Powered Rail - On
+newmtl 27_1
+Kd 0.5843 0.4039 0.2745
 d 1.0000
 illum 1
 

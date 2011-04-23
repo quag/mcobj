@@ -5,7 +5,9 @@
 {"blockId": 3,  "color": "#866043",   "name": "Dirt"                                                       },
 {"blockId": 4,  "color": "#757575",   "name": "Cobblestone"                                                },
 {"blockId": 5,  "color": "#9d804f",   "name": "Wooden Plank"                                               },
-{"blockId": 6,  "color": "#5d7e1e",   "name": "Sapling",                                "item": true       },
+{"blockId": 6,  "color": "#5d7e1e",   "name": "Sapling",                    "data": 0,  "item": true       },
+{"blockId": 6,  "color": "#779656",   "name": "Sapling Spruce",             "data": 1,  "item": true       },
+{"blockId": 6,  "color": "#30341e",   "name": "Sapling Birch",              "data": 2,  "item": true       },
 {"blockId": 7,  "color": "#545454",   "name": "Bedrock"                                                    },
 {"blockId": 8,  "color": "#009aff50", "name": "Water",                                  "transparent": true},
 {"blockId": 9,  "color": "#009aff50", "name": "Stationary water",                       "transparent": true},
@@ -33,6 +35,10 @@
 {"blockId": 26, "color": "#af7475",   "name": "Head of bed pointing North", "data": 9,  "item": true       },
 {"blockId": 26, "color": "#af7475",   "name": "Head of bed pointing East",  "data": 10, "item": true       },
 {"blockId": 26, "color": "#af7475",   "name": "Head of bed pointing South", "data": 11, "item": true       },
+{"blockId": 27, "color": "#87714e",   "name": "Powered Rail - Off",         "data": 0,  "item": true       },
+{"blockId": 27, "color": "#956746",   "name": "Powered Rail - On",          "data": 1,  "item": true       },
+{"blockId": 28, "color": "#766251",   "name": "Detector Rail",                          "item": true       },
+{"blockId": 30, "color": "#dadada99", "name": "Web",                                    "item": true       },
 {"blockId": 35, "color": "#dedede",   "name": "Wool - White",               "data": 0                      },
 {"blockId": 35, "color": "#ea8037",   "name": "Wool - Orange",              "data": 1                      },
 {"blockId": 35, "color": "#bf4cc9",   "name": "Wool - Magenta",             "data": 2                      },
@@ -106,5 +112,6 @@
 {"blockId": 91, "color": "#b9861d",   "name": "Jack-O-Lantern"                                             },
 {"blockId": 92, "color": "#e5cecf",   "name": "Cake Block",                             "item": true       },
 {"blockId": 93, "color": "#989494",   "name": "Redstone Repeater (\"off\" state)",      "item": true       },
-{"blockId": 94, "color": "#a19494",   "name": "Redstone Repeater (\"on\" state)",       "item": true       }
+{"blockId": 94, "color": "#a19494",   "name": "Redstone Repeater (\"on\" state)",       "item": true       },
+{"blockId": 95, "color": "#835e25",   "name": "Locked Chest"                                               }
 ]

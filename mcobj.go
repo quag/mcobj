@@ -288,6 +288,7 @@ func loadBlockTypesJson(filename string) os.Error {
 				var (
 					blockId      byte
 					data         byte = 255
+					dataArray    []byte
 					name         string
 					mass         SingularOrAggregate = Mass
 					transparency Transparency        = Opaque
@@ -314,7 +315,15 @@ func loadBlockTypesJson(filename string) os.Error {
 					case "blockId":
 						blockId = byte(v.(float64))
 					case "data":
-						data = byte(v.(float64))
+						switch d := v.(type) {
+						case float64:
+							data = byte(d)
+						case []interface{}:
+							dataArray = make([]byte, len(d))
+							for i, value := range d {
+								dataArray[i] = byte(value.(float64))
+							}
+						}
 					case "item":
 						if v.(bool) {
 							mass = Item
@@ -341,11 +350,18 @@ func loadBlockTypesJson(filename string) os.Error {
 				}
 
 				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty}
-				if data != 255 {
-					extraData[blockId] = true
-					colors = append(colors, MTL{blockId, data, color, name})
+				if dataArray == nil {
+					if data != 255 {
+						extraData[blockId] = true
+						colors = append(colors, MTL{blockId, data, color, name})
+					} else {
+						colors[blockId] = MTL{blockId, data, color, name}
+					}
 				} else {
-					colors[blockId] = MTL{blockId, data, color, name}
+					extraData[blockId] = true
+					for _, data = range dataArray {
+						colors = append(colors, MTL{blockId, data, color, fmt.Sprintf("%s - %d", name, data)})
+					}
 				}
 			}
 		}

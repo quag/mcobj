@@ -1614,13 +1614,13 @@ illum 1
 
 # Wood.Spruce
 newmtl Wood.Spruce
-Kd 0.4000 0.3176 0.1961
+Kd 0.1804 0.1137 0.0471
 d 1.0000
 illum 1
 
 # Wood.Birch
 newmtl Wood.Birch
-Kd 0.4000 0.3176 0.1961
+Kd 0.8118 0.8078 0.7882
 d 1.0000
 illum 1
 
@@ -1638,25 +1638,25 @@ illum 1
 
 # Leaves.Spruce_1
 newmtl Leaves.Spruce_1
-Kd 0.1098 0.2784 0.0196
+Kd 0.1647 0.2627 0.1647
 d 1.0000
 illum 1
 
 # Leaves.Spruce_9
 newmtl Leaves.Spruce_9
-Kd 0.1098 0.2784 0.0196
+Kd 0.1647 0.2627 0.1647
 d 1.0000
 illum 1
 
 # Leaves.Birch_2
 newmtl Leaves.Birch_2
-Kd 0.1098 0.2784 0.0196
+Kd 0.2549 0.3294 0.1725
 d 1.0000
 illum 1
 
 # Leaves.Birch_10
 newmtl Leaves.Birch_10
-Kd 0.1098 0.2784 0.0196
+Kd 0.2549 0.3294 0.1725
 d 1.0000
 illum 1
 

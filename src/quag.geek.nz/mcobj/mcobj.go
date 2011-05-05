@@ -330,7 +330,29 @@ func loadBlockTypesJson(filename string) os.Error {
 					transparency Transparency        = Opaque
 					empty        bool                = false
 					color        uint32
+					tex          TexCoord
+					sideTex      TexCoord
+					botTex       TexCoord
+					topTex       TexCoord
 				)
+				assignMultiArray := func(v []interface{}) TexCoord {
+					retval := NullTexCoord()
+					if len(v) == 2 {
+						vsub0 := v[0]
+						vsub1 := v[1]
+						switch v0 := vsub0.(type) {
+						case []interface{}:
+							switch v1 := vsub1.(type) {
+							case []interface{}:
+								if len(v0) == 2 && len(v1) == 2 {
+									return NewTexCoord(v0[0].(float64), v0[1].(float64), v1[0].(float64), v1[1].(float64))
+								}
+							}
+						}
+					}
+					return retval
+				}
+
 				for k, v := range fields {
 					switch k {
 					case "name":
@@ -348,6 +370,14 @@ func loadBlockTypesJson(filename string) os.Error {
 								color = uint32(n)
 							}
 						}
+					case "tex":
+						tex = assignMultiArray(v.([]interface{}))
+					case "texSide":
+						sideTex = assignMultiArray(v.([]interface{}))
+					case "texTop":
+						topTex = assignMultiArray(v.([]interface{}))
+					case "texBot":
+						botTex = assignMultiArray(v.([]interface{}))
 					case "blockId":
 						blockId = byte(v.(float64))
 					case "data":
@@ -384,8 +414,21 @@ func loadBlockTypesJson(filename string) os.Error {
 						}
 					}
 				}
+				if tex.isNull() {
+					tex = sideTex
+				}
+				if sideTex.isNull() {
+					sideTex = tex
+				}
+				if botTex.isNull() {
+					botTex = topTex
+				}
+				if topTex.isNull() {
+					topTex = tex
+					botTex = tex
+				}
+				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty, tex, sideTex, botTex, topTex}
 
-				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty}
 				if dataArray == nil {
 					if data != 255 {
 						extraData[blockId] = true

@@ -372,11 +372,13 @@ func loadBlockTypesJson(filename string) os.Error {
 						}
 					case "tex":
 						tex = assignMultiArray(v.([]interface{}))
-					case "texSide":
+					case "texFront":
+						tex = assignMultiArray(v.([]interface{}))
+					case "sideTex":
 						sideTex = assignMultiArray(v.([]interface{}))
-					case "texTop":
+					case "topTex":
 						topTex = assignMultiArray(v.([]interface{}))
-					case "texBot":
+					case "botTex":
 						botTex = assignMultiArray(v.([]interface{}))
 					case "blockId":
 						blockId = byte(v.(float64))

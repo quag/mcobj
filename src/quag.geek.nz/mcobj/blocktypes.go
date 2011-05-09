@@ -70,67 +70,6 @@ type BlockDescriber interface {
 	BlockInfo(blockId byte) BlockInfo
 }
 
-type Vec2 struct {
-	x float32
-	y float32
-}
-
-type TexCoord struct {
-	topLeft     Vec2
-	bottomRight Vec2
-}
-
-func NullTexCoord() TexCoord {
-	return TexCoord{Vec2{0, 0},
-		Vec2{0, 0}}
-}
-func (t TexCoord) equals(u TexCoord) bool {
-	return t.topLeft.x == u.topLeft.x &&
-		t.topLeft.y == u.topLeft.y &&
-		t.bottomRight.x == u.bottomRight.x &&
-		t.bottomRight.y == u.bottomRight.y
-
-}
-
-func (t TexCoord) isNull() bool {
-	return t.equals(NullTexCoord())
-}
-
-func NewTexCoord(v00 float64, v01 float64, v10 float64, v11 float64) TexCoord {
-	return TexCoord{Vec2{float32(v00), float32(v01)},
-		Vec2{float32(v10), float32(v11)}}
-
-}
-
-func (t TexCoord) TopLeft() Vec2 {
-	return t.topLeft
-}
-
-func (t TexCoord) BottomRight() Vec2 {
-	return t.bottomRight
-}
-
-func (t TexCoord) TopRight() Vec2 {
-	return Vec2{t.bottomRight.x, t.topLeft.y}
-}
-
-func (t TexCoord) BottomLeft() Vec2 {
-	return Vec2{t.topLeft.x, t.bottomRight.y}
-}
-
-func (t TexCoord) vertex(i int) Vec2 {
-	switch i {
-	case 0:
-		return t.TopLeft()
-	case 1:
-		return t.TopRight()
-	case 2:
-		return t.BottomRight()
-	case 3:
-		return t.BottomLeft()
-	}
-	return Vec2{0, 0}
-}
 
 type BlockInfo interface {
 	IsItem() bool
@@ -145,10 +84,6 @@ type BlockType struct {
 	mass         SingularOrAggregate
 	transparency Transparency
 	empty        bool
-	sideTex      TexCoord
-	frontTex     TexCoord
-	topTex       TexCoord
-	botTex       TexCoord
 }
 
 

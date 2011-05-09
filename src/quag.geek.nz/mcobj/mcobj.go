@@ -429,19 +429,19 @@ func loadBlockTypesJson(filename string) os.Error {
 					topTex = tex
 					botTex = tex
 				}
-				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty, tex, sideTex, botTex, topTex}
+				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty}
 
 				if dataArray == nil {
 					if data != 255 {
 						extraData[blockId] = true
-						colors = append(colors, MTL{blockId, data, color, name})
+						colors = append(colors, MTL{blockId, data, color, name, tex, sideTex, botTex, topTex})
 					} else {
-						colors[blockId] = MTL{blockId, data, color, name}
+						colors[blockId] = MTL{blockId, data, color, name, tex, sideTex, botTex, topTex}
 					}
 				} else {
 					extraData[blockId] = true
 					for _, data = range dataArray {
-						colors = append(colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data)})
+						colors = append(colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), tex, sideTex, botTex, topTex})
 					}
 				}
 			}

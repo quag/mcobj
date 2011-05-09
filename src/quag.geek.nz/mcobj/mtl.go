@@ -105,15 +105,14 @@ type MTL struct {
 }
 
 func (mtl *MTL) Print(w io.Writer) {
-	/*
-		var (
-			r = mtl.color >> 24
-			g = mtl.color >> 16 & 0xff
-			b = mtl.color >> 8 & 0xff
-			a = mtl.color & 0xff
-		)
-	*/
-	fmt.Fprintf(w, "# %s\nnewmtl %s\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\nmap_Kd terrain.png\n\n", mtl.name, MaterialNamer.NameBlockId(uint16(mtl.blockId)+uint16(mtl.metadata)*256), 1.0, 1.0, 1.0) //float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
+	var (
+		r = mtl.color >> 24
+		g = mtl.color >> 16 & 0xff
+		b = mtl.color >> 8 & 0xff
+		a = mtl.color & 0xff
+	)
+
+	fmt.Fprintf(w, "# %s\nnewmtl %s\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\nmap_Kd terrain.png\n\n", mtl.name, MaterialNamer.NameBlockId(uint16(mtl.blockId)+uint16(mtl.metadata)*256), float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
 }
 
 func (mtl *MTL) colorId() uint16 {

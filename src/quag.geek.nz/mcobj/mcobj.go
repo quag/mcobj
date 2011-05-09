@@ -248,8 +248,13 @@ func (b *Blocks) Get(x, y, z int) uint16 {
 	return (*b)[y+(z*128+(x*128*16))]
 }
 
+var air BlockColumn = make(BlockColumn, 128)
+
 func (b *Blocks) Column(x, z int) BlockColumn {
 	var i = 128 * (z + x*16)
+	if len(*b) < i+128 {
+		return air
+	}
 	return BlockColumn((*b)[i : i+128])
 }
 

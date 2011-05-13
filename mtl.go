@@ -17,7 +17,7 @@ func writeMtlFile(filename string) os.Error {
 		return nil
 	}
 
-	var outFile, outErr = os.Open(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	var outFile, outErr = os.Create(filename)
 	if outErr != nil {
 		return outErr
 	}

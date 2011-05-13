@@ -84,7 +84,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 		return
 	}
 
-	var outFile, outErr = os.Open(outFilename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	var outFile, outErr = os.Create(outFilename)
 	if outErr != nil {
 		fmt.Fprintln(os.Stderr, outErr)
 		return

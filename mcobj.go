@@ -255,7 +255,7 @@ func moreChunks(unprocessedCount int) bool {
 }
 
 func loadChunk(filename string) (*nbt.Chunk, os.Error) {
-	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
+	var file, fileErr = os.Open(filename)
 	defer file.Close()
 	if fileErr != nil {
 		return nil, fileErr

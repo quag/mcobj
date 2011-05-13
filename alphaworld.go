@@ -17,7 +17,7 @@ type AlphaWorld struct {
 }
 
 func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
-	var file, fileErr = os.Open(chunkPath(w.worldDir, x, z), os.O_RDONLY, 0666)
+	var file, fileErr = os.Open(chunkPath(w.worldDir, x, z))
 	if fileErr != nil {
 		return nil, fileErr
 	}

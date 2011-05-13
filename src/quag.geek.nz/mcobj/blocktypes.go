@@ -84,6 +84,7 @@ type BlockType struct {
 	mass         SingularOrAggregate
 	transparency Transparency
 	empty        bool
+	colors       []MTL
 }
 
 

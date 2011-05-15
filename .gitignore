@@ -1,19 +1,12 @@
+*.6
 *.8
 *.a
 *.exe
-*.mtl
 *.obj
+*.mtl
 *.prt
 *.zip
 *.7z
 
+mcobj
 version.go
-
-c.0.0.dat
-c.4.4.dat
-World4
-junk
-minecraft
-testworld/
-Reddit\ Server/
-3dsmax-*

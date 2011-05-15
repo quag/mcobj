@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -71,10 +70,10 @@ func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
 }
 
 func (v *visitor) VisitFile(file string, f *os.FileInfo) {
-	var match, err = path.Match("c.*.*.dat", path.Base(file))
+	var match, err = filepath.Match("c.*.*.dat", filepath.Base(file))
 	if match && err == nil {
 		var (
-			s       = strings.Split(path.Base(file), ".", 4)
+			s       = strings.Split(filepath.Base(file), ".", 4)
 			x, xErr = strconv.Btoi64(s[1], 36)
 			z, zErr = strconv.Btoi64(s[2], 36)
 		)
@@ -85,7 +84,7 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 }
 
 func chunkPath(world string, x, z int) string {
-	return path.Join(world, encodeFolder(x), encodeFolder(z), "c."+base36(x)+"."+base36(z)+".dat")
+	return filepath.Join(world, encodeFolder(x), encodeFolder(z), "c."+base36(x)+"."+base36(z)+".dat")
 }
 
 func base36(i int) string {

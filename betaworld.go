@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"strconv"
 )
@@ -26,7 +26,7 @@ type McrFile struct {
 
 func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
 	var mcrName = fmt.Sprintf("r.%v.%v.mcr", x>>5, z>>5)
-	var mcrPath = path.Join(w.worldDir, "region", mcrName)
+	var mcrPath = filepath.Join(w.worldDir, "region", mcrName)
 
 	var file, mcrOpenErr = os.Open(mcrPath)
 	if mcrOpenErr != nil {
@@ -102,7 +102,7 @@ func (cl ChunkLocation) Sectors() int {
 }
 
 func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
-	var regionDirname = path.Join(w.worldDir, "region")
+	var regionDirname = filepath.Join(w.worldDir, "region")
 	var dir, dirOpenErr = os.Open(regionDirname)
 	if dirOpenErr != nil {
 		return nil, dirOpenErr
@@ -130,7 +130,7 @@ func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
 			)
 
 			if rxErr == nil && ryErr == nil {
-				var regionFilename = path.Join(regionDirname, filenames[0])
+				var regionFilename = filepath.Join(regionDirname, filenames[0])
 				var region, regionOpenErr = os.Open(regionFilename)
 				if regionOpenErr != nil {
 					return nil, regionOpenErr

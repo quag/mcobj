@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type ObjGenerator struct {
@@ -77,7 +77,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 		}
 	}()
 
-	var mtlFilename = fmt.Sprintf("%s.mtl", outFilename[:len(outFilename)-len(path.Ext(outFilename))])
+	var mtlFilename = fmt.Sprintf("%s.mtl", outFilename[:len(outFilename)-len(filepath.Ext(outFilename))])
 	var mtlErr = writeMtlFile(mtlFilename)
 	if mtlErr != nil {
 		fmt.Fprintln(os.Stderr, mtlErr)
@@ -101,7 +101,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 		return
 	}
 
-	fmt.Fprintln(o.out, "mtllib", path.Base(mtlFilename))
+	fmt.Fprintln(o.out, "mtllib", filepath.Base(mtlFilename))
 
 	o.outFile, outFile = outFile, nil
 }

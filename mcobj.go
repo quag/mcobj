@@ -9,7 +9,7 @@ import (
 	"math"
 	"nbt"
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -136,8 +136,8 @@ func main() {
 	}
 
 	{
-		var dir, _ = path.Split(strings.Replace(os.Args[0], "\\", "/", -1))
-		var jsonError = loadBlockTypesJson(path.Join(dir, "blocks.json"))
+		var dir, _ = filepath.Split(strings.Replace(os.Args[0], "\\", "/", -1))
+		var jsonError = loadBlockTypesJson(filepath.Join(dir, "blocks.json"))
 		if jsonError != nil {
 			fmt.Fprintln(os.Stderr, jsonError)
 			return

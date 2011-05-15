@@ -16,5 +16,6 @@ GOFILES=\
 	alphaworld.go\
 	betaworld.go\
 	chunkmasks.go\
+	usage-$(GOOS).go\
 
 include $(GOROOT)/src/Make.cmd

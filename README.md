@@ -12,6 +12,49 @@ The [http://reddit.com/r/mcobj](r/mcobj) sub-reddit been setup for showing off r
 
 As I'd love to see renders, please email me copies of images you create.
 
+Usage
+-----
+
+On Windows:
+
+    mcobj -cpu 4 -s 20 -o world1.obj %AppData%\.minecraft\saves\World1
+
+On OSX:
+
+    mcobj -cpu 4 -s 20 -o world1.obj ~/Library/Application\ Support/minecraft/saves/World1
+
+On Linux:
+
+    mcobj -cpu 4 -s 20 -o world1.obj ~/.minecraft/saves/World1
+
+Flags:
+
+<table>
+      <tbody><tr><td>-cpu 4</td><td>How many cores to use while processing. Defaults to 1. Set to the number of cpu's in the machine.</td></tr>
+      <tr><td>-o a.obj</td><td>Name for the obj file to write to. Defaults to a.obj</td></tr>
+      <tr><td>-h</td><td>Help</td></tr>
+      <tr><td>-prt</td><td>Output a <a href="http://software.primefocusworld.com/software/support/krakatoa/prt_file_format.php">PRT</a> file instead of OBJ</td></tr>
+    </tbody></table>
+
+Chunk Selection:
+
+<table>
+      <tbody><tr><td>-cx 10 -cz -23</td><td>Center the output to chunk x=10 and z=23. Defaults to chunk 0,0. To calculate the chunk coords, divide the values given in Minecraft's F3 screen by 16</td></tr>
+      <tr><td>-s 20</td><td>Output a sized square of chunks centered on -cx -cz. -s 20 will output 20x20 area around 0,0</td></tr>
+      <tr><td>-rx 2 -rx 8</td><td>Output a sized rectangle of chunks centered on -cx -cz. -rx 2 -rx 8 will output a 2x8 area around 0,0</td></tr>
+    </tbody></table>
+
+Limit the output:
+
+<table>
+      <tbody><tr><td>-fk 300</td><td>Limit the face count (in thousands of faces)</td></tr>
+      <tr><td>-y 63</td><td>Omit all blocks below this height. Use 63 for sea level</td></tr>
+      <tr><td>-hb</td><td>Hide the bottom of the world</td></tr>
+      <tr><td>-g</td><td>Gray; omit materials</td></tr>
+      <tr><td>-bf</td><td>Don't combine adjacent faces of the same block within a column</td></tr>
+      <tr><td>-sides</td><td>Output sides of chunks at the edges of selection. Sides are usually omitted</td></tr>
+    </tbody></table>
+
 Change Log
 ---------
 
@@ -145,41 +188,6 @@ Change Log
     <td>&nbsp;</td>
   </tr>
 </table>
-
-Usage
------
-
-On windows:
-
-    mcobj -cpu 4 -s 20 -o world1.obj %AppData%\.minecraft\saves\World1
-
-Flags:
-
-<table>
-      <tbody><tr><td>-cpu 4</td><td>How many cores to use while processing. Defaults to 1. Set to the number of cpu's in the machine.</td></tr>
-      <tr><td>-o a.obj</td><td>Name for the obj file to write to. Defaults to a.obj</td></tr>
-      <tr><td>-h</td><td>Help</td></tr>
-      <tr><td>-prt</td><td>Output a <a href="http://software.primefocusworld.com/software/support/krakatoa/prt_file_format.php">PRT</a> file instead of OBJ</td></tr>
-    </tbody></table>
-
-Chunk Selection:
-
-<table>
-      <tbody><tr><td>-cx 10 -cz -23</td><td>Center the output to chunk x=10 and z=23. Defaults to chunk 0,0. To calculate the chunk coords, divide the values given in Minecraft's F3 screen by 16</td></tr>
-      <tr><td>-s 20</td><td>Output a sized square of chunks centered on -cx -cz. -s 20 will output 20x20 area around 0,0</td></tr>
-      <tr><td>-rx 2 -rx 8</td><td>Output a sized rectangle of chunks centered on -cx -cz. -rx 2 -rx 8 will output a 2x8 area around 0,0</td></tr>
-    </tbody></table>
-
-Limit the output:
-
-<table>
-      <tbody><tr><td>-fk 300</td><td>Limit the face count (in thousands of faces)</td></tr>
-      <tr><td>-y 63</td><td>Omit all blocks below this height. Use 63 for sea level</td></tr>
-      <tr><td>-hb</td><td>Hide the bottom of the world</td></tr>
-      <tr><td>-g</td><td>Gray; omit materials</td></tr>
-      <tr><td>-bf</td><td>Don't combine adjacent faces of the same block within a column</td></tr>
-      <tr><td>-sides</td><td>Output sides of chunks at the edges of selection. Sides are usually omitted</td></tr>
-    </tbody></table>
 
 Limitations
 -----------

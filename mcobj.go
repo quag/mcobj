@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"json"
 	"math"
-	"nbt"
+	"./nbt"
 	"os"
 	"path/filepath"
 	"runtime"

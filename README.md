@@ -12,13 +12,11 @@ The [http://reddit.com/r/mcobj](r/mcobj) sub-reddit been setup for showing off r
 
 As I'd love to see renders, please email me copies of images you create.
 
-Downloads
+Change Log
 ---------
 
 <table>
   <tr>
-    <th></th>
-    <th></th>
     <th></th>
     <th></th>
     <th>Change Log</th>
@@ -26,9 +24,7 @@ Downloads
   <tr>
     <td>2011-04-17</td>
     <td>0.11</td>
-    <td><a href="http://github.com/downloads/quag/mcobj/mcobj-0.11-windows.7z">mcobj-0.11-windows.7z</a></td>
-    <td>547K</td>
-    <td rowspan=4>
+    <td>
       <ul>
         <li>Add -solid flag for putting sides on the area</li>
         <li>Add -rx 2 -rz 8 for selecting a rectangular area</li>
@@ -39,28 +35,8 @@ Downloads
     </td>
   </tr>
   <tr>
-    <td></td>
-    <td></td>
-    <td><a href="http://github.com/downloads/quag/mcobj/mcobj-0.11-linux-x86.7z">mcobj-0.11-linux-x86.7z</a></td>
-    <td>353K</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td><a href="http://github.com/downloads/quag/mcobj/mcobj-0.11-linux-x64.7z">mcobj-0.11-linux-x64.7z</a></td>
-    <td>364K</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td><a href="http://github.com/downloads/quag/mcobj/mcobj-0.11-osx.7z">mcobj-0.11-osx.7z</a></td>
-    <td>366K</td>
-  </tr>
-  <tr>
     <td>2011-03-17</td>
     <td>0.10.2</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Add beds and redstone repeaters</li>
@@ -72,8 +48,6 @@ Downloads
   <tr>
     <td>2011-03-14</td>
     <td>0.10.1</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Bug fix: colors missing from blocks with extra data (except for wool) in OBJ</li>
@@ -83,8 +57,6 @@ Downloads
   <tr>
     <td>2011-03-13</td>
     <td>0.10</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Flip both x and z axis for PRT output</li>
@@ -95,8 +67,6 @@ Downloads
   <tr>
     <td>2011-03-06</td>
     <td>0.9.2</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Rename PRT channel from MtlIndex to BlockId</li>
@@ -106,8 +76,6 @@ Downloads
   <tr>
     <td>2011-03-06</td>
     <td>0.9.1</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Fix bug (when PRT support was added) that made OBJ files empty</li>
@@ -117,8 +85,6 @@ Downloads
   <tr>
     <td>2011-03-05</td>
     <td>0.9</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Fix PRT export bug where all blocks appeared in a 16x16x128 space</li>
@@ -128,8 +94,6 @@ Downloads
   <tr>
     <td>2011-03-05</td>
     <td>0.8</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Add alternative output format: <a href="http://software.primefocusworld.com/software/support/krakatoa/prt_file_format.php">PRT</a> (use -prt flag to enable)</li>
@@ -139,8 +103,6 @@ Downloads
   <tr>
     <td>2011-03-05</td>
     <td>0.7</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Add support for the beta world format</li>
@@ -150,8 +112,6 @@ Downloads
   <tr>
     <td>2011-02-19</td>
     <td>0.6</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Further tweaks to colors</li>
@@ -162,8 +122,6 @@ Downloads
   <tr>
     <td>2011-02-17</td>
     <td>0.5</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Switch to WormSlayer's block colors</li>
@@ -174,8 +132,6 @@ Downloads
   <tr>
     <td>2011-02-17</td>
     <td>0.4</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>
       <ul>
         <li>Use absolute vertex numbers instead of relative (to support 3dsmax)</li>
@@ -186,8 +142,6 @@ Downloads
   <tr>
     <td>2011-02-14</td>
     <td>0.3</td>
-    <td>&nbsp;</td>
-    <td>&nbsp;</td>
     <td>&nbsp;</td>
   </tr>
 </table>

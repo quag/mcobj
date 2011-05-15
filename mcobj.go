@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"json"
 	"math"
-	"nbt"
+	"./nbt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -70,7 +70,7 @@ func main() {
 
 	if *showHelp || flag.NArg() == 0 {
 		fmt.Fprintln(os.Stderr)
-		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj %AppData%\\.minecraft\\saves\\World1")
+		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", exampleWorldPath)
 		fmt.Fprintln(os.Stderr)
 		flag.PrintDefaults()
 		return

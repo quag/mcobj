@@ -1,7 +1,7 @@
 package main
 
 import (
-	"nbt"
+	"./nbt"
 )
 
 type SideCache struct {

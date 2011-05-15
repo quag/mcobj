@@ -86,9 +86,9 @@ func (o *PrtGenerator) chunkProcessor() {
 						ya = y - 64
 						za = -(z + e.zPos*16)
 					)
-					binary.Write(o.zw, binary.LittleEndian, float32(xa*2))
-					binary.Write(o.zw, binary.LittleEndian, float32(za*2))
-					binary.Write(o.zw, binary.LittleEndian, float32(ya*2))
+					binary.Write(o.zw, binary.LittleEndian, float32(xa))
+					binary.Write(o.zw, binary.LittleEndian, float32(za))
+					binary.Write(o.zw, binary.LittleEndian, float32(ya))
 					binary.Write(o.zw, binary.LittleEndian, int32(blockId))
 				}
 			}

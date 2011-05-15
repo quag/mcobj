@@ -39,7 +39,9 @@ Flags:
 Chunk Selection:
 
 <table>
-      <tbody><tr><td>-cx 10 -cz -23</td><td>Center the output to chunk x=10 and z=23. Defaults to chunk 0,0. To calculate the chunk coords, divide the values given in Minecraft's F3 screen by 16</td></tr>
+      <tbody>
+      <tr><td>-x -8.4 -z 272.8</td><td>Center the output to chunk x=-1 and z=17. Defaults to chunk 0,0</td></tr>
+      <tr><td>-cx 10 -cz -23</td><td>Center the output to chunk x=10 and z=23. Defaults to chunk 0,0. To calculate the chunk coords, divide the values given in Minecraft's F3 screen by 16</td></tr>
       <tr><td>-s 20</td><td>Output a sized square of chunks centered on -cx -cz. -s 20 will output 20x20 area around 0,0</td></tr>
       <tr><td>-rx 2 -rx 8</td><td>Output a sized rectangle of chunks centered on -cx -cz. -rx 2 -rx 8 will output a 2x8 area around 0,0</td></tr>
     </tbody></table>
@@ -63,6 +65,23 @@ Change Log
     <th></th>
     <th></th>
     <th>Change Log</th>
+  </tr>
+  <tr>
+    <td>2011-05-15</td>
+    <td>0.12</td>
+    <td>
+      <ul>
+        <li>Add -x and -z flags for centering using Minecraft's F3 coordinates</li>
+        <li>Change to material names instead of numbers</li>
+        <li>Update blocks.json to handle Minecraft 1.5 blocks</li>
+        <li>Fix bug: materials with extra data, e.g., wool colors, were always grey</li>
+        <li>Fix bug: some leaves showed up as grey blocks</li>
+        <li>Fix bug: -s square not centered on -cx -cz (off-by-one)</li>
+        <li>Add arrays of block data to blocks.json -- beds and saplings</li>
+        <li>Reworked build and release scripts</li>
+        <li>Update source to compile with go release.r57.1</li>
+      </ul>
+    </td>
   </tr>
   <tr>
     <td>2011-04-17</td>

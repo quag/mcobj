@@ -35,7 +35,7 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, bounda
 
 	var openErr os.Error
 
-	o.outFile, openErr = os.Open(outFilename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	o.outFile, openErr = os.Create(outFilename)
 	if openErr != nil {
 		fmt.Fprintln(os.Stderr, openErr) // TODO: return openErr
 		return

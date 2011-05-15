@@ -3,7 +3,7 @@ package main
 import (
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type ChunkOpener interface {
@@ -25,7 +25,7 @@ type ChunkPool interface {
 }
 
 func OpenWorld(worldDir string, mask ChunkMask) World {
-	var _, err = os.Stat(path.Join(worldDir, "region"))
+	var _, err = os.Stat(filepath.Join(worldDir, "region"))
 	if err != nil {
 		return &AlphaWorld{worldDir, mask}
 	}

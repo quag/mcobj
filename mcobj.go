@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"json"
 	"math"
-	"nbt"
+	"./nbt"
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -32,12 +32,14 @@ var (
 )
 
 func main() {
+	var bx, bz float64
 	var cx, cz int
 	var square int
 	var rectx, rectz int
 	var maxProcs = runtime.GOMAXPROCS(0)
 	var prt bool
 	var solidSides bool
+	var mtlNumber bool
 
 	var defaultObjOutFilename = "a.obj"
 	var defaultPrtOutFilename = "a.prt"
@@ -50,13 +52,16 @@ func main() {
 	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
 	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
 	flag.BoolVar(&noColor, "g", false, "Omit materials")
-	flag.IntVar(&cx, "cx", 0, "Center x coordinate")
-	flag.IntVar(&cz, "cz", 0, "Center z coordinate")
+	flag.Float64Var(&bx, "x", 0, "Center x coordinate in blocks")
+	flag.Float64Var(&bz, "z", 0, "Center z coordinate in blocks")
+	flag.IntVar(&cx, "cx", 0, "Center x coordinate in chunks")
+	flag.IntVar(&cz, "cz", 0, "Center z coordinate in chunks")
 	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
 	flag.IntVar(&rectx, "rx", math.MaxInt32, "Width(x) of rectangle size")
 	flag.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
 	flag.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
+	flag.BoolVar(&mtlNumber, "mtlnum", false, "Number materials instead of using names")
 	var showHelp = flag.Bool("h", false, "Show Help")
 	flag.Parse()
 
@@ -65,7 +70,7 @@ func main() {
 
 	if *showHelp || flag.NArg() == 0 {
 		fmt.Fprintln(os.Stderr)
-		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj %AppData%\\.minecraft\\saves\\World1")
+		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", exampleWorldPath)
 		fmt.Fprintln(os.Stderr)
 		flag.PrintDefaults()
 		return
@@ -73,6 +78,26 @@ func main() {
 
 	if faceLimit != math.MaxInt32 {
 		faceLimit *= 1000
+	}
+
+	if mtlNumber {
+		MaterialNamer = new(NumberBlockIdNamer)
+	} else {
+		MaterialNamer = new(NameBlockIdNamer)
+	}
+
+	switch {
+	case bx == 0 && cx == 0:
+		cx = 0
+	case cx == 0:
+		cx = int(math.Floor(bx / 16))
+	}
+
+	switch {
+	case bz == 0 && cz == 0:
+		cz = 0
+	case cz == 0:
+		cz = int(math.Floor(bz / 16))
 	}
 
 	if square != math.MaxInt32 {
@@ -111,8 +136,8 @@ func main() {
 	}
 
 	{
-		var dir, _ = path.Split(strings.Replace(os.Args[0], "\\", "/", -1))
-		var jsonError = loadBlockTypesJson(path.Join(dir, "blocks.json"))
+		var dir, _ = filepath.Split(strings.Replace(os.Args[0], "\\", "/", -1))
+		var jsonError = loadBlockTypesJson(filepath.Join(dir, "blocks.json"))
 		if jsonError != nil {
 			fmt.Fprintln(os.Stderr, jsonError)
 			return
@@ -230,7 +255,7 @@ func moreChunks(unprocessedCount int) bool {
 }
 
 func loadChunk(filename string) (*nbt.Chunk, os.Error) {
-	var file, fileErr = os.Open(filename, os.O_RDONLY, 0666)
+	var file, fileErr = os.Open(filename)
 	defer file.Close()
 	if fileErr != nil {
 		return nil, fileErr
@@ -288,6 +313,7 @@ func loadBlockTypesJson(filename string) os.Error {
 				var (
 					blockId      byte
 					data         byte = 255
+					dataArray    []byte
 					name         string
 					mass         SingularOrAggregate = Mass
 					transparency Transparency        = Opaque
@@ -314,7 +340,15 @@ func loadBlockTypesJson(filename string) os.Error {
 					case "blockId":
 						blockId = byte(v.(float64))
 					case "data":
-						data = byte(v.(float64))
+						switch d := v.(type) {
+						case float64:
+							data = byte(d)
+						case []interface{}:
+							dataArray = make([]byte, len(d))
+							for i, value := range d {
+								dataArray[i] = byte(value.(float64))
+							}
+						}
 					case "item":
 						if v.(bool) {
 							mass = Item
@@ -341,11 +375,18 @@ func loadBlockTypesJson(filename string) os.Error {
 				}
 
 				blockTypeMap[blockId] = &BlockType{blockId, mass, transparency, empty}
-				if data != 255 {
-					extraData[blockId] = true
-					colors = append(colors, MTL{blockId, data, color, name})
+				if dataArray == nil {
+					if data != 255 {
+						extraData[blockId] = true
+						colors = append(colors, MTL{blockId, data, color, name})
+					} else {
+						colors[blockId] = MTL{blockId, data, color, name}
+					}
 				} else {
-					colors[blockId] = MTL{blockId, data, color, name}
+					extraData[blockId] = true
+					for _, data = range dataArray {
+						colors = append(colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data)})
+					}
 				}
 			}
 		}

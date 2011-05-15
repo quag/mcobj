@@ -1,0 +1,33 @@
+ - center on spawn point, not chunk (0,0)
+ - make processBlock() return the data rather than calling the process methods itself. Rename current method.
+ - unit tests
+ - godoc
+ - refactor: introduce a 'preferences' type
+ - refactor: tell the ntb file parser what it should extract and have it return that data (easy to pull out say, the spawn coords)
+ - add flag to output all water faces / blocks (deep water darker)
+ - add flag to output all blocks (particularly for prt mode)
+ - transparent blocks (torches, glass, redstone paths...) aren't part of the 'surface' and must include the blocks under them
+ - write out txt file with mcobjBlockIds, blockIds, data values, and interpretation of those values IOT make it easy for prt users to create meshes
+ - 3DSMax .obj support
+ - update build system to handle the three different platforms automatically
+ - instead of showing 'cubes' for flat files (tracks, pressure plates, ...) change the face they sit on. (Same for buttons and torches on walls)
+ - add FAQ (and try to make those questions not happen)
+ - luxrender output
+ - only write out the materials actually used
+ - If no arguments supplied, read args from stdin
+ - black glass (try removing glass faces adjacent with other faces)
+ - compile as separate units (private stuff can only be seen when compiled at the same time)
+ - Non-cubed blocks
+    - crosses for saplings, sugar cane, fire, red/yellow flowers, red/brown shrooms, wheat
+    - snow blocks are 1/8th height (Full height and 1/8th height snow blocks have the same ID)
+    - calculate water/lava heights
+    - farm land is 7/8th height
+    - cake, half-blocks, pressure plates (stone, wood), fence posts, doors (wood, metal), ladder, tracks, redstone wire, signs, wall signs, steps, buttons, beds, redstone repeaters
+ - Calculate data for grass, fenses, restone wire, chests, water/lava, portals
+ - 64-bit Linux builds
+ - 3DSMax output or 3DSMax fixer
+ - Center on spawn location
+ - Center on player location
+ - open source mcobj
+ - 'chunk slice' renders
+ - add FBX output format (http://usa.autodesk.com/adsk/servlet/pc/index?id=6837478&siteID=123112)

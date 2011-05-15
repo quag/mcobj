@@ -82,9 +82,9 @@ func (o *PrtGenerator) chunkProcessor() {
 				case o.boundary.IsBoundary(blockId, e.Get(x, y, z+1)):
 					o.particleCount++
 					var (
-						xa = -(x + e.xPos*16)
+						xa = x + e.xPos*16
 						ya = y - 64
-						za = z + e.zPos*16
+						za = -(z + e.zPos*16)
 					)
 					binary.Write(o.zw, binary.LittleEndian, float32(xa*2))
 					binary.Write(o.zw, binary.LittleEndian, float32(za*2))

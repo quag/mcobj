@@ -90,14 +90,14 @@ func main() {
 	case bx == 0 && cx == 0:
 		cx = 0
 	case cx == 0:
-		cx = int(bx / 16)
+		cx = int(math.Floor(bx / 16))
 	}
 
 	switch {
 	case bz == 0 && cz == 0:
 		cz = 0
 	case cz == 0:
-		cz = int(bz / 16)
+		cz = int(math.Floor(bz / 16))
 	}
 
 	if square != math.MaxInt32 {

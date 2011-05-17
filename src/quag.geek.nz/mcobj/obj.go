@@ -43,9 +43,9 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 				var b = o.memoryWriterPool.GetWriter()
 				var vb = o.memoryWriterPool.GetWriter()
 
-				var faceCount, vertexCount, mtls = faces.ProcessChunk(job.enclosed, b, vb)
+				var faceCount, vCount, vtCount, mtls = faces.ProcessChunk(job.enclosed, b, vb)
 
-				o.writeFacesChan <- &WriteFacesJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, vertexCount, mtls, b, vb, job.last}
+				o.writeFacesChan <- &WriteFacesJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, vCount, vtCount, mtls, b, vb, job.last}
 			}
 		}()
 	}
@@ -53,7 +53,8 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	go func() {
 		var chunkCount = 0
 		var size = 0
-		var vertexBase = 0
+		var vBase = 0
+		var vtBase = 0
 		for {
 			var job = <-o.writeFacesChan
 			chunkCount++
@@ -67,11 +68,12 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 				for _, mtl := range job.mtls {
 					printMtl(o.fout, mtl.blockId)
 					for _, face := range mtl.faces {
-						printFaceLine(o.fout, face, vertexBase)
+						printFaceLine(o.fout, face, vBase, vtBase)
 					}
 				}
 				o.fout.Flush()
-				vertexBase += job.vertexCount
+				vBase += job.vCount
+				vtBase += job.vtCount
 			}
 
 			size += len(job.b.buf)
@@ -227,10 +229,10 @@ func copyFile(w io.Writer, filename string) os.Error {
 }
 
 type WriteFacesJob struct {
-	xPos, zPos, faceCount, vertexCount int
-	mtls                               []*MtlFaces
-	b, vb                              *MemoryWriter
-	last                               bool
+	xPos, zPos, faceCount, vCount, vtCount int
+	mtls                                   []*MtlFaces
+	b, vb                                  *MemoryWriter
+	last                                   bool
 }
 
 type Faces struct {
@@ -243,11 +245,11 @@ type Faces struct {
 	boundary  *BoundaryLocator
 }
 
-func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer, vw io.Writer) (faceCount, vertexCount int, mtls []*MtlFaces) {
+func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer, vw io.Writer) (faceCount, vCount, vtCount int, mtls []*MtlFaces) {
 	fs.clean(enclosed.xPos, enclosed.zPos)
 	fs.processBlocks(enclosed)
-	vertexCount, mtls = fs.Write(w, vw)
-	return len(fs.faces), vertexCount, mtls
+	vCount, vtCount, mtls = fs.Write(w, vw)
+	return len(fs.faces), vCount, vtCount, mtls
 }
 
 func (fs *Faces) clean(xPos, zPos int) {
@@ -259,7 +261,7 @@ func (fs *Faces) clean(xPos, zPos int) {
 	} else {
 		fs.vertexes.Clear()
 	}
-
+	fs.texcoords.Clear()
 	if fs.faces == nil {
 		fs.faces = make([]IndexFace, 0, 8192)
 	} else {
@@ -273,23 +275,49 @@ type IndexFace struct {
 	texIndexes [4]int
 }
 
-type VertexNumFace [4]int
+type VertexNumFace struct {
+	v  [4]int
+	vt [4]int
+}
 
 type MtlFaces struct {
 	blockId uint16
 	faces   []*VertexNumFace
 }
 
+func crossProductTop(v1, v2, v3 Vertex) bool {
+	a := v2.sub(v1)
+	b := v3.sub(v1)
+	return (a.z*b.x - a.x*b.z) > 0
+}
+
 func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
-	var tc TexCoord = NullTexCoord()
+
+	mtl := blockTypeMap[uint8(blockId&255)].findMaterial(blockId)
+	var tc TexCoord
+	if v1.y == v2.y && v2.y == v3.y && v3.y == v4.y {
+		if crossProductTop(v1, v2, v3) {
+			tc = mtl.topTex
+		} else {
+			tc = mtl.botTex
+		}
+	} else {
+		if v1.x == v2.x && v2.x == v3.x && v3.x == v4.x {
+			tc = mtl.sideTex
+		} else {
+			tc = mtl.frontTex
+		}
+	}
 	var face = IndexFace{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}, [4]int{fs.texcoords.Use(tc, false, false, 0), fs.texcoords.Use(tc, true, false, 0), fs.texcoords.Use(tc, true, true, 0), fs.texcoords.Use(tc, false, true, 0)}}
 	fs.faces = append(fs.faces, face)
 }
 
-func (fs *Faces) Write(w io.Writer, vw io.Writer) (vertexCount int, mtls []*MtlFaces) {
+func (fs *Faces) Write(w io.Writer, vw io.Writer) (vCount, vtCount int, mtls []*MtlFaces) {
 	fs.vertexes.Number()
-	var vc = int16(fs.vertexes.Print(io.MultiWriter(w, vw), fs.xPos, fs.zPos))
-
+	mw := io.MultiWriter(w, vw)
+	var vc = int16(fs.vertexes.Print(mw, fs.xPos, fs.zPos))
+	fs.texcoords.Number()
+	var tc = int16(fs.texcoords.Print(mw, 1024, 1024))
 	var blockIds = make([]uint16, 0, 16)
 	for _, face := range fs.faces {
 		var found = false
@@ -314,18 +342,18 @@ func (fs *Faces) Write(w io.Writer, vw io.Writer) (vertexCount int, mtls []*MtlF
 		for _, face := range fs.faces {
 			if face.blockId == blockId {
 				var vf = face.VertexNumFace(fs.vertexes)
-				printFaceLine(w, vf, -int(vc+1))
+				printFaceLine(w, vf, -int(vc+1), -int(tc+1))
 				mf.faces = append(mf.faces, vf)
 				faceCount++
 			}
 		}
 	}
 
-	return int(vc), mfs
+	return int(vc), int(tc), mfs
 }
 
-func printFaceLine(w io.Writer, f *VertexNumFace, offset int) {
-	fmt.Fprintln(w, "f", f[0]+offset, f[1]+offset, f[2]+offset, f[3]+offset)
+func printFaceLine(w io.Writer, f *VertexNumFace, vbase int, vtbase int) {
+	fmt.Fprintf(w, "f %d/%d %d/%d %d/%d %d/%d\n", f.v[0]+vbase, f.vt[0]+vtbase, f.v[1]+vbase, f.vt[1]+vtbase, f.v[2]+vbase, f.vt[2]+vtbase, f.v[3]+vbase, f.vt[3]+vtbase)
 }
 
 type Vertex struct {
@@ -355,11 +383,16 @@ func (vs *Vertexes) Get(i int) int16 {
 }
 
 func (face *IndexFace) VertexNumFace(vs Vertexes) *VertexNumFace {
-	return &VertexNumFace{
+	return &VertexNumFace{[4]int{
 		int(vs.Get(face.indexes[0])),
 		int(vs.Get(face.indexes[1])),
 		int(vs.Get(face.indexes[2])),
-		int(vs.Get(face.indexes[3]))}
+		int(vs.Get(face.indexes[3]))},
+		[4]int{
+			int(vs.Get(face.texIndexes[0])),
+			int(vs.Get(face.texIndexes[1])),
+			int(vs.Get(face.texIndexes[2])),
+			int(vs.Get(face.texIndexes[3]))}}
 }
 
 func (vs *Vertexes) Clear() {
@@ -477,8 +510,9 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 					yPixel := j*patternWidth + jsub*(patternWidth-1)
 					index := i*2 + isub + (j*2+jsub)*numBlockPatternsAcross*2
 					if (*tcs)[index] != -1 {
+						count++
 						xCoord := float64(xPixel) / float64(imageWidth-1)
-						yCoord := float64(yPixel) / float64(imageHeight-1)
+						yCoord := 1 - float64(yPixel)/float64(imageHeight-1)
 						buf = buf[:3]
 						if xCoord == xCoord {
 							buf = appendFloat(buf, xCoord)
@@ -488,12 +522,14 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 							buf = appendFloat(buf, yCoord)
 						}
 						buf = append(buf, '\n')
+						w.Write(buf)
 					}
 				}
 			}
 		}
 	}
-
+	repeatingImageWidth := imageWidth / numBlockPatternsAcross * numRepeatingPatternsAcross
+	repeatingImageHeight := imageWidth / numBlockPatternsAcross
 	for i := 0; i < numRepeatingPatternsAcross; i++ {
 		for j := 0; j < maxDepth; j++ {
 			for isub := 0; isub < 2; isub++ {
@@ -504,17 +540,15 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 				}
 				index := i*2 + isub + j*numRepeatingPatternsAcross*2 + numNonrepeatingTexcoords
 				if (*tcs)[index] != -1 {
-					xCoord := float64(xPixel) / float64(imageWidth-1)
-					yCoord := float64(yPixel) / float64(imageHeight-1)
+					count++
+					xCoord := float64(xPixel) / float64(repeatingImageWidth-1)
+					yCoord := 1 - float64(yPixel)/float64(repeatingImageHeight-1)
 					buf = buf[:3]
-					if xCoord == xCoord {
-						buf = append(buf, '1') //appendCoord(buf, xCoord)
-					}
+					buf = appendFloat(buf, xCoord)
 					buf = append(buf, ' ')
-					if yCoord == yCoord {
-						buf = append(buf, '1') //appendCoord(buf, yCoord)
-					}
+					buf = appendFloat(buf, yCoord)
 					buf = append(buf, '\n')
+					w.Write(buf)
 				}
 			}
 		}
@@ -560,10 +594,9 @@ func (vs *Vertexes) Print(w io.Writer, xPos, zPos int) (count int) {
 
 func appendFloat(buf []byte, x float64) []byte {
 	var highbar float64 = 1.0
-	const precision = 32 //match below
+	const precision = 8 //match below
 	var b [64]byte
 	var j = 0
-
 	if x < 0 {
 		x = -x
 		b[j] = '-'
@@ -581,10 +614,13 @@ func appendFloat(buf []byte, x float64) []byte {
 
 		highbar /= 10
 		digit := math.Floor(x / highbar)
-		b[k] = numbers[int(digit)]
+		b[k] = numbers[int(digit)%10]
 		x -= digit * highbar
 	}
-	return b[0:precision]
+	var end = len(buf) + precision
+	var d = buf[len(buf):end]
+	copy(d, b[0:precision])
+	return buf[:end]
 }
 
 
@@ -632,6 +668,13 @@ func appendCoord(buf []byte, x int) []byte {
 	var d = buf[len(buf):end]
 	copy(d, b[j:])
 	return buf[:end]
+}
+
+func (v Vertex) add(v2 Vertex) Vertex {
+	return Vertex{v.x + v2.x, v.y + v2.y, v.z + v2.z}
+}
+func (v Vertex) sub(v2 Vertex) Vertex {
+	return Vertex{v.x - v2.x, v.y - v2.y, v.z - v2.z}
 }
 
 func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {

@@ -602,7 +602,7 @@ func appendFloat(buf []byte, x float64) []byte {
 		b[j] = '-'
 		j += 1
 	}
-	for highbar = 1.0; highbar < x; highbar *= 10 {
+	for highbar = 1.0; highbar <= x; highbar *= 10 {
 
 	}
 	numbers := "0123456789"

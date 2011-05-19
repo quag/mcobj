@@ -288,7 +288,7 @@ type MtlFaces struct {
 func crossProductTop(v1, v2, v3 Vertex) bool {
 	a := v2.sub(v1)
 	b := v3.sub(v1)
-	return (a.z*b.x - a.x*b.z) > 0
+	return (a.z*b.x - a.x*b.z) < 0
 }
 
 func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
@@ -308,7 +308,7 @@ func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
 			tc = mtl.frontTex
 		}
 	}
-	var face = IndexFace{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}, [4]int{fs.texcoords.Use(tc, false, false, 0), fs.texcoords.Use(tc, true, false, 0), fs.texcoords.Use(tc, true, true, 0), fs.texcoords.Use(tc, false, true, 0)}}
+	var face = IndexFace{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}, [4]int{fs.texcoords.Use(tc, true, true, 0), fs.texcoords.Use(tc, false, true, 0), fs.texcoords.Use(tc, false, false, 0), fs.texcoords.Use(tc, true, false, 0)}}
 	fs.faces = append(fs.faces, face)
 }
 
@@ -502,10 +502,10 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 	copy(buf[0:3], "vt ")
 	patternWidth := (imageWidth / numBlockPatternsAcross)
 	count = 0
-	for i := 0; i < numBlockPatternsAcross; i++ {
-		for j := 0; j < numBlockPatternsAcross; j++ {
-			for isub := 0; isub < 2; isub++ {
-				for jsub := 0; jsub < 2; jsub++ {
+	for j := 0; j < numBlockPatternsAcross; j++ {
+		for jsub := 0; jsub < 2; jsub++ {
+			for i := 0; i < numBlockPatternsAcross; i++ {
+				for isub := 0; isub < 2; isub++ {
 					xPixel := i*patternWidth + isub*(patternWidth-1)
 					yPixel := j*patternWidth + jsub*(patternWidth-1)
 					index := i*2 + isub + (j*2+jsub)*numBlockPatternsAcross*2
@@ -691,19 +691,14 @@ func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 		}
 	}
 
-	var updateBlockRun func(rp **blockRun, nr *blockRun, flag bool)
+	var updateBlockRun func(rp **blockRun, nr *blockRun)
 	if !blockFaces {
-		updateBlockRun = func(rp **blockRun, nr *blockRun, flag bool) {
+		updateBlockRun = func(rp **blockRun, nr *blockRun) {
 			var r = *rp
 			if r.dirty {
 				if nr.blockId == r.blockId {
-					if flag {
-						r.v3 = nr.v3
-						r.v4 = nr.v4
-					} else {
-						r.v2 = nr.v2
-						r.v3 = nr.v3
-					}
+					r.v3 = nr.v3
+					r.v4 = nr.v4
 				} else {
 					finishRun(r)
 					*rp = nr
@@ -713,7 +708,7 @@ func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 			}
 		}
 	} else {
-		updateBlockRun = func(rp **blockRun, nr *blockRun, flag bool) {
+		updateBlockRun = func(rp **blockRun, nr *blockRun) {
 			finishRun(nr)
 		}
 	}
@@ -743,25 +738,25 @@ func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x-1, y, z)) {
-				updateBlockRun(&r1, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true}, true)
+				updateBlockRun(&r1, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true})
 			} else {
 				finishRun(r1)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x+1, y, z)) {
-				updateBlockRun(&r2, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true}, false)
+				updateBlockRun(&r2, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true})
 			} else {
 				finishRun(r2)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y, z-1)) {
-				updateBlockRun(&r3, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true}, false)
+				updateBlockRun(&r3, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true})
 			} else {
 				finishRun(r3)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y, z+1)) {
-				updateBlockRun(&r4, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true}, true)
+				updateBlockRun(&r4, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true})
 			} else {
 				finishRun(r4)
 			}

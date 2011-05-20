@@ -145,6 +145,19 @@ func main() {
 			fmt.Fprintln(os.Stderr, "blocks.json error:", jsonError)
 			return
 		}
+		{
+			w, err := os.Open("terrain.png")
+			if err != nil {
+				fmt.Fprintln(os.Stderr, jsonError)
+				return
+			}
+			var terrainImageError = extractTerrainImage(w, "repeating_terrain", blockTypeMap)
+			if terrainImageError != nil {
+				fmt.Fprintln(os.Stderr, jsonError)
+				return
+			}
+		}
+
 	}
 
 	for i := 0; i < flag.NArg(); i++ {
@@ -440,13 +453,13 @@ func loadBlockTypesJson(filename string) os.Error {
 
 				if dataArray == nil {
 					if data != 255 {
-						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), tex, sideTex, botTex, topTex})
+						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), "", 0, 0, tex, sideTex, botTex, topTex})
 					} else {
-						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, name, tex, sideTex, botTex, topTex})
+						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, name, "", 0, 0, tex, sideTex, botTex, topTex})
 					}
 				} else {
 					for _, data = range dataArray {
-						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), tex, sideTex, botTex, topTex})
+						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), "", 0, 0, tex, sideTex, botTex, topTex})
 					}
 				}
 			}

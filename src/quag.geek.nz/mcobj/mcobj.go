@@ -152,6 +152,7 @@ func main() {
 				return
 			}
 			var terrainImageError = extractTerrainImage(w, "repeating_terrain", blockTypeMap)
+			w.Close()
 			if terrainImageError != nil {
 				fmt.Fprintln(os.Stderr, jsonError)
 				return

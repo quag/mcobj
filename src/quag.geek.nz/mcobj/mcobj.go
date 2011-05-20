@@ -148,7 +148,7 @@ func main() {
 		{
 			w, err := os.Open("terrain.png")
 			if err != nil {
-				fmt.Fprintln(os.Stderr, jsonError)
+				fmt.Fprintln(os.Stderr, err)
 				return
 			}
 			var terrainImageError = extractTerrainImage(w, "repeating_terrain", blockTypeMap)

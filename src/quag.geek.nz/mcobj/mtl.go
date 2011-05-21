@@ -117,6 +117,8 @@ func (mtl *MTL) Print(w io.Writer) {
 	)
 
 	fmt.Fprintf(w, "# %s\nnewmtl %s\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\nmap_Kd terrain.png\n\n", mtl.name, MaterialNamer.NameBlockId(uint16(mtl.blockId)+uint16(mtl.metadata)*256), float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
+	fmt.Fprintf(w, "# %s\nnewmtl repeating_%s\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\nmap_Kd %s\n\n", mtl.name, MaterialNamer.NameBlockId(uint16(mtl.blockId)+uint16(mtl.metadata)*256), float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255, mtl.repeatingTextureName)
+
 }
 
 func (mtl *MTL) colorId() uint16 {

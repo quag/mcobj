@@ -80,8 +80,8 @@ func extractTerrainImage(reader io.Reader, outputTemplate string, blockTypeMap m
 	currentTextureName, currentTexture := makeTexture(&img, outputTemplate, currentTextureCount)
 	var repeatingTextureNames map[string]string = make(map[string]string)
 	var repeatingTextureOffsets map[string]int = make(map[string]int)
-	for _, blockValue := range blockTypeMap {
-		for _, colorValue := range blockValue.colors {
+	for blockName, blockValue := range blockTypeMap {
+		for colorName, colorValue := range blockValue.colors {
 			tc := colorValue.frontTex
 			for side := 0; side < 2; side++ {
 				tckey := fmt.Sprint(tc)
@@ -114,11 +114,11 @@ func extractTerrainImage(reader io.Reader, outputTemplate string, blockTypeMap m
 						image.Rect(int(tc.topLeft.x)*blockSizeX,
 							int(tc.topLeft.y)*blockSizeY, int(tc.bottomRight.x)*blockSizeX, int(tc.bottomRight.y)*blockSizeY))
 				}
-				colorValue.repeatingTextureName = repeatingTextureName
+				blockTypeMap[blockName].colors[colorName].repeatingTextureName = repeatingTextureName
 				if side == 0 {
-					colorValue.repeatingFrontOffset = repeatingTextureOffset
+					blockTypeMap[blockName].colors[colorName].repeatingFrontOffset = repeatingTextureOffset
 				} else {
-					colorValue.repeatingSideOffset = repeatingTextureOffset
+					blockTypeMap[blockName].colors[colorName].repeatingSideOffset = repeatingTextureOffset
 				}
 				tc = colorValue.sideTex
 

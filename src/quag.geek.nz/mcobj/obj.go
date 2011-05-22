@@ -295,6 +295,7 @@ func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
 
 	mtl := blockTypeMap[uint8(blockId&255)].findMaterial(blockId)
 	var tc TexCoord
+	numRepetitions := 0
 	if v1.y == v2.y && v2.y == v3.y && v3.y == v4.y {
 		if crossProductTop(v1, v2, v3) {
 			tc = mtl.topTex
@@ -302,13 +303,22 @@ func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
 			tc = mtl.botTex
 		}
 	} else {
-		if v1.x == v2.x && v2.x == v3.x && v3.x == v4.x {
-			tc = mtl.sideTex
+		if v3.y-v2.y > 1 {
+			numRepetitions = v3.y - v2.y
+			if v1.x == v2.x && v2.x == v3.x && v3.x == v4.x {
+				tc = mtl.repeatingSideOffset
+			} else {
+				tc = mtl.repeatingFrontOffset
+			}
 		} else {
-			tc = mtl.frontTex
+			if v1.x == v2.x && v2.x == v3.x && v3.x == v4.x {
+				tc = mtl.sideTex
+			} else {
+				tc = mtl.frontTex
+			}
 		}
 	}
-	var face = IndexFace{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}, [4]int{fs.texcoords.Use(tc, true, true, 0), fs.texcoords.Use(tc, false, true, 0), fs.texcoords.Use(tc, false, false, 0), fs.texcoords.Use(tc, true, false, 0)}}
+	var face = IndexFace{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}, [4]int{fs.texcoords.Use(tc, true, true, numRepetitions), fs.texcoords.Use(tc, false, true, numRepetitions), fs.texcoords.Use(tc, false, false, numRepetitions), fs.texcoords.Use(tc, true, false, numRepetitions)}}
 	fs.faces = append(fs.faces, face)
 }
 
@@ -432,16 +442,16 @@ func (vs *TexCoords) Index(x int, y int, xright bool, ybot bool, reps bool) int 
 	if xright {
 		xoffset = -1 //get the coordinate just on the closer edge of the pixel
 	}
-	var yoffset = 0
-	if ybot {
-		yoffset = -1 //get the coordinate just on the closer edge of the pixel
-	}
 	if x == 0 && xoffset < 0 {
 		return 0
 	}
 
 	if reps {
-		return x*2 + xoffset + numRepeatingTexcoordsAcross*y
+		return x*2 + xoffset + numRepeatingTexcoordsAcross*y + numNonrepeatingTexcoords
+	}
+	var yoffset = 0
+	if ybot {
+		yoffset = -1 //get the coordinate just on the closer edge of the pixel
 	}
 	if y == 0 && yoffset < 0 {
 		return 0
@@ -450,18 +460,19 @@ func (vs *TexCoords) Index(x int, y int, xright bool, ybot bool, reps bool) int 
 }
 
 func (tcs *TexCoords) Use(tc TexCoord, xright bool, ybot bool, numReps int) int {
+	isRepeating := (numReps != 0)
 	var i = 0
 	if xright {
 		if ybot {
-			i = tcs.Index(int(tc.bottomRight.x), int(tc.bottomRight.y), xright, ybot, false) //fixme reps
+			i = tcs.Index(int(tc.bottomRight.x), int(tc.bottomRight.y)+numReps, xright, ybot, isRepeating) //fixme reps
 		} else {
-			i = tcs.Index(int(tc.bottomRight.x), int(tc.topLeft.y), xright, ybot, false) //fixme reps
+			i = tcs.Index(int(tc.bottomRight.x), int(tc.topLeft.y), xright, ybot, isRepeating) //fixme reps
 		}
 	} else {
 		if ybot {
-			i = tcs.Index(int(tc.topLeft.x), int(tc.bottomRight.y), xright, ybot, false) //fixme reps
+			i = tcs.Index(int(tc.topLeft.x), int(tc.bottomRight.y)+numReps, xright, ybot, isRepeating) //fixme reps
 		} else {
-			i = tcs.Index(int(tc.topLeft.x), int(tc.topLeft.y), xright, ybot, false) //fixme reps
+			i = tcs.Index(int(tc.topLeft.x), int(tc.topLeft.y), xright, ybot, isRepeating) //fixme reps
 		}
 	}
 	(*tcs)[i]++

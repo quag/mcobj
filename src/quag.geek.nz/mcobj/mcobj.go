@@ -454,13 +454,13 @@ func loadBlockTypesJson(filename string) os.Error {
 
 				if dataArray == nil {
 					if data != 255 {
-						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), "", 0, 0, tex, sideTex, botTex, topTex})
+						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), "", NullTexCoord(), NullTexCoord(), tex, sideTex, botTex, topTex})
 					} else {
-						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, name, "", 0, 0, tex, sideTex, botTex, topTex})
+						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, name, "", NullTexCoord(), NullTexCoord(), tex, sideTex, botTex, topTex})
 					}
 				} else {
 					for _, data = range dataArray {
-						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), "", 0, 0, tex, sideTex, botTex, topTex})
+						blockTypeMap[blockId].colors = append(blockTypeMap[blockId].colors, MTL{blockId, data, color, fmt.Sprintf("%s_%d", name, data), "", NullTexCoord(), NullTexCoord(), tex, sideTex, botTex, topTex})
 					}
 				}
 			}

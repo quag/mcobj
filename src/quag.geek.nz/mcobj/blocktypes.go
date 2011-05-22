@@ -92,7 +92,7 @@ type BlockType struct {
 }
 
 func (b BlockType) findMaterial(blockId uint16) (retval MTL) {
-	retval = MTL{0, 255, 0x800000ff, fmt.Sprintf("Unknown.%d", blockId&0xff), "", 0, 0, NullTexCoord(), NullTexCoord(), NullTexCoord(), NullTexCoord()}
+	retval = MTL{0, 255, 0x800000ff, fmt.Sprintf("Unknown.%d", blockId&0xff), "", NullTexCoord(), NullTexCoord(), NullTexCoord(), NullTexCoord(), NullTexCoord(), NullTexCoord()}
 	for i, m := range b.colors {
 		perfectMatch := m.metadata == uint8(blockId>>8)
 		if i == 0 || m.metadata == 255 || perfectMatch {

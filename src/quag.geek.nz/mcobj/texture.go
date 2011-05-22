@@ -115,10 +115,11 @@ func extractTerrainImage(reader io.Reader, outputTemplate string, blockTypeMap m
 							int(tc.topLeft.y)*blockSizeY, int(tc.bottomRight.x)*blockSizeX, int(tc.bottomRight.y)*blockSizeY))
 				}
 				blockTypeMap[blockName].colors[colorName].repeatingTextureName = repeatingTextureName
+				tc := TexCoord{Vec2{float32(repeatingTextureOffset), 0}, Vec2{float32(repeatingTextureOffset + 1), 1.0}}
 				if side == 0 {
-					blockTypeMap[blockName].colors[colorName].repeatingFrontOffset = repeatingTextureOffset
+					blockTypeMap[blockName].colors[colorName].repeatingFrontOffset = tc
 				} else {
-					blockTypeMap[blockName].colors[colorName].repeatingSideOffset = repeatingTextureOffset
+					blockTypeMap[blockName].colors[colorName].repeatingSideOffset = tc
 				}
 				tc = colorValue.sideTex
 

@@ -562,7 +562,7 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 		for i := 0; i < numRepeatingPatternsAcross; i++ {
 			for isub := 0; isub < 2; isub++ {
 				xPixel := i*patternWidth + isub*(patternWidth-1)
-				yPixel := j*patternWidth + (patternWidth - 1)
+				yPixel := (j-1)*patternWidth + (patternWidth - 1)
 				if j == 0 {
 					yPixel = 0
 				}

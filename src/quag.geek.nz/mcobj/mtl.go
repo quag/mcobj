@@ -6,9 +6,13 @@ import (
 	"os"
 )
 
-func printMtl(w io.Writer, blockId uint16) {
+func printMtl(w io.Writer, blockId uint16, repeating bool) {
 	if !noColor {
-		fmt.Fprintln(w, "usemtl", MaterialNamer.NameBlockId(blockId))
+		if repeating {
+			fmt.Fprintln(w, "usemtl repeating_"+MaterialNamer.NameBlockId(blockId))
+		} else {
+			fmt.Fprintln(w, "usemtl", MaterialNamer.NameBlockId(blockId))
+		}
 	}
 }
 

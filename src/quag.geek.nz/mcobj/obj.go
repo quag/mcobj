@@ -66,8 +66,15 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 				o.vout.Flush()
 
 				for _, mtl := range job.mtls {
-					printMtl(o.fout, mtl.blockId)
+					wroteRepeatingTexcoords := false
+					printMtl(o.fout, mtl.blockId, wroteRepeatingTexcoords)
 					for _, face := range mtl.faces {
+						writingRepeatingTexcoords := face.repeating
+
+						if writingRepeatingTexcoords != wroteRepeatingTexcoords {
+							printMtl(o.fout, mtl.blockId, writingRepeatingTexcoords)
+							wroteRepeatingTexcoords = writingRepeatingTexcoords
+						}
 						printFaceLine(o.fout, face, vBase, vtBase)
 					}
 				}
@@ -276,8 +283,9 @@ type IndexFace struct {
 }
 
 type VertexNumFace struct {
-	v  [4]int
-	vt [4]int
+	v         [4]int
+	vt        [4]int
+	repeating bool
 }
 
 type MtlFaces struct {
@@ -346,11 +354,19 @@ func (fs *Faces) Write(w io.Writer, vw io.Writer) (vCount, vtCount int, mtls []*
 	var mfs = make([]*MtlFaces, 0, len(blockIds))
 
 	for _, blockId := range blockIds {
-		printMtl(w, blockId)
+		printMtl(w, blockId, false)
+		wroteRepeatingTexcoords := false
 		var mf = &MtlFaces{blockId, make([]*VertexNumFace, 0, len(fs.faces))}
 		mfs = append(mfs, mf)
 		for _, face := range fs.faces {
 			if face.blockId == blockId {
+				writingRepeatingTexcoords := face.texIndexes[0] >= numNonrepeatingTexcoords
+
+				if writingRepeatingTexcoords != wroteRepeatingTexcoords {
+					printMtl(w, blockId, writingRepeatingTexcoords)
+					wroteRepeatingTexcoords = writingRepeatingTexcoords
+				}
+
 				var vf = face.VertexNumFace(fs.vertexes)
 				printFaceLine(w, vf, -int(vc+1), -int(tc+1))
 				mf.faces = append(mf.faces, vf)
@@ -402,7 +418,8 @@ func (face *IndexFace) VertexNumFace(vs Vertexes) *VertexNumFace {
 			int(vs.Get(face.texIndexes[0])),
 			int(vs.Get(face.texIndexes[1])),
 			int(vs.Get(face.texIndexes[2])),
-			int(vs.Get(face.texIndexes[3]))}}
+			int(vs.Get(face.texIndexes[3]))},
+		face.texIndexes[0] >= numNonrepeatingTexcoords}
 }
 
 func (vs *Vertexes) Clear() {
@@ -427,7 +444,7 @@ func (vs *Vertexes) Number() {
 const numBlockPatternsAcross = 16
 const numBlockPatterns = numBlockPatternsAcross * numBlockPatternsAcross
 const numNonrepeatingTexcoordsAcross = numBlockPatternsAcross * 2
-const numNonrepeatingTexcoords = numBlockPatternsAcross * numBlockPatternsAcross
+const numNonrepeatingTexcoords = numNonrepeatingTexcoordsAcross * numNonrepeatingTexcoordsAcross
 
 const numRepeatingPatternsAcross = 64
 const numRepeatingTexcoordsAcross = numRepeatingPatternsAcross * 2
@@ -541,8 +558,8 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 	}
 	repeatingImageWidth := imageWidth / numBlockPatternsAcross * numRepeatingPatternsAcross
 	repeatingImageHeight := imageWidth / numBlockPatternsAcross
-	for i := 0; i < numRepeatingPatternsAcross; i++ {
-		for j := 0; j < maxDepth; j++ {
+	for j := 0; j < maxDepth; j++ {
+		for i := 0; i < numRepeatingPatternsAcross; i++ {
 			for isub := 0; isub < 2; isub++ {
 				xPixel := i*patternWidth + isub*(patternWidth-1)
 				yPixel := j*patternWidth + (patternWidth - 1)

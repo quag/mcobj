@@ -90,6 +90,17 @@ func extractTerrainImage(reader io.Reader, outputTemplate string, blockTypeMap m
 				if ok {
 					repeatingTextureOffset, ok = repeatingTextureOffsets[tckey]
 				} else {
+					blockSizeX := img.Bounds().Dx() / numBlockPatternsAcross
+					blockSizeY := img.Bounds().Dy() / numBlockPatternsAcross
+					//copy the texture to the repeating texture pack
+					copyBlock(currentTexture,
+						img,
+						image.Rect(currentTextureOffset*blockSizeX, 0,
+							(currentTextureOffset+1)*blockSizeX, blockSizeY),
+						image.Rect(int(tc.topLeft.x)*blockSizeX,
+							int(tc.topLeft.y)*blockSizeY, int(tc.bottomRight.x)*blockSizeX, int(tc.bottomRight.y)*blockSizeY))
+
+					//find new block to allocate in the repeating texture pack
 					if (side == 1 && currentTextureOffset < numRepeatingPatternsAcross) || currentTextureOffset+1 < numRepeatingPatternsAcross {
 						repeatingTextureOffset = currentTextureOffset
 						repeatingTextureName = currentTextureName
@@ -104,15 +115,6 @@ func extractTerrainImage(reader io.Reader, outputTemplate string, blockTypeMap m
 					}
 					repeatingTextureNames[tckey] = repeatingTextureName
 					repeatingTextureOffsets[tckey] = repeatingTextureOffset
-					blockSizeX := img.Bounds().Dx() / numBlockPatternsAcross
-					blockSizeY := img.Bounds().Dy() / numBlockPatternsAcross
-
-					copyBlock(currentTexture,
-						img,
-						image.Rect(currentTextureOffset*blockSizeX, 0,
-							(currentTextureOffset+1)*blockSizeX, blockSizeY),
-						image.Rect(int(tc.topLeft.x)*blockSizeX,
-							int(tc.topLeft.y)*blockSizeY, int(tc.bottomRight.x)*blockSizeX, int(tc.bottomRight.y)*blockSizeY))
 				}
 				blockTypeMap[blockName].colors[colorName].repeatingTextureName = repeatingTextureName
 				tc := TexCoord{Vec2{float32(repeatingTextureOffset), 0}, Vec2{float32(repeatingTextureOffset + 1), 1.0}}

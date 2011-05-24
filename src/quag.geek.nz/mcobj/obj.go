@@ -25,7 +25,7 @@ type ObjGenerator struct {
 	outFilename, vFilename, fFilename string
 }
 
-func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error {
+func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator, imageWidth int, imageHeight int) os.Error {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
 	o.completeChan = make(chan bool)
@@ -43,7 +43,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 				var b = o.memoryWriterPool.GetWriter()
 				var vb = o.memoryWriterPool.GetWriter()
 
-				var faceCount, vCount, vtCount, mtls = faces.ProcessChunk(job.enclosed, b, vb)
+				var faceCount, vCount, vtCount, mtls = faces.ProcessChunk(job.enclosed, b, vb, imageWidth, imageHeight)
 
 				o.writeFacesChan <- &WriteFacesJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, vCount, vtCount, mtls, b, vb, job.last}
 			}
@@ -252,10 +252,10 @@ type Faces struct {
 	boundary  *BoundaryLocator
 }
 
-func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer, vw io.Writer) (faceCount, vCount, vtCount int, mtls []*MtlFaces) {
+func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer, vw io.Writer, imageWidth int, imageHeight int) (faceCount, vCount, vtCount int, mtls []*MtlFaces) {
 	fs.clean(enclosed.xPos, enclosed.zPos)
 	fs.processBlocks(enclosed)
-	vCount, vtCount, mtls = fs.Write(w, vw)
+	vCount, vtCount, mtls = fs.Write(w, vw, imageWidth, imageHeight)
 	return len(fs.faces), vCount, vtCount, mtls
 }
 
@@ -330,12 +330,12 @@ func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
 	fs.faces = append(fs.faces, face)
 }
 
-func (fs *Faces) Write(w io.Writer, vw io.Writer) (vCount, vtCount int, mtls []*MtlFaces) {
+func (fs *Faces) Write(w io.Writer, vw io.Writer, imageWidth int, imageHeight int) (vCount, vtCount int, mtls []*MtlFaces) {
 	fs.vertexes.Number()
 	mw := io.MultiWriter(w, vw)
 	var vc = int16(fs.vertexes.Print(mw, fs.xPos, fs.zPos))
 	fs.texcoords.Number()
-	var tc = int16(fs.texcoords.Print(mw, 1024, 1024))
+	var tc = int16(fs.texcoords.Print(mw, imageWidth, imageHeight))
 	var blockIds = make([]uint16, 0, 16)
 	for _, face := range fs.faces {
 		var found = false
@@ -539,8 +539,8 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 					index := i*2 + isub + (j*2+jsub)*numBlockPatternsAcross*2
 					if (*tcs)[index] != -1 {
 						count++
-						xCoord := float64(xPixel) / float64(imageWidth-1)
-						yCoord := 1 - float64(yPixel)/float64(imageHeight-1)
+						xCoord := (float64(xPixel) + .5) / float64(imageWidth)
+						yCoord := 1 - (float64(yPixel)+.5)/float64(imageHeight)
 						buf = buf[:3]
 						if xCoord == xCoord {
 							buf = appendFloat(buf, xCoord)
@@ -569,8 +569,8 @@ func (tcs *TexCoords) Print(w io.Writer, imageWidth int, imageHeight int) (count
 				index := i*2 + isub + j*numRepeatingPatternsAcross*2 + numNonrepeatingTexcoords
 				if (*tcs)[index] != -1 {
 					count++
-					xCoord := float64(xPixel) / float64(repeatingImageWidth-1)
-					yCoord := 1 - float64(yPixel)/float64(repeatingImageHeight-1)
+					xCoord := (float64(xPixel) + .5) / float64(repeatingImageWidth)
+					yCoord := 1 - (float64(yPixel)+.5)/float64(repeatingImageHeight)
 					buf = buf[:3]
 					buf = appendFloat(buf, xCoord)
 					buf = append(buf, ' ')

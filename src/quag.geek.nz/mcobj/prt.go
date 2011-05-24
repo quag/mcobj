@@ -22,7 +22,7 @@ type PrtGenerator struct {
 	boundary      *BoundaryLocator
 }
 
-func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error {
+func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator, imageWidth int, imageHeight int) os.Error {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.completeChan = make(chan bool)
 	o.total = total

@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"io"
 	"image"
 	"image/png"
 	"fmt"
@@ -70,11 +69,8 @@ func writeTexture(outputName string, retimg ImageNG) os.Error {
 	outputFile.Close()
 	return nil
 }
-func extractTerrainImage(reader io.Reader, outputTemplate string, blockTypeMap map[byte]*BlockType) (retval os.Error) {
-	var img, fileErr = png.Decode(reader)
-	if fileErr != nil {
-		return fileErr
-	}
+func extractTerrainImage(img image.Image, outputTemplate string, blockTypeMap map[byte]*BlockType) (retval os.Error) {
+
 	currentTextureCount := 0
 	currentTextureOffset := 0
 	currentTextureName, currentTexture := makeTexture(&img, outputTemplate, currentTextureCount)

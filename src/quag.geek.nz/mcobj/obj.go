@@ -350,27 +350,26 @@ func (fs *Faces) Write(w io.Writer, vw io.Writer, imageWidth int, imageHeight in
 			blockIds = append(blockIds, face.blockId)
 		}
 	}
-
 	var mfs = make([]*MtlFaces, 0, len(blockIds))
+	lastMTL := ""
+	for writeRepeatingTexcoords := 0; writeRepeatingTexcoords < 2; writeRepeatingTexcoords++ {
+		for _, blockId := range blockIds {
+			if lastMTL != getMtlName(blockId, writeRepeatingTexcoords != 0) {
+				lastMTL = printMtl(w, blockId, writeRepeatingTexcoords != 0)
+			}
+			var mf = &MtlFaces{blockId, make([]*VertexNumFace, 0, len(fs.faces))}
+			mfs = append(mfs, mf)
+			for _, face := range fs.faces {
+				if face.blockId == blockId {
+					needsRepeatingTexcoords := face.texIndexes[0] >= numNonrepeatingTexcoords
 
-	for _, blockId := range blockIds {
-		printMtl(w, blockId, false)
-		wroteRepeatingTexcoords := false
-		var mf = &MtlFaces{blockId, make([]*VertexNumFace, 0, len(fs.faces))}
-		mfs = append(mfs, mf)
-		for _, face := range fs.faces {
-			if face.blockId == blockId {
-				writingRepeatingTexcoords := face.texIndexes[0] >= numNonrepeatingTexcoords
-
-				if writingRepeatingTexcoords != wroteRepeatingTexcoords {
-					printMtl(w, blockId, writingRepeatingTexcoords)
-					wroteRepeatingTexcoords = writingRepeatingTexcoords
+					if needsRepeatingTexcoords == (writeRepeatingTexcoords != 0) {
+						var vf = face.VertexNumFace(fs.vertexes)
+						printFaceLine(w, vf, -int(vc+1), -int(tc+1))
+						mf.faces = append(mf.faces, vf)
+						faceCount++
+					}
 				}
-
-				var vf = face.VertexNumFace(fs.vertexes)
-				printFaceLine(w, vf, -int(vc+1), -int(tc+1))
-				mf.faces = append(mf.faces, vf)
-				faceCount++
 			}
 		}
 	}

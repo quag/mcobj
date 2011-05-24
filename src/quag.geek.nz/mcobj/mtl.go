@@ -6,14 +6,27 @@ import (
 	"os"
 )
 
-func printMtl(w io.Writer, blockId uint16, repeating bool) {
+func getMtlName(blockId uint16, repeating bool) (retval string) {
 	if !noColor {
 		if repeating {
-			fmt.Fprintln(w, "usemtl repeating_"+MaterialNamer.NameBlockId(blockId))
+			retval = "repeating_" + MaterialNamer.NameBlockId(blockId)
 		} else {
-			fmt.Fprintln(w, "usemtl", MaterialNamer.NameBlockId(blockId))
+			retval = MaterialNamer.NameBlockId(blockId)
 		}
+	} else {
+		retval = ""
 	}
+	return
+}
+
+func printMtl(w io.Writer, blockId uint16, repeating bool) (retval string) {
+	if !noColor {
+		retval = getMtlName(blockId, repeating)
+		fmt.Fprintln(w, "usemtl "+retval)
+	} else {
+		retval = ""
+	}
+	return
 }
 
 func writeMtlFile(filename string) os.Error {

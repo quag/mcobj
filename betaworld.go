@@ -141,6 +141,9 @@ func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
 					for cx := 0; cx < 32; cx++ {
 						var location uint32
 						var readErr = binary.Read(region, binary.BigEndian, &location)
+						if readErr == os.EOF {
+							continue
+						}
 						if readErr != nil {
 							return nil, readErr
 						}

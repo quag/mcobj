@@ -59,7 +59,7 @@ func (mtl *MTL) colorId() uint16 {
 func init() {
 	colors = make([]MTL, 256)
 	for i, _ := range colors {
-		colors[i] = MTL{byte(i), 255, 0x7f7f7f, "Unknown"}
+		colors[i] = MTL{byte(i), 255, 0x800000ff, "Unknown"}
 	}
 
 	extraData = make(map[byte]bool)

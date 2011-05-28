@@ -37,6 +37,10 @@
 {"blockId": 27, "data": 1,              "name": "PoweredRail.On",      "color": "#956746",   "item": true       },
 {"blockId": 28,                         "name": "DetectorRail",        "color": "#766251",   "item": true       },
 {"blockId": 30,                         "name": "Web",                 "color": "#dadada99", "item": true       },
+{"blockId": 31, "data": 0,              "name": "Dead Shrub",          "color": "#7c4f19",   "item": true       },
+{"blockId": 31, "data": 1,              "name": "Tall Grass",          "color": "#52732c",   "item": true       },
+{"blockId": 31, "data": 2,              "name": "Live Shrub",          "color": "#497328",   "item": true       },
+{"blockId": 32,                         "name": "Dead Shrub",          "color": "#7c4f19",   "item": true       },
 {"blockId": 35, "data": 0,              "name": "Wool.White",          "color": "#dedede"                       },
 {"blockId": 35, "data": 1,              "name": "Wool.Orange",         "color": "#ea8037"                       },
 {"blockId": 35, "data": 2,              "name": "Wool.Magenta",        "color": "#bf4cc9"                       },
@@ -111,5 +115,6 @@
 {"blockId": 92,                         "name": "CakeBlock",           "color": "#e5cecf",   "item": true       },
 {"blockId": 93,                         "name": "RedstoneRepeater.Off","color": "#989494",   "item": true       },
 {"blockId": 94,                         "name": "RedstoneRepeater.On", "color": "#a19494",   "item": true       },
-{"blockId": 95,                         "name": "LockedChest",         "color": "#835e25"                       }
+{"blockId": 95,                         "name": "LockedChest",         "color": "#835e25"                       },
+{"blockId": 96,                         "name": "Trapdoor",            "color": "#81602f",   "item": true       }
 ]

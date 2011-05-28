@@ -13,6 +13,7 @@ type ObjGenerator struct {
 	completeChan   chan bool
 
 	freelist chan *MemoryWriter
+	memoryWriterPool *MemoryWriterPool
 
 	total int
 
@@ -25,7 +26,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	o.writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
 	o.completeChan = make(chan bool)
 
-	o.freelist = make(chan *MemoryWriter, maxProcs*2)
+	o.memoryWriterPool = NewMemoryWriterPool(maxProcs*2, 128*1024)
 	o.total = total
 
 	for i := 0; i < maxProcs; i++ {
@@ -35,14 +36,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 			for {
 				var job = <-o.enclosedsChan
 
-				var b *MemoryWriter
-				select {
-				case b = <-o.freelist:
-					// Got a buffer
-				default:
-					b = &MemoryWriter{make([]byte, 0, 128*1024)}
-				}
-
+				var b = o.memoryWriterPool.GetWriter()
 				var faceCount = faces.ProcessChunk(job.enclosed, b)
 				fmt.Fprintln(b)
 
@@ -63,13 +57,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 			size += len(job.b.buf)
 			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, o.total, job.xPos, job.zPos, job.faceCount, float64(size)/1024/1024)
 
-			job.b.Clean()
-			select {
-			case o.freelist <- job.b:
-				// buffer added to free list
-			default:
-				// free list is full, discard the buffer
-			}
+			o.memoryWriterPool.ReuseWriter(job.b)
 
 			if job.last {
 				o.completeChan <- true
@@ -125,17 +113,3 @@ type WriteFacesJob struct {
 	last                  bool
 }
 
-type MemoryWriter struct {
-	buf []byte
-}
-
-func (m *MemoryWriter) Clean() {
-	if m.buf != nil {
-		m.buf = m.buf[:0]
-	}
-}
-
-func (m *MemoryWriter) Write(p []byte) (n int, err os.Error) {
-	m.buf = append(m.buf, p...)
-	return len(p), nil
-}

@@ -78,6 +78,10 @@ func (fs *Faces) Write(w io.Writer) {
 	}
 }
 
+type Vertex struct {
+	x, y, z int
+}
+
 type Vertexes []int16
 
 func (vs *Vertexes) Index(x, y, z int) int {
@@ -199,52 +203,56 @@ func appendCoord(buf []byte, x int) []byte {
 	return buf[:end]
 }
 
-type Vertex struct {
-	x, y, z int
-}
-
-type blockRun struct {
-	blockId        uint16
-	v1, v2, v3, v4 Vertex
-	dirty          bool
-}
-
-func (r *blockRun) AddFace(faces *Faces) {
-	if r.dirty {
-		faces.AddFace(r.blockId, r.v1, r.v2, r.v3, r.v4)
-		r.dirty = false
+func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
+	type blockRun struct {
+		blockId        uint16
+		v1, v2, v3, v4 Vertex
+		dirty          bool
 	}
-}
 
-func (r *blockRun) Update(faces *Faces, nr *blockRun, flag bool) {
-	if !blockFaces {
+	var finishRun = func(r *blockRun) {
 		if r.dirty {
-			if nr.blockId == r.blockId {
-				if flag {
-					r.v3 = nr.v3
-					r.v4 = nr.v4
+			fs.AddFace(r.blockId, r.v1, r.v2, r.v3, r.v4)
+			r.dirty = false
+		}
+	}
+
+	var updateBlockRun func(rp **blockRun, nr *blockRun, flag bool)
+	if !blockFaces {
+		updateBlockRun = func(rp **blockRun, nr *blockRun, flag bool) {
+			var r = *rp
+			if r.dirty {
+				if nr.blockId == r.blockId {
+					if flag {
+						r.v3 = nr.v3
+						r.v4 = nr.v4
+					} else {
+						r.v2 = nr.v2
+						r.v3 = nr.v3
+					}
 				} else {
-					r.v2 = nr.v2
-					r.v3 = nr.v3
+					finishRun(r)
+					*rp = nr
 				}
 			} else {
-				r.AddFace(faces)
-				*r = *nr
+				*rp = nr
 			}
-		} else {
-			*r = *nr
 		}
 	} else {
-		nr.AddFace(faces)
-		nr.dirty = false
+		updateBlockRun = func(rp **blockRun, nr *blockRun, flag bool) {
+			finishRun(nr)
+		}
 	}
-}
 
-func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 	for i := 0; i < len(enclosedChunk.blocks); i += 128 {
 		var x, z = (i / 128) / 16, (i / 128) % 16
 
-		var r1, r2, r3, r4 blockRun
+		var (
+			r1 = new(blockRun)
+			r2 = new(blockRun)
+			r3 = new(blockRun)
+			r4 = new(blockRun)
+		)
 
 		var column = BlockColumn(enclosedChunk.blocks[i : i+128])
 		for y, blockId := range column {
@@ -261,33 +269,33 @@ func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x-1, y, z)) {
-				r1.Update(fs, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true}, true)
+				updateBlockRun(&r1, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true}, true)
 			} else {
-				r1.AddFace(fs)
+				finishRun(r1)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x+1, y, z)) {
-				r2.Update(fs, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true}, false)
+				updateBlockRun(&r2, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true}, false)
 			} else {
-				r2.AddFace(fs)
+				finishRun(r2)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y, z-1)) {
-				r3.Update(fs, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true}, false)
+				updateBlockRun(&r3, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true}, false)
 			} else {
-				r3.AddFace(fs)
+				finishRun(r3)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y, z+1)) {
-				r4.Update(fs, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true}, true)
+				updateBlockRun(&r4, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true}, true)
 			} else {
-				r4.AddFace(fs)
+				finishRun(r4)
 			}
 		}
 
-		r1.AddFace(fs)
-		r2.AddFace(fs)
-		r3.AddFace(fs)
-		r4.AddFace(fs)
+		finishRun(r1)
+		finishRun(r2)
+		finishRun(r3)
+		finishRun(r4)
 	}
 }

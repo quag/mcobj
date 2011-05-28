@@ -20,7 +20,7 @@ func (m *MemoryWriter) Write(p []byte) (n int, err os.Error) {
 }
 
 type MemoryWriterPool struct {
-	freelist chan *MemoryWriter
+	freelist          chan *MemoryWriter
 	initialBufferSize int
 }
 

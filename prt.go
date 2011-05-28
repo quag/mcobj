@@ -104,11 +104,12 @@ func (o *PrtGenerator) chunkProcessor() {
 	}
 }
 
-func (o *PrtGenerator) Close() {
+func (o *PrtGenerator) Close() os.Error {
 	o.zw.Close()
 	o.w.Flush()
 	UpdateParticleCount(o.outFile, o.particleCount)
 	o.outFile.Close()
+	return nil
 }
 
 func (o *PrtGenerator) GetEnclosedJobsChan() chan *EnclosedChunkJob {

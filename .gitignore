@@ -3,6 +3,8 @@
 *.a
 *.exe
 *.obj
+*.obj.f
+*.obj.v
 *.mtl
 *.prt
 *.zip

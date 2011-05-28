@@ -29,6 +29,8 @@ var (
 	chunkLimit int
 
 	chunkMask ChunkMask
+
+	obj3dsmax bool
 )
 
 func main() {
@@ -61,6 +63,7 @@ func main() {
 	flag.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
 	flag.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
+	flag.BoolVar(&obj3dsmax, "3dsmax", true, "Create .obj file compatible with 3dsMax")
 	flag.BoolVar(&mtlNumber, "mtlnum", false, "Number materials instead of using names")
 	var showHelp = flag.Bool("h", false, "Show Help")
 	flag.Parse()
@@ -157,7 +160,7 @@ func main() {
 		var world = OpenWorld(dirpath, chunkMask)
 		var pool, poolErr = world.ChunkPool()
 		if poolErr != nil {
-			fmt.Println(poolErr)
+			fmt.Fprintln(os.Stderr, poolErr)
 			continue
 		}
 
@@ -175,7 +178,11 @@ func main() {
 			<-generator.GetCompleteChan()
 		}
 
-		generator.Close()
+		var closeErr = generator.Close()
+		if closeErr != nil {
+			fmt.Fprintln(os.Stderr, closeErr)
+			continue
+		}
 	}
 }
 
@@ -183,7 +190,7 @@ type OutputGenerator interface {
 	Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator)
 	GetEnclosedJobsChan() chan *EnclosedChunkJob
 	GetCompleteChan() chan bool
-	Close()
+	Close() os.Error
 }
 
 type EnclosedChunkJob struct {

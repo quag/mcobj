@@ -13,13 +13,15 @@ type ObjGenerator struct {
 	writeFacesChan chan *WriteFacesJob
 	completeChan   chan bool
 
-	freelist chan *MemoryWriter
+	freelist         chan *MemoryWriter
 	memoryWriterPool *MemoryWriterPool
 
 	total int
 
-	outFile *os.File
-	out     *bufio.Writer
+	outFile, voutFile, foutFile *os.File
+	out, vout, fout             *bufio.Writer
+
+	outFilename, vFilename, fFilename string
 }
 
 func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) {
@@ -38,9 +40,11 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 				var job = <-o.enclosedsChan
 
 				var b = o.memoryWriterPool.GetWriter()
-				var faceCount = faces.ProcessChunk(job.enclosed, b)
+				var vb = o.memoryWriterPool.GetWriter()
 
-				o.writeFacesChan <- &WriteFacesJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, b, job.last}
+				var faceCount, vertexCount, mtls = faces.ProcessChunk(job.enclosed, b, vb)
+
+				o.writeFacesChan <- &WriteFacesJob{job.enclosed.xPos, job.enclosed.zPos, faceCount, vertexCount, mtls, b, vb, job.last}
 			}
 		}()
 	}
@@ -48,16 +52,32 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	go func() {
 		var chunkCount = 0
 		var size = 0
+		var vertexBase = 0
 		for {
 			var job = <-o.writeFacesChan
 			chunkCount++
 			o.out.Write(job.b.buf)
 			o.out.Flush()
 
+			if obj3dsmax {
+				o.vout.Write(job.vb.buf)
+				o.vout.Flush()
+
+				for _, mtl := range job.mtls {
+					printMtl(o.fout, mtl.blockId)
+					for _, face := range mtl.faces {
+						printFaceLine(o.fout, face, vertexBase)
+					}
+				}
+				o.fout.Flush()
+				vertexBase += job.vertexCount
+			}
+
 			size += len(job.b.buf)
 			fmt.Printf("%4v/%-4v (%3v,%3v) Faces: %4d Size: %4.1fMB\n", chunkCount, o.total, job.xPos, job.zPos, job.faceCount, float64(size)/1024/1024)
 
 			o.memoryWriterPool.ReuseWriter(job.b)
+			o.memoryWriterPool.ReuseWriter(job.vb)
 
 			if job.last {
 				o.completeChan <- true
@@ -72,7 +92,13 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 		return
 	}
 
-	var outFile, outErr = os.Create(outFilename)
+	o.outFilename = outFilename
+	o.vFilename = outFilename + ".v"
+	o.fFilename = outFilename + ".f"
+
+	var outFile, voutFile, foutFile *os.File
+	var outErr os.Error
+	outFile, outErr = os.Create(o.outFilename)
 	if outErr != nil {
 		fmt.Fprintln(os.Stderr, outErr)
 		return
@@ -82,6 +108,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 			outFile.Close()
 		}
 	}()
+
 	var bufErr os.Error
 	o.out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
 	if bufErr != nil {
@@ -89,9 +116,52 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 		return
 	}
 
-	fmt.Fprintln(o.out, "mtllib", filepath.Base(mtlFilename))
+	if obj3dsmax {
+		voutFile, outErr = os.Create(o.vFilename)
+		if outErr != nil {
+			fmt.Fprintln(os.Stderr, outErr)
+			return
+		}
+		defer func() {
+			if voutFile != nil {
+				voutFile.Close()
+			}
+		}()
+
+		foutFile, outErr = os.Create(o.fFilename)
+		if outErr != nil {
+			fmt.Fprintln(os.Stderr, outErr)
+			return
+		}
+		defer func() {
+			if foutFile != nil {
+				foutFile.Close()
+			}
+		}()
+
+		o.vout, bufErr = bufio.NewWriterSize(voutFile, 1024*1024)
+		if bufErr != nil {
+			fmt.Fprintln(os.Stderr, bufErr)
+			return
+		}
+		o.fout, bufErr = bufio.NewWriterSize(foutFile, 1024*1024)
+		if bufErr != nil {
+			fmt.Fprintln(os.Stderr, bufErr)
+			return
+		}
+	}
+
+	var mw io.Writer
+	if obj3dsmax {
+		mw = io.MultiWriter(o.out, o.vout)
+	} else {
+		mw = o.out
+	}
+	fmt.Fprintln(mw, "mtllib", filepath.Base(mtlFilename))
 
 	o.outFile, outFile = outFile, nil
+	o.voutFile, voutFile = voutFile, nil
+	o.foutFile, foutFile = foutFile, nil
 }
 
 func (o *ObjGenerator) GetEnclosedJobsChan() chan *EnclosedChunkJob {
@@ -102,15 +172,69 @@ func (o *ObjGenerator) GetCompleteChan() chan bool {
 	return o.completeChan
 }
 
-func (o *ObjGenerator) Close() {
+func (o *ObjGenerator) Close() os.Error {
 	o.out.Flush()
 	o.outFile.Close()
+
+	if obj3dsmax {
+		o.vout.Flush()
+		o.fout.Flush()
+
+		o.voutFile.Close()
+		o.foutFile.Close()
+
+		var tFilename = o.outFilename + ".tmp"
+
+		toutFile, outErr := os.Create(tFilename)
+		if outErr != nil {
+			return outErr
+		}
+		defer toutFile.Close()
+
+		err := copyFile(toutFile, o.vFilename)
+		if err != nil {
+			return err
+		}
+		err = copyFile(toutFile, o.fFilename)
+		if err != nil {
+			return err
+		}
+		err = toutFile.Close()
+		if err != nil {
+			return err
+		}
+		err = os.Rename(tFilename, o.outFilename)
+		if err != nil {
+			return err
+		}
+		err = os.Remove(o.vFilename)
+		if err != nil {
+			return err
+		}
+		err = os.Remove(o.fFilename)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func copyFile(w io.Writer, filename string) os.Error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(w, file)
+	return err
 }
 
 type WriteFacesJob struct {
-	xPos, zPos, faceCount int
-	b                     *MemoryWriter
-	last                  bool
+	xPos, zPos, faceCount, vertexCount int
+	mtls                               []*MtlFaces
+	b, vb                              *MemoryWriter
+	last                               bool
 }
 
 type Faces struct {
@@ -118,15 +242,15 @@ type Faces struct {
 	count      int
 
 	vertexes Vertexes
-	faces    []Face
+	faces    []IndexFace
 	boundary *BoundaryLocator
 }
 
-func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer) (count int) {
+func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer, vw io.Writer) (faceCount, vertexCount int, mtls []*MtlFaces) {
 	fs.clean(enclosed.xPos, enclosed.zPos)
 	fs.processBlocks(enclosed)
-	fs.Write(w)
-	return len(fs.faces)
+	vertexCount, mtls = fs.Write(w, vw)
+	return len(fs.faces), vertexCount, mtls
 }
 
 func (fs *Faces) clean(xPos, zPos int) {
@@ -140,25 +264,32 @@ func (fs *Faces) clean(xPos, zPos int) {
 	}
 
 	if fs.faces == nil {
-		fs.faces = make([]Face, 0, 8192)
+		fs.faces = make([]IndexFace, 0, 8192)
 	} else {
 		fs.faces = fs.faces[:0]
 	}
 }
 
-type Face struct {
+type IndexFace struct {
 	blockId uint16
 	indexes [4]int
 }
 
+type VertexNumFace [4]int
+
+type MtlFaces struct {
+	blockId uint16
+	faces   []*VertexNumFace
+}
+
 func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
-	var face = Face{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}}
+	var face = IndexFace{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}}
 	fs.faces = append(fs.faces, face)
 }
 
-func (fs *Faces) Write(w io.Writer) {
+func (fs *Faces) Write(w io.Writer, vw io.Writer) (vertexCount int, mtls []*MtlFaces) {
 	fs.vertexes.Number()
-	var vc = int16(fs.vertexes.Print(w, fs.xPos, fs.zPos))
+	var vc = int16(fs.vertexes.Print(io.MultiWriter(w, vw), fs.xPos, fs.zPos))
 
 	var blockIds = make([]uint16, 0, 16)
 	for _, face := range fs.faces {
@@ -175,15 +306,27 @@ func (fs *Faces) Write(w io.Writer) {
 		}
 	}
 
+	var mfs = make([]*MtlFaces, 0, len(blockIds))
+
 	for _, blockId := range blockIds {
 		printMtl(w, blockId)
+		var mf = &MtlFaces{blockId, make([]*VertexNumFace, 0, len(fs.faces))}
+		mfs = append(mfs, mf)
 		for _, face := range fs.faces {
 			if face.blockId == blockId {
-				fmt.Fprintln(w, "f", fs.vertexes.Get(face.indexes[0])-vc-1, fs.vertexes.Get(face.indexes[1])-vc-1, fs.vertexes.Get(face.indexes[2])-vc-1, fs.vertexes.Get(face.indexes[3])-vc-1)
+				var vf = face.VertexNumFace(fs.vertexes)
+				printFaceLine(w, vf, -int(vc+1))
+				mf.faces = append(mf.faces, vf)
 				faceCount++
 			}
 		}
 	}
+
+	return int(vc), mfs
+}
+
+func printFaceLine(w io.Writer, f *VertexNumFace, offset int) {
+	fmt.Fprintln(w, "f", f[0] + offset, f[1] + offset, f[2] + offset, f[3] + offset)
 }
 
 type Vertex struct {
@@ -210,6 +353,14 @@ func (vs *Vertexes) Release(v Vertex) int {
 
 func (vs *Vertexes) Get(i int) int16 {
 	return (*vs)[i]
+}
+
+func (face *IndexFace) VertexNumFace(vs Vertexes) *VertexNumFace {
+	return &VertexNumFace{
+		int(vs.Get(face.indexes[0])),
+		int(vs.Get(face.indexes[1])),
+		int(vs.Get(face.indexes[2])),
+		int(vs.Get(face.indexes[3]))}
 }
 
 func (vs *Vertexes) Clear() {

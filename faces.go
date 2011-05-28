@@ -15,13 +15,13 @@ type Faces struct {
 }
 
 func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer) (count int) {
-	fs.Clean(enclosed.xPos, enclosed.zPos)
-	fs.processBlocks(enclosed, fs)
+	fs.clean(enclosed.xPos, enclosed.zPos)
+	fs.processBlocks(enclosed)
 	fs.Write(w)
 	return len(fs.faces)
 }
 
-func (fs *Faces) Clean(xPos, zPos int) {
+func (fs *Faces) clean(xPos, zPos int) {
 	fs.xPos = xPos
 	fs.zPos = zPos
 

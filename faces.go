@@ -38,10 +38,6 @@ func (fs *Faces) clean(xPos, zPos int) {
 	}
 }
 
-type AddFacer interface {
-	AddFace(blockId uint16, v1, v2, v3, v4 Vertex)
-}
-
 type Face struct {
 	blockId uint16
 	indexes [4]int
@@ -213,14 +209,14 @@ type blockRun struct {
 	dirty          bool
 }
 
-func (r *blockRun) AddFace(faces AddFacer) {
+func (r *blockRun) AddFace(faces *Faces) {
 	if r.dirty {
 		faces.AddFace(r.blockId, r.v1, r.v2, r.v3, r.v4)
 		r.dirty = false
 	}
 }
 
-func (r *blockRun) Update(faces AddFacer, nr *blockRun, flag bool) {
+func (r *blockRun) Update(faces *Faces, nr *blockRun, flag bool) {
 	if !blockFaces {
 		if r.dirty {
 			if nr.blockId == r.blockId {
@@ -244,7 +240,7 @@ func (r *blockRun) Update(faces AddFacer, nr *blockRun, flag bool) {
 	}
 }
 
-func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk, faces AddFacer) {
+func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 	for i := 0; i < len(enclosedChunk.blocks); i += 128 {
 		var x, z = (i / 128) / 16, (i / 128) % 16
 
@@ -257,41 +253,41 @@ func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk, faces AddFacer) {
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y-1, z)) {
-				faces.AddFace(blockId, Vertex{x, y, z}, Vertex{x + 1, y, z}, Vertex{x + 1, y, z + 1}, Vertex{x, y, z + 1})
+				fs.AddFace(blockId, Vertex{x, y, z}, Vertex{x + 1, y, z}, Vertex{x + 1, y, z + 1}, Vertex{x, y, z + 1})
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y+1, z)) {
-				faces.AddFace(blockId, Vertex{x, y + 1, z}, Vertex{x, y + 1, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y + 1, z})
+				fs.AddFace(blockId, Vertex{x, y + 1, z}, Vertex{x, y + 1, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y + 1, z})
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x-1, y, z)) {
-				r1.Update(faces, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true}, true)
+				r1.Update(fs, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y, z + 1}, Vertex{x, y + 1, z + 1}, Vertex{x, y + 1, z}, true}, true)
 			} else {
-				r1.AddFace(faces)
+				r1.AddFace(fs)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x+1, y, z)) {
-				r2.Update(faces, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true}, false)
+				r2.Update(fs, &blockRun{blockId, Vertex{x + 1, y, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y + 1, z + 1}, Vertex{x + 1, y, z + 1}, true}, false)
 			} else {
-				r2.AddFace(faces)
+				r2.AddFace(fs)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y, z-1)) {
-				r3.Update(faces, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true}, false)
+				r3.Update(fs, &blockRun{blockId, Vertex{x, y, z}, Vertex{x, y + 1, z}, Vertex{x + 1, y + 1, z}, Vertex{x + 1, y, z}, true}, false)
 			} else {
-				r3.AddFace(faces)
+				r3.AddFace(fs)
 			}
 
 			if fs.boundary.IsBoundary(blockId, enclosedChunk.Get(x, y, z+1)) {
-				r4.Update(faces, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true}, true)
+				r4.Update(fs, &blockRun{blockId, Vertex{x, y, z + 1}, Vertex{x + 1, y, z + 1}, Vertex{x + 1, y + 1, z + 1}, Vertex{x, y + 1, z + 1}, true}, true)
 			} else {
-				r4.AddFace(faces)
+				r4.AddFace(fs)
 			}
 		}
 
-		r1.AddFace(faces)
-		r2.AddFace(faces)
-		r3.AddFace(faces)
-		r4.AddFace(faces)
+		r1.AddFace(fs)
+		r2.AddFace(fs)
+		r3.AddFace(fs)
+		r4.AddFace(fs)
 	}
 }

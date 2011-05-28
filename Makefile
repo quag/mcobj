@@ -6,7 +6,6 @@ GOFILES=\
 	version.go\
 	obj.go\
 	mtl.go\
-	faces.go\
 	prt.go\
 	sides.go\
 	sideCache.go\

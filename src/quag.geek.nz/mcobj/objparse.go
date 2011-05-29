@@ -36,7 +36,7 @@ type ObjFile struct {
 	materials []Material
 }
 
-var floatingPointNumber string = "([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)"
+var floatingPointNumber string = "([\\-+]?[0-9]*\\.?[0-9]+([eE][\\-+]?[0-9]+)?)"
 
 func parseMaterialLibrary(mtllib string, materialMap map[string]int, maxMaterial int) (retval []Material) {
 	if maxMaterial == 0 {
@@ -47,7 +47,29 @@ func parseMaterialLibrary(mtllib string, materialMap map[string]int, maxMaterial
 	specRE := regexp.MustCompile("^Ns[ \t](" + floatingPointNumber + ")")
 	colorRE := regexp.MustCompile("^(K[a-z])[ \t]+(" + floatingPointNumber + "[ \t]+" + floatingPointNumber + "[ \t]+" + floatingPointNumber + ")")
 	retval = make([]Material, maxMaterial)
-
+	for materialName, index := range materialMap {
+		if strings.Index(materialName, "articles") != -1 {
+			retval[index].texture = "particles.png"
+		} else if strings.Index(materialName, "Lava") != -1 || strings.Index(materialName, "lava") != -1 {
+			if strings.Index(materialName, "lowing") != -1 {
+				retval[index].texture = "custom_lava_flowing.png"
+			} else {
+				retval[index].texture = "custom_lava_still.png"
+			}
+		} else if strings.Index(materialName, "Water") != -1 || strings.Index(materialName, "water") != -1 {
+			if strings.Index(materialName, "lowing") != -1 {
+				retval[index].texture = "custom_water_flowing.png"
+			} else {
+				retval[index].texture = "custom_water_still.png"
+			}
+		} else if strings.Index(materialName, "ortal") != -1 {
+			retval[index].texture = "custom_portal.png"
+		} else if strings.Index(materialName, "lternate") != -1 || strings.Index(materialName, "LTERNATE") != -1 {
+			retval[index].texture = "ALTERNATES.png"
+		} else {
+			retval[index].texture = "terrain.png"
+		}
+	}
 	var file, fileErr = os.Open(mtllib)
 	reader := line.NewReader(file, 16384)
 	if fileErr == nil {
@@ -80,15 +102,17 @@ func parseMaterialLibrary(mtllib string, materialMap map[string]int, maxMaterial
 
 			}
 		}
+	} else {
+		fmt.Println("Warning: unable to open material file ", mtllib, " using terrain.png as default texture")
 	}
 	return
 }
 func parseObj(f io.Reader) (retval ObjFile) {
 	curMaterial := 0
 	maxMaterial := 0
-	var materialMap map[string]int
+	materialMap := make(map[string]int)
 	//integerNumber:="-{0,1}[0-9]+";
-	polygonVertex := "(-{0,1}[0-9]+)(/-{0,1}[0-9]*)?(/-{0,1}[0-9]*)?"
+	polygonVertex := "(\\-*[0-9]+)(/\\-*[0-9]*)?(/\\-*[0-9]*)?"
 	mtllibRE := regexp.MustCompile("^mtllib[ \t]+([^#]*)")
 	usemtlRE := regexp.MustCompile("^usemtl[ \t]+([^#]*)")
 	vertexRE := regexp.MustCompile("^v[ \t]+" + floatingPointNumber + "[ \t]+" + floatingPointNumber + "[ \t]+" + floatingPointNumber)
@@ -124,8 +148,8 @@ func parseObj(f io.Reader) (retval ObjFile) {
 		}
 		if vertex != nil {
 			x, err0 := strconv.Atof32(string(vertex[1]))
-			y, err1 := strconv.Atof32(string(vertex[2]))
-			z, err2 := strconv.Atof32(string(vertex[3]))
+			y, err1 := strconv.Atof32(string(vertex[3]))
+			z, err2 := strconv.Atof32(string(vertex[5]))
 			if err0 != nil || err1 != nil || err2 != nil {
 				fmt.Println("Error parsing obj vertex file, line: ", linenum, err0, err1, err2)
 			}
@@ -133,8 +157,8 @@ func parseObj(f io.Reader) (retval ObjFile) {
 		}
 		if normal != nil {
 			x, err0 := strconv.Atof32(string(normal[1]))
-			y, err1 := strconv.Atof32(string(normal[2]))
-			z, err2 := strconv.Atof32(string(normal[3]))
+			y, err1 := strconv.Atof32(string(normal[3]))
+			z, err2 := strconv.Atof32(string(normal[5]))
 			if err0 != nil || err1 != nil || err2 != nil {
 				fmt.Println("Error parsing obj normal file, line: ", linenum, err0, err1, err2)
 			}
@@ -142,7 +166,7 @@ func parseObj(f io.Reader) (retval ObjFile) {
 		}
 		if texCoord != nil {
 			u, err0 := strconv.Atof32(string(texCoord[1]))
-			v, err1 := strconv.Atof32(string(texCoord[2]))
+			v, err1 := strconv.Atof32(string(texCoord[3]))
 			if err0 != nil || err1 != nil {
 				fmt.Println("Error parsing obj texcoord file, line: ", linenum, err0, err1)
 			}

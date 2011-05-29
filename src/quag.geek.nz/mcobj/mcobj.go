@@ -71,7 +71,8 @@ func main() {
 
 	runtime.GOMAXPROCS(maxProcs)
 	fmt.Printf("mcobj %v (cpu: %d) Copyright (c) 2011 Jonathan Wright\n", version, runtime.GOMAXPROCS(0))
-
+	//obj_parse, _ := os.Open("torch.obj")
+	//fmt.Println("Object parsed to ", parseObj(obj_parse))
 	if *showHelp || flag.NArg() == 0 {
 		fmt.Fprintln(os.Stderr)
 		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", ExampleWorldPath())

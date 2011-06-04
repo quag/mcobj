@@ -131,36 +131,48 @@ func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
 
 			if rxErr == nil && ryErr == nil {
 				var regionFilename = filepath.Join(regionDirname, filenames[0])
-				var region, regionOpenErr = os.Open(regionFilename)
-				if regionOpenErr != nil {
-					return nil, regionOpenErr
-				}
-				defer region.Close()
-
-				for cz := 0; cz < 32; cz++ {
-					for cx := 0; cx < 32; cx++ {
-						var location uint32
-						var readErr = binary.Read(region, binary.BigEndian, &location)
-						if readErr != nil {
-							return nil, readErr
-						}
-						if location != 0 {
-							var (
-								x = rx*32 + cx
-								z = rz*32 + cz
-							)
-
-							if !w.mask.IsMasked(x, z) {
-								pool.chunkMap[betaChunkPoolKey(x, z)] = true
-							}
-						}
-					}
+				var mcrErr = w.poolMcrChunks(regionFilename, pool, rx, rz)
+				if mcrErr != nil {
+					return nil, mcrErr
 				}
 			}
 		}
 	}
 
 	return pool, nil
+}
+
+func (w *BetaWorld) poolMcrChunks(regionFilename string, pool *BetaChunkPool, rx, rz int) os.Error {
+	var region, regionOpenErr = os.Open(regionFilename)
+	if regionOpenErr != nil {
+		return regionOpenErr
+	}
+	defer region.Close()
+
+	for cz := 0; cz < 32; cz++ {
+		for cx := 0; cx < 32; cx++ {
+			var location uint32
+			var readErr = binary.Read(region, binary.BigEndian, &location)
+			if readErr == os.EOF {
+				continue
+			}
+			if readErr != nil {
+				return readErr
+			}
+			if location != 0 {
+				var (
+					x = rx*32 + cx
+					z = rz*32 + cz
+				)
+
+				if !w.mask.IsMasked(x, z) {
+					pool.chunkMap[betaChunkPoolKey(x, z)] = true
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 type BetaChunkPool struct {

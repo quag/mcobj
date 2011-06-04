@@ -31,3 +31,5 @@
  - open source mcobj
  - 'chunk slice' renders
  - add FBX output format (http://usa.autodesk.com/adsk/servlet/pc/index?id=6837478&siteID=123112)
+ - add player and mob meshes
+ - clean up error handling

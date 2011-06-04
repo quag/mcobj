@@ -24,7 +24,7 @@ type ObjGenerator struct {
 	outFilename, vFilename, fFilename string
 }
 
-func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) {
+func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
 	o.completeChan = make(chan bool)
@@ -88,8 +88,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	var mtlFilename = fmt.Sprintf("%s.mtl", outFilename[:len(outFilename)-len(filepath.Ext(outFilename))])
 	var mtlErr = writeMtlFile(mtlFilename)
 	if mtlErr != nil {
-		fmt.Fprintln(os.Stderr, mtlErr)
-		return
+		return mtlErr
 	}
 
 	o.outFilename = outFilename
@@ -100,8 +99,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	var outErr os.Error
 	outFile, outErr = os.Create(o.outFilename)
 	if outErr != nil {
-		fmt.Fprintln(os.Stderr, outErr)
-		return
+		return outErr
 	}
 	defer func() {
 		if outFile != nil {
@@ -112,15 +110,13 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	var bufErr os.Error
 	o.out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
 	if bufErr != nil {
-		fmt.Fprintln(os.Stderr, bufErr)
-		return
+		return bufErr
 	}
 
 	if obj3dsmax {
 		voutFile, outErr = os.Create(o.vFilename)
 		if outErr != nil {
-			fmt.Fprintln(os.Stderr, outErr)
-			return
+			return outErr
 		}
 		defer func() {
 			if voutFile != nil {
@@ -130,8 +126,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 
 		foutFile, outErr = os.Create(o.fFilename)
 		if outErr != nil {
-			fmt.Fprintln(os.Stderr, outErr)
-			return
+			return outErr
 		}
 		defer func() {
 			if foutFile != nil {
@@ -141,13 +136,11 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 
 		o.vout, bufErr = bufio.NewWriterSize(voutFile, 1024*1024)
 		if bufErr != nil {
-			fmt.Fprintln(os.Stderr, bufErr)
-			return
+			return bufErr
 		}
 		o.fout, bufErr = bufio.NewWriterSize(foutFile, 1024*1024)
 		if bufErr != nil {
-			fmt.Fprintln(os.Stderr, bufErr)
-			return
+			return bufErr
 		}
 	}
 
@@ -162,6 +155,8 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	o.outFile, outFile = outFile, nil
 	o.voutFile, voutFile = voutFile, nil
 	o.foutFile, foutFile = foutFile, nil
+
+	return nil
 }
 
 func (o *ObjGenerator) GetEnclosedJobsChan() chan *EnclosedChunkJob {

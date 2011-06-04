@@ -22,7 +22,7 @@ type PrtGenerator struct {
 	boundary      *BoundaryLocator
 }
 
-func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) {
+func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.completeChan = make(chan bool)
 	o.total = total
@@ -37,8 +37,7 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, bounda
 
 	o.outFile, openErr = os.Create(outFilename)
 	if openErr != nil {
-		fmt.Fprintln(os.Stderr, openErr) // TODO: return openErr
-		return
+		return openErr
 	}
 
 	o.w = bufio.NewWriter(o.outFile)
@@ -47,9 +46,10 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	var zErr os.Error
 	o.zw, zErr = zlib.NewWriterLevel(o.w, zlib.NoCompression)
 	if zErr != nil {
-		fmt.Fprintln(os.Stderr, zErr) // TODO: return zErr
-		return
+		return zErr
 	}
+
+	return nil
 }
 
 func (o *PrtGenerator) chunkProcessor() {

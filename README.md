@@ -68,6 +68,21 @@ Change Log
     <th>Change Log</th>
   </tr>
   <tr>
+    <td>?</td>
+    <td>0.13</td>
+    <td>
+      <ul>
+        <li>Add blocks for 1.6</li>
+        <li>Fix bug: EOF error on empty mcr files in beta worlds</li>
+        <li>Fix bug: crash when -o refers to a missing directory</li>
+        <li>Switch to goinstall based building (requires a weekly build newer than go-r57)</li>
+        <li>PRT: invert x and z</li>
+        <li>PRT: remove 2x scaling</li>
+        <li>Generate .obj files that can be read without any special flags in 3dsmax</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
     <td>2011-05-15</td>
     <td>0.12</td>
     <td>

@@ -3,10 +3,17 @@
 *.a
 *.exe
 *.obj
+*.obj.f
+*.obj.v
 *.mtl
 *.prt
 *.zip
 *.7z
 
-mcobj
 version.go
+
+src/quag.geek.nz/mcobj/mcobj
+
+bin/
+pkg/
+cmd/

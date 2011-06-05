@@ -22,7 +22,7 @@ type PrtGenerator struct {
 	boundary      *BoundaryLocator
 }
 
-func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) {
+func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.completeChan = make(chan bool)
 	o.total = total
@@ -37,8 +37,7 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, bounda
 
 	o.outFile, openErr = os.Create(outFilename)
 	if openErr != nil {
-		fmt.Fprintln(os.Stderr, openErr) // TODO: return openErr
-		return
+		return openErr
 	}
 
 	o.w = bufio.NewWriter(o.outFile)
@@ -47,9 +46,10 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	var zErr os.Error
 	o.zw, zErr = zlib.NewWriterLevel(o.w, zlib.NoCompression)
 	if zErr != nil {
-		fmt.Fprintln(os.Stderr, zErr) // TODO: return zErr
-		return
+		return zErr
 	}
+
+	return nil
 }
 
 func (o *PrtGenerator) chunkProcessor() {
@@ -82,13 +82,13 @@ func (o *PrtGenerator) chunkProcessor() {
 				case o.boundary.IsBoundary(blockId, e.Get(x, y, z+1)):
 					o.particleCount++
 					var (
-						xa = -(x + e.xPos*16)
+						xa = x + e.xPos*16
 						ya = y - 64
-						za = z + e.zPos*16
+						za = -(z + e.zPos*16)
 					)
-					binary.Write(o.zw, binary.LittleEndian, float32(xa*2))
-					binary.Write(o.zw, binary.LittleEndian, float32(za*2))
-					binary.Write(o.zw, binary.LittleEndian, float32(ya*2))
+					binary.Write(o.zw, binary.LittleEndian, float32(xa))
+					binary.Write(o.zw, binary.LittleEndian, float32(za))
+					binary.Write(o.zw, binary.LittleEndian, float32(ya))
 					binary.Write(o.zw, binary.LittleEndian, int32(blockId))
 				}
 			}
@@ -104,11 +104,12 @@ func (o *PrtGenerator) chunkProcessor() {
 	}
 }
 
-func (o *PrtGenerator) Close() {
+func (o *PrtGenerator) Close() os.Error {
 	o.zw.Close()
 	o.w.Flush()
 	UpdateParticleCount(o.outFile, o.particleCount)
 	o.outFile.Close()
+	return nil
 }
 
 func (o *PrtGenerator) GetEnclosedJobsChan() chan *EnclosedChunkJob {

@@ -34,6 +34,7 @@ Flags:
       <tr><td>-o a.obj</td><td>Name for the obj file to write to. Defaults to a.obj</td></tr>
       <tr><td>-h</td><td>Help</td></tr>
       <tr><td>-prt</td><td>Output a <a href="http://software.primefocusworld.com/software/support/krakatoa/prt_file_format.php">PRT</a> file instead of OBJ</td></tr>
+      <tr><td>-3dsmax=false</td><td>Output an obj file that is incompatible with 3dsMax. Typically is faster, uses less memory and results in a smaller .obj files</td></tr>
     </tbody></table>
 
 Chunk Selection:

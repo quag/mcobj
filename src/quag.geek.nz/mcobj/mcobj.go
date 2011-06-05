@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"json"
 	"math"
-	"./nbt"
+	"quag.geek.nz/nbt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -29,6 +29,8 @@ var (
 	chunkLimit int
 
 	chunkMask ChunkMask
+
+	obj3dsmax bool
 )
 
 func main() {
@@ -61,6 +63,7 @@ func main() {
 	flag.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
 	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
 	flag.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
+	flag.BoolVar(&obj3dsmax, "3dsmax", true, "Create .obj file compatible with 3dsMax")
 	flag.BoolVar(&mtlNumber, "mtlnum", false, "Number materials instead of using names")
 	var showHelp = flag.Bool("h", false, "Show Help")
 	flag.Parse()
@@ -70,7 +73,7 @@ func main() {
 
 	if *showHelp || flag.NArg() == 0 {
 		fmt.Fprintln(os.Stderr)
-		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", exampleWorldPath)
+		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", ExampleWorldPath())
 		fmt.Fprintln(os.Stderr)
 		flag.PrintDefaults()
 		return
@@ -139,7 +142,7 @@ func main() {
 		var dir, _ = filepath.Split(strings.Replace(os.Args[0], "\\", "/", -1))
 		var jsonError = loadBlockTypesJson(filepath.Join(dir, "blocks.json"))
 		if jsonError != nil {
-			fmt.Fprintln(os.Stderr, jsonError)
+			fmt.Fprintln(os.Stderr, "blocks.json error:", jsonError)
 			return
 		}
 	}
@@ -148,7 +151,7 @@ func main() {
 		var dirpath = flag.Arg(i)
 		var fi, err = os.Stat(dirpath)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, "World error:", err)
 			continue
 		} else if !fi.IsDirectory() {
 			fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
@@ -157,7 +160,7 @@ func main() {
 		var world = OpenWorld(dirpath, chunkMask)
 		var pool, poolErr = world.ChunkPool()
 		if poolErr != nil {
-			fmt.Println(poolErr)
+			fmt.Fprintln(os.Stderr, "Chunk pool error:", poolErr)
 			continue
 		}
 
@@ -169,21 +172,29 @@ func main() {
 		}
 		var boundary = new(BoundaryLocator)
 		boundary.Init()
-		generator.Start(outFilename, pool.Remaining(), maxProcs, boundary)
+		var startErr = generator.Start(outFilename, pool.Remaining(), maxProcs, boundary)
+		if startErr != nil {
+			fmt.Fprintln(os.Stderr, "Generator start error:", startErr)
+			continue
+		}
 
 		if walkEnclosedChunks(pool, world, cx, cz, generator.GetEnclosedJobsChan()) {
 			<-generator.GetCompleteChan()
 		}
 
-		generator.Close()
+		var closeErr = generator.Close()
+		if closeErr != nil {
+			fmt.Fprintln(os.Stderr, "Generator close error:", closeErr)
+			continue
+		}
 	}
 }
 
 type OutputGenerator interface {
-	Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator)
+	Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error
 	GetEnclosedJobsChan() chan *EnclosedChunkJob
 	GetCompleteChan() chan bool
-	Close()
+	Close() os.Error
 }
 
 type EnclosedChunkJob struct {

@@ -142,7 +142,7 @@ func main() {
 		var dir, _ = filepath.Split(strings.Replace(os.Args[0], "\\", "/", -1))
 		var jsonError = loadBlockTypesJson(filepath.Join(dir, "blocks.json"))
 		if jsonError != nil {
-			fmt.Fprintln(os.Stderr, jsonError)
+			fmt.Fprintln(os.Stderr, "blocks.json error:", jsonError)
 			return
 		}
 	}
@@ -151,7 +151,7 @@ func main() {
 		var dirpath = flag.Arg(i)
 		var fi, err = os.Stat(dirpath)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, "World error:", err)
 			continue
 		} else if !fi.IsDirectory() {
 			fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
@@ -160,7 +160,7 @@ func main() {
 		var world = OpenWorld(dirpath, chunkMask)
 		var pool, poolErr = world.ChunkPool()
 		if poolErr != nil {
-			fmt.Fprintln(os.Stderr, poolErr)
+			fmt.Fprintln(os.Stderr, "Chunk pool error:", poolErr)
 			continue
 		}
 
@@ -174,7 +174,7 @@ func main() {
 		boundary.Init()
 		var startErr = generator.Start(outFilename, pool.Remaining(), maxProcs, boundary)
 		if startErr != nil {
-			fmt.Fprintln(os.Stderr, startErr)
+			fmt.Fprintln(os.Stderr, "Generator start error:", startErr)
 			continue
 		}
 
@@ -184,7 +184,7 @@ func main() {
 
 		var closeErr = generator.Close()
 		if closeErr != nil {
-			fmt.Fprintln(os.Stderr, closeErr)
+			fmt.Fprintln(os.Stderr, "Generator close error:", closeErr)
 			continue
 		}
 	}

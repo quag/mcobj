@@ -1,13 +1,12 @@
 #!/bin/bash
 
-echo "package main" > version.go
-echo >> version.go
-echo "const version = \""$(git describe || echo "unknown")"\"" >> version.go
+export GOPATH=$(dirname $PWD/$0)
 
-gofmt -w nbt/*.go || exit
-gofmt -w *.go || exit
+CMDPKG=quag.geek.nz/mcobj
+CMDSRC=$GOPATH/src/$CMDPKG
 
-make -C nbt || exit
-cp nbt/_obj/nbt.a nbt.a || exit
+echo "package main" > $CMDSRC/version.go
+echo >> $CMDSRC/version.go
+echo "const version = \""$(git describe || echo "unknown")"\"" >> $CMDSRC/version.go
 
-make || exit
+goinstall -clean $CMDPKG || exit

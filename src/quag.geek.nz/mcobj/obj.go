@@ -321,7 +321,7 @@ func (fs *Faces) Write(w io.Writer, vw io.Writer) (vertexCount int, mtls []*MtlF
 }
 
 func printFaceLine(w io.Writer, f *VertexNumFace, offset int) {
-	fmt.Fprintln(w, "f", f[0] + offset, f[1] + offset, f[2] + offset, f[3] + offset)
+	fmt.Fprintln(w, "f", f[0]+offset, f[1]+offset, f[2]+offset, f[3]+offset)
 }
 
 type Vertex struct {

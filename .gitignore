@@ -10,5 +10,10 @@
 *.zip
 *.7z
 
-mcobj
 version.go
+
+mcobj
+
+bin/
+pkg/
+cmd/

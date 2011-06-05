@@ -12,7 +12,7 @@
 
 version.go
 
-mcobj
+src/quag.geek.nz/mcobj/mcobj
 
 bin/
 pkg/

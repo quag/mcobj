@@ -113,12 +113,11 @@ func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
 
 	for {
 		var filenames, readErr = dir.Readdirnames(1)
+		if readErr == os.EOF || len(filenames) == 0 {
+			break
+		}
 		if readErr != nil {
 			return nil, readErr
-		}
-
-		if len(filenames) == 0 {
-			break
 		}
 
 		var fields = strings.FieldsFunc(filenames[0], func(c int) bool { return c == '.' })

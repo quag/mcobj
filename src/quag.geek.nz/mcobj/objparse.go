@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"io"
 	"regexp"
-	"encoding/line"
 	"strconv"
 	"fmt"
 	"strings"
@@ -71,7 +71,7 @@ func parseMaterialLibrary(mtllib string, materialMap map[string]int, maxMaterial
 		}
 	}
 	var file, fileErr = os.Open(mtllib)
-	reader := line.NewReader(file, 16384)
+	reader, _ := bufio.NewReaderSize(file, 16384)
 	if fileErr == nil {
 		var dummyMaterial Material
 		curMaterial := &dummyMaterial
@@ -119,7 +119,7 @@ func parseObj(f io.Reader) (retval ObjFile) {
 	normalRE := regexp.MustCompile("^vn[ \t]+" + floatingPointNumber + "[ \t]+" + floatingPointNumber + "[ \t]+" + floatingPointNumber)
 	texCoordRE := regexp.MustCompile("^vt[ \t]+" + floatingPointNumber + "[ \t]+" + floatingPointNumber)
 	polygonRE := regexp.MustCompile("^f[ \t]+(" + polygonVertex + "([ \t]+" + polygonVertex + ")*" + ")")
-	reader := line.NewReader(f, 16384)
+	reader, _ := bufio.NewReaderSize(f, 16384)
 	var materialFileName string
 	for linenum := 0; true; linenum++ {
 		line, _, err := reader.ReadLine()

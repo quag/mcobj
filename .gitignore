@@ -17,3 +17,4 @@ src/quag.geek.nz/mcobj/mcobj
 bin/
 pkg/
 cmd/
+goinstall.log

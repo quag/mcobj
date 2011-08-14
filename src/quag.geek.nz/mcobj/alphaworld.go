@@ -73,7 +73,7 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 	var match, err = filepath.Match("c.*.*.dat", filepath.Base(file))
 	if match && err == nil {
 		var (
-			s       = strings.Split(filepath.Base(file), ".", 4)
+			s       = strings.SplitN(filepath.Base(file), ".", 4)
 			x, xErr = strconv.Btoi64(s[1], 36)
 			z, zErr = strconv.Btoi64(s[2], 36)
 		)

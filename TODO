@@ -1,4 +1,28 @@
+ - read blocks.json from same directory as exe
+
  - center on spawn point, not chunk (0,0)
+ - center on player, not chunk (0,0)
+
+ - off-by-one errors with chunk selection (-cx 1 -cz -10)
+
+ - paintings (Jaz/WormSlayer)
+    - players
+    - zombies/skellies/...
+    - pigs/cows/...
+    - items
+
+ - customizable prt output (.json file)
+    - column names
+    - color
+
+ - support users who don't know how to use command line programs
+    1. prompt for options if not provided
+    2. have configuration file for controling the export
+    3. provide a UI to use
+
+ - Point Cloud file formats
+    - xyz (emails: henryspam)
+
  - make processBlock() return the data rather than calling the process methods itself. Rename current method.
  - unit tests
  - godoc
@@ -24,11 +48,9 @@
     - farm land is 7/8th height
     - cake, half-blocks, pressure plates (stone, wood), fence posts, doors (wood, metal), ladder, tracks, redstone wire, signs, wall signs, steps, buttons, beds, redstone repeaters
  - Calculate data for grass, fenses, restone wire, chests, water/lava, portals
- - 64-bit Linux builds
  - 3DSMax output or 3DSMax fixer
  - Center on spawn location
  - Center on player location
- - open source mcobj
  - 'chunk slice' renders
  - add FBX output format (http://usa.autodesk.com/adsk/servlet/pc/index?id=6837478&siteID=123112)
  - add player and mob meshes

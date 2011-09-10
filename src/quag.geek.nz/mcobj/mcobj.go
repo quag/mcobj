@@ -46,37 +46,59 @@ func main() {
 	var defaultObjOutFilename = "a.obj"
 	var defaultPrtOutFilename = "a.prt"
 
+	commandLine := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+
 	var outFilename string
-	flag.IntVar(&maxProcs, "cpu", maxProcs, "Number of cores to use")
-	flag.StringVar(&outFilename, "o", defaultObjOutFilename, "Name for output file")
-	flag.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
-	flag.BoolVar(&solidSides, "sides", false, "Solid sides, rather than showing underground")
-	flag.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
-	flag.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
-	flag.BoolVar(&noColor, "g", false, "Omit materials")
-	flag.Float64Var(&bx, "x", 0, "Center x coordinate in blocks")
-	flag.Float64Var(&bz, "z", 0, "Center z coordinate in blocks")
-	flag.IntVar(&cx, "cx", 0, "Center x coordinate in chunks")
-	flag.IntVar(&cz, "cz", 0, "Center z coordinate in chunks")
-	flag.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
-	flag.IntVar(&rectx, "rx", math.MaxInt32, "Width(x) of rectangle size")
-	flag.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
-	flag.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
-	flag.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
-	flag.BoolVar(&obj3dsmax, "3dsmax", true, "Create .obj file compatible with 3dsMax")
-	flag.BoolVar(&mtlNumber, "mtlnum", false, "Number materials instead of using names")
-	var showHelp = flag.Bool("h", false, "Show Help")
-	flag.Parse()
+	commandLine.IntVar(&maxProcs, "cpu", maxProcs, "Number of cores to use")
+	commandLine.StringVar(&outFilename, "o", defaultObjOutFilename, "Name for output file")
+	commandLine.IntVar(&yMin, "y", 0, "Omit all blocks below this height. 63 is sea level")
+	commandLine.BoolVar(&solidSides, "sides", false, "Solid sides, rather than showing underground")
+	commandLine.BoolVar(&blockFaces, "bf", false, "Don't combine adjacent faces of the same block within a column")
+	commandLine.BoolVar(&hideBottom, "hb", false, "Hide bottom of world")
+	commandLine.BoolVar(&noColor, "g", false, "Omit materials")
+	commandLine.Float64Var(&bx, "x", 0, "Center x coordinate in blocks")
+	commandLine.Float64Var(&bz, "z", 0, "Center z coordinate in blocks")
+	commandLine.IntVar(&cx, "cx", 0, "Center x coordinate in chunks")
+	commandLine.IntVar(&cz, "cz", 0, "Center z coordinate in chunks")
+	commandLine.IntVar(&square, "s", math.MaxInt32, "Chunk square size")
+	commandLine.IntVar(&rectx, "rx", math.MaxInt32, "Width(x) of rectangle size")
+	commandLine.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
+	commandLine.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
+	commandLine.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
+	commandLine.BoolVar(&obj3dsmax, "3dsmax", true, "Create .obj file compatible with 3dsMax")
+	commandLine.BoolVar(&mtlNumber, "mtlnum", false, "Number materials instead of using names")
+	var showHelp = commandLine.Bool("h", false, "Show Help")
+	commandLine.Parse(os.Args[1:])
 
 	runtime.GOMAXPROCS(maxProcs)
 	fmt.Printf("mcobj %v (cpu: %d) Copyright (c) 2011 Jonathan Wright\n", version, runtime.GOMAXPROCS(0))
 
-	if *showHelp || flag.NArg() == 0 {
+	if *showHelp || commandLine.NArg() == 0 {
 		fmt.Fprintln(os.Stderr)
 		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", ExampleWorldPath)
 		fmt.Fprintln(os.Stderr)
-		flag.PrintDefaults()
-		return
+		commandLine.PrintDefaults()
+
+		fmt.Println()
+		stdin := bufio.NewReader(os.Stdin)
+
+		for commandLine.NArg() == 0 {
+			fmt.Printf("command line: ")
+			line, _, err := stdin.ReadLine()
+			if err == os.EOF {
+				fmt.Println()
+				return
+			} else if err != nil {
+				fmt.Fprintln(os.Stderr, "stdin.ReadLine:", err)
+				return
+			}
+			args := strings.Split(string(line), " ")
+			if len(args) >= 1 && args[0] == "mcobj" {
+				args = args[1:]
+			}
+			commandLine.Parse(args)
+			fmt.Println()
+		}
 	}
 
 	if faceLimit != math.MaxInt32 {
@@ -147,8 +169,8 @@ func main() {
 		}
 	}
 
-	for i := 0; i < flag.NArg(); i++ {
-		var dirpath = flag.Arg(i)
+	for i := 0; i < commandLine.NArg(); i++ {
+		var dirpath = commandLine.Arg(i)
 		var fi, err = os.Stat(dirpath)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "World error:", err)

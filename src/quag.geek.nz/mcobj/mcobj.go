@@ -7,9 +7,9 @@ import (
 	"io/ioutil"
 	"json"
 	"math"
-	"quag.geek.nz/nbt"
 	"os"
 	"path/filepath"
+	"quag.geek.nz/nbt"
 	"runtime"
 	"strconv"
 	"strings"
@@ -271,7 +271,7 @@ func loadChunk(filename string) (*nbt.Chunk, os.Error) {
 	if fileErr != nil {
 		return nil, fileErr
 	}
-	var chunk, err = nbt.ReadDat(file)
+	var chunk, err = nbt.ReadChunkDat(file)
 	if err == os.EOF {
 		err = nil
 	}
@@ -285,7 +285,7 @@ func loadChunk2(opener ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
 	}
 	defer r.Close()
 
-	var chunk, nbtErr = nbt.ReadNbt(r)
+	var chunk, nbtErr = nbt.ReadChunkNbt(r)
 	if nbtErr != nil {
 		return nil, nbtErr
 	}

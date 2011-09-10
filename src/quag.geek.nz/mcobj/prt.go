@@ -126,6 +126,7 @@ type ChannelDefinition struct {
 }
 
 // http://software.primefocusworld.com/software/support/krakatoa/prt_file_format.php
+// http://www.thinkboxsoftware.com/krak-prt-file-format/
 func WriteHeader(w io.Writer, particleCount int64, channels []ChannelDefinition) {
 	// Header (56 bytes)
 	var magic = []byte{192, 'P', 'R', 'T', '\r', '\n', 26, '\n'}

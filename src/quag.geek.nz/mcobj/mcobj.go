@@ -93,7 +93,6 @@ func main() {
 				fmt.Fprintln(os.Stderr, "stdin.ReadLine:", err)
 				return
 			}
-			// TODO: replace ~/ with $HOME
 			args := commandline.SplitCommandLine(string(line))
 			if len(args) >= 1 && args[0] == "mcobj" {
 				args = args[1:]
@@ -178,46 +177,74 @@ func main() {
 		}
 	}
 
-	for i := 0; i < commandLine.NArg(); i++ {
-		var dirpath = commandLine.Arg(i)
+	settings := &ProcessingSettings {
+		Prt: prt,
+		OutFilename: outFilename,
+		MaxProcs: maxProcs,
+		Cx: cx,
+		Cz: cz,
+	}
+
+	validPath := false
+	for _, dirpath := range commandLine.Args() {
 		var fi, err = os.Stat(dirpath)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "World error:", err)
-			continue
-		} else if !fi.IsDirectory() {
-			fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
-		}
+		validPath = validPath || (err == nil && !fi.IsDirectory())
+	}
 
-		var world = OpenWorld(dirpath, chunkMask)
-		var pool, poolErr = world.ChunkPool()
-		if poolErr != nil {
-			fmt.Fprintln(os.Stderr, "Chunk pool error:", poolErr)
-			continue
+	if validPath {
+		for _, dirpath := range commandLine.Args() {
+			processWorldDir(dirpath, settings)
 		}
+	} else {
+		processWorldDir(strings.Join(commandLine.Args(), " "), settings)
+	}
+}
 
-		var generator OutputGenerator
-		if prt {
-			generator = new(PrtGenerator)
-		} else {
-			generator = new(ObjGenerator)
-		}
-		var boundary = new(BoundaryLocator)
-		boundary.Init()
-		var startErr = generator.Start(outFilename, pool.Remaining(), maxProcs, boundary)
-		if startErr != nil {
-			fmt.Fprintln(os.Stderr, "Generator start error:", startErr)
-			continue
-		}
+type ProcessingSettings struct {
+	Prt         bool
+	OutFilename string
+	MaxProcs    int
+	Cx, Cz      int
+}
 
-		if walkEnclosedChunks(pool, world, cx, cz, generator.GetEnclosedJobsChan()) {
-			<-generator.GetCompleteChan()
-		}
+func processWorldDir(dirpath string, settings *ProcessingSettings) {
+	var fi, err = os.Stat(dirpath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "World error:", err)
+		return
+	} else if !fi.IsDirectory() {
+		fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
+	}
 
-		var closeErr = generator.Close()
-		if closeErr != nil {
-			fmt.Fprintln(os.Stderr, "Generator close error:", closeErr)
-			continue
-		}
+	var world = OpenWorld(dirpath, chunkMask)
+	var pool, poolErr = world.ChunkPool()
+	if poolErr != nil {
+		fmt.Fprintln(os.Stderr, "Chunk pool error:", poolErr)
+		return
+	}
+
+	var generator OutputGenerator
+	if settings.Prt {
+		generator = new(PrtGenerator)
+	} else {
+		generator = new(ObjGenerator)
+	}
+	var boundary = new(BoundaryLocator)
+	boundary.Init()
+	var startErr = generator.Start(settings.OutFilename, pool.Remaining(), settings.MaxProcs, boundary)
+	if startErr != nil {
+		fmt.Fprintln(os.Stderr, "Generator start error:", startErr)
+		return
+	}
+
+	if walkEnclosedChunks(pool, world, settings.Cx, settings.Cz, generator.GetEnclosedJobsChan()) {
+		<-generator.GetCompleteChan()
+	}
+
+	var closeErr = generator.Close()
+	if closeErr != nil {
+		fmt.Fprintln(os.Stderr, "Generator close error:", closeErr)
+		return
 	}
 }
 

@@ -68,6 +68,16 @@ Change Log
     <th>Change Log</th>
   </tr>
   <tr>
+    <td>2011-09-12</td>
+    <td>0.13.1</td>
+    <td>
+      <ul>
+        <li>Fix build to generate .exe on Windows executable's name</li>
+        <li>Disable: Generate .obj files that can be read without any special flags in 3dsmax</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
     <td>2011-09-11</td>
     <td>0.13</td>
     <td>

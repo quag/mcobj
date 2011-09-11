@@ -1,5 +1,6 @@
  - support naming worlds (and reading from default directory) rather than providing full path
     - list worlds (when no world provided)
+    - if no world selected, default to picking first world in save directory
 
  - read args from file
 

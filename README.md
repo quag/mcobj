@@ -68,7 +68,7 @@ Change Log
     <th>Change Log</th>
   </tr>
   <tr>
-    <td>?</td>
+    <td>2011-09-11</td>
     <td>0.13</td>
     <td>
       <ul>

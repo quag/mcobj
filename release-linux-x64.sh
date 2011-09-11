@@ -1,3 +1,3 @@
 #!/bin/bash
 
-7z a mcobj-$(git describe)-linux-x64.7z mcobj blocks.json
+BUILD=linux-x64 GOOS=linux GOARCH=amd64 $(dirname $0)/release-common.sh

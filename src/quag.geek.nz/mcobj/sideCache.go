@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./nbt"
+	"quag.geek.nz/nbt"
 )
 
 type SideCache struct {

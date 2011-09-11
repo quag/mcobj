@@ -1,3 +1,3 @@
 #!/bin/bash
 
-7za mcobj-$(git describe)-osx.7z mcobj blocks.json
+BUILD=osx GOOS=darwin GOARCH=amd64 $(dirname $0)/release-common.sh

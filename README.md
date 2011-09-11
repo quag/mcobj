@@ -34,6 +34,7 @@ Flags:
       <tr><td>-o a.obj</td><td>Name for the obj file to write to. Defaults to a.obj</td></tr>
       <tr><td>-h</td><td>Help</td></tr>
       <tr><td>-prt</td><td>Output a <a href="http://software.primefocusworld.com/software/support/krakatoa/prt_file_format.php">PRT</a> file instead of OBJ</td></tr>
+      <tr><td>-3dsmax=false</td><td>Output an obj file that is incompatible with 3dsMax. Typically is faster, uses less memory and results in a smaller .obj files</td></tr>
     </tbody></table>
 
 Chunk Selection:
@@ -65,6 +66,26 @@ Change Log
     <th></th>
     <th></th>
     <th>Change Log</th>
+  </tr>
+  <tr>
+    <td>?</td>
+    <td>0.13</td>
+    <td>
+      <ul>
+        <li>Add blocks for 1.6 and 1.7</li>
+        <li>Center on spawn point by default</li>
+        <li>Usability: Read commandline from settings.txt file beside mcobj.exe</li>
+        <li>Usability: Prompt for command line when someone double clicks on the exe (no more fighting with Windows cmd or OSX Terminal)</li>
+        <li>Usability: Correct for unquoted spaces in paths to worlds</li>
+        <li>Fix bug: EOF error on empty mcr files in beta worlds</li>
+        <li>Fix bug: crash when -o refers to a missing directory</li>
+        <li>Fix bug: "panic: runtime error: slice bounds out of range" on some chunks</li>
+        <li>Switch to goinstall based building (requires a weekly build newer than go-r57)</li>
+        <li>PRT: invert x and z</li>
+        <li>PRT: remove 2x scaling</li>
+        <li>Generate .obj files that can be read without any special flags in 3dsmax</li>
+      </ul>
+    </td>
   </tr>
   <tr>
     <td>2011-05-15</td>

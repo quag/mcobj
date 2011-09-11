@@ -1,12 +1,21 @@
-*.6
-*.8
+_*
+*.out
+*.[568]
 *.a
 *.exe
 *.obj
+*.obj.f
+*.obj.v
 *.mtl
 *.prt
 *.zip
 *.7z
 
-mcobj
 version.go
+
+src/quag.geek.nz/mcobj/mcobj
+
+bin/
+pkg/
+cmd/
+goinstall.log

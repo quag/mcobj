@@ -2,8 +2,7 @@
     - list worlds (when no world provided)
     - if no world selected, default to picking first world in save directory
 
- - center on spawn point, not chunk (0,0)
- - center on player, not chunk (0,0)
+ - center on player, not chunk (0,0) or spawn
 
  - off-by-one errors with chunk selection (-cx 1 -cz -10)
 

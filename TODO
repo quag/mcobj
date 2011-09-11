@@ -2,10 +2,6 @@
     - list worlds (when no world provided)
     - if no world selected, default to picking first world in save directory
 
- - read args from file
-
- - read blocks.json from same directory as exe
-
  - center on spawn point, not chunk (0,0)
  - center on player, not chunk (0,0)
 

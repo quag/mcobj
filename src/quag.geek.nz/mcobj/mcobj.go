@@ -74,38 +74,43 @@ func main() {
 	runtime.GOMAXPROCS(maxProcs)
 	fmt.Printf("mcobj %v (cpu: %d) Copyright (c) 2011 Jonathan Wright\n", version, runtime.GOMAXPROCS(0))
 
+	exeDir, _ := filepath.Split(strings.Replace(os.Args[0], "\\", "/", -1))
+
 	if *showHelp || commandLine.NArg() == 0 {
-		fmt.Fprintln(os.Stderr)
-		fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", ExampleWorldPath)
-		fmt.Fprintln(os.Stderr)
-		commandLine.PrintDefaults()
+		settingsPath := filepath.Join(exeDir, "settings.txt")
+		fi, err := os.Stat(settingsPath)
+		if err == nil && (fi.IsRegular() || fi.IsSymlink()) {
+			line, err := ioutil.ReadFile(settingsPath)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "ioutil.ReadFile:", err)
+			} else {
+				parseFakeCommandLine(commandLine, line)
+			}
+		}
 
-		fmt.Println()
-		stdin := bufio.NewReader(os.Stdin)
+		if commandLine.NArg() == 0 {
+			fmt.Fprintln(os.Stderr)
+			fmt.Fprintln(os.Stderr, "Usage: mcobj -cpu 4 -s 20 -o world1.obj", ExampleWorldPath)
+			fmt.Fprintln(os.Stderr)
+			commandLine.PrintDefaults()
 
-		for commandLine.NArg() == 0 {
-			fmt.Printf("command line: ")
-			line, _, err := stdin.ReadLine()
-			if err == os.EOF {
-				fmt.Println()
-				return
-			} else if err != nil {
-				fmt.Fprintln(os.Stderr, "stdin.ReadLine:", err)
-				return
-			}
-			args := commandline.SplitCommandLine(string(line))
-			if len(args) >= 1 && args[0] == "mcobj" {
-				args = args[1:]
-			}
-			for i, arg := range args {
-				if strings.HasPrefix(arg, "~/") {
-					args[i] = filepath.Join(os.Getenv("HOME"), arg[2:])
-				} else if strings.HasPrefix(strings.ToUpper(arg), "%APPDATA%\\") || strings.HasPrefix(strings.ToUpper(arg), "%APPDATA%/") {
-					args[i] = filepath.Join(os.Getenv("APPDATA"), arg[len("%APPDATA%/"):])
-				}
-			}
-			commandLine.Parse(args)
 			fmt.Println()
+			stdin := bufio.NewReader(os.Stdin)
+
+			for commandLine.NArg() == 0 {
+				fmt.Printf("command line: ")
+				line, _, err := stdin.ReadLine()
+				if err == os.EOF {
+					fmt.Println()
+					return
+				} else if err != nil {
+					fmt.Fprintln(os.Stderr, "stdin.ReadLine:", err)
+					return
+				}
+
+				parseFakeCommandLine(commandLine, line)
+				fmt.Println()
+			}
 		}
 	}
 
@@ -169,8 +174,7 @@ func main() {
 	}
 
 	{
-		var dir, _ = filepath.Split(strings.Replace(os.Args[0], "\\", "/", -1))
-		var jsonError = loadBlockTypesJson(filepath.Join(dir, "blocks.json"))
+		var jsonError = loadBlockTypesJson(filepath.Join(exeDir, "blocks.json"))
 		if jsonError != nil {
 			fmt.Fprintln(os.Stderr, "blocks.json error:", jsonError)
 			return
@@ -198,6 +202,21 @@ func main() {
 	} else {
 		processWorldDir(strings.Join(commandLine.Args(), " "), settings)
 	}
+}
+
+func parseFakeCommandLine(commandLine *flag.FlagSet, line []byte) {
+	args := commandline.SplitCommandLine(strings.Trim(string(line), " \r\n"))
+	if len(args) >= 1 && args[0] == "mcobj" {
+		args = args[1:]
+	}
+	for i, arg := range args {
+		if strings.HasPrefix(arg, "~/") {
+			args[i] = filepath.Join(os.Getenv("HOME"), arg[2:])
+		} else if strings.HasPrefix(strings.ToUpper(arg), "%APPDATA%\\") || strings.HasPrefix(strings.ToUpper(arg), "%APPDATA%/") {
+			args[i] = filepath.Join(os.Getenv("APPDATA"), arg[len("%APPDATA%/"):])
+		}
+	}
+	commandLine.Parse(args)
 }
 
 type ProcessingSettings struct {

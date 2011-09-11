@@ -14,7 +14,7 @@ CMDPATH="$GOPATH/cmd/${GOOS}_$GOARCH"
 rm -f "$GOPATH/bin/"* || exit
 rm -f "$CMDPATH/"* || exit
 
-goinstall -make=false -clean "$CMDPKG" || exit
+goinstall -clean "$CMDPKG" || exit
 
 mkdir -p "$CMDPATH" || exit
 cp "$GOPATH/bin/"* "$CMDPATH/" || exit

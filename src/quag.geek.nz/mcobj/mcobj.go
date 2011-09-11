@@ -63,7 +63,7 @@ func main() {
 	commandLine.IntVar(&rectz, "rz", math.MaxInt32, "Height(z) of rectangle size")
 	commandLine.IntVar(&faceLimit, "fk", math.MaxInt32, "Face limit (thousands of faces)")
 	commandLine.BoolVar(&prt, "prt", false, "Write out PRT file instead of Obj file")
-	commandLine.BoolVar(&obj3dsmax, "3dsmax", true, "Create .obj file compatible with 3dsMax")
+	commandLine.BoolVar(&obj3dsmax, "3dsmax", false, "Create .obj file compatible with 3dsMax")
 	commandLine.BoolVar(&mtlNumber, "mtlnum", false, "Number materials instead of using names")
 	var showHelp = commandLine.Bool("h", false, "Show Help")
 	commandLine.Parse(os.Args[1:])

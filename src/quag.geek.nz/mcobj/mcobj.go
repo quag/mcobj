@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"quag.geek.nz/mcobj/commandline"
 )
 
 var (
@@ -92,7 +93,8 @@ func main() {
 				fmt.Fprintln(os.Stderr, "stdin.ReadLine:", err)
 				return
 			}
-			args := strings.Split(string(line), " ")
+			// TODO: replace ~/ with $HOME
+			args := commandline.SplitCommandLine(string(line))
 			if len(args) >= 1 && args[0] == "mcobj" {
 				args = args[1:]
 			}

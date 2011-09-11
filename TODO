@@ -1,3 +1,8 @@
+ - support naming worlds (and reading from default directory) rather than providing full path
+    - list worlds (when no world provided)
+
+ - read args from file
+
  - read blocks.json from same directory as exe
 
  - center on spawn point, not chunk (0,0)

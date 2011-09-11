@@ -73,7 +73,8 @@ Change Log
     <td>
       <ul>
         <li>Add blocks for 1.6 and 1.7</li>
-        <li>Prompt for command line when someone double clicks on the exe (no more fighting with Windows cmd or OSX Terminal)</li>
+        <li>Usability: Prompt for command line when someone double clicks on the exe (no more fighting with Windows cmd or OSX Terminal)</li>
+        <li>Usability: Correct for unquoted spaces in paths to worlds</li>
         <li>Fix bug: EOF error on empty mcr files in beta worlds</li>
         <li>Fix bug: crash when -o refers to a missing directory</li>
         <li>Fix bug: "panic: runtime error: slice bounds out of range" on some chunks</li>

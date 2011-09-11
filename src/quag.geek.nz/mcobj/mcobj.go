@@ -98,6 +98,13 @@ func main() {
 			if len(args) >= 1 && args[0] == "mcobj" {
 				args = args[1:]
 			}
+			for i, arg := range args {
+				if strings.HasPrefix(arg, "~/") {
+					args[i] = filepath.Join(os.Getenv("HOME"), arg[2:])
+				} else if strings.HasPrefix(strings.ToUpper(arg), "%APPDATA%\\") || strings.HasPrefix(strings.ToUpper(arg), "%APPDATA%/") {
+					args[i] = filepath.Join(os.Getenv("APPDATA"), arg[len("%APPDATA%/"):])
+				}
+			}
 			commandLine.Parse(args)
 			fmt.Println()
 		}

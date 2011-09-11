@@ -27,9 +27,6 @@ var (
 	faceLimit int
 
 	chunkCount int
-	chunkLimit int
-
-	chunkMask ChunkMask
 
 	obj3dsmax bool
 )
@@ -114,6 +111,20 @@ func main() {
 		}
 	}
 
+	manualCenter := false
+	commandLine.Visit(func(f *flag.Flag) {
+		switch f.Name {
+		case "x":
+			fallthrough
+		case "z":
+			fallthrough
+		case "cx":
+			fallthrough
+		case "cz":
+			manualCenter = true
+		}
+	})
+
 	if faceLimit != math.MaxInt32 {
 		faceLimit *= 1000
 	}
@@ -138,33 +149,6 @@ func main() {
 		cz = int(math.Floor(bz / 16))
 	}
 
-	if square != math.MaxInt32 {
-		chunkLimit = square * square
-		var h = square / 2
-		chunkMask = &RectangeChunkMask{cx - h, cz - h, cx - h + square, cz - h + square}
-	} else if rectx != math.MaxInt32 || rectz != math.MaxInt32 {
-		switch {
-		case rectx != math.MaxInt32 && rectz != math.MaxInt32:
-			chunkLimit = rectx * rectz
-			var (
-				hx = rectx / 2
-				hz = rectz / 2
-			)
-			chunkMask = &RectangeChunkMask{cx - hx, cz - hz, cx - hx + rectx, cz - hz + rectz}
-		case rectx != math.MaxInt32:
-			chunkLimit = math.MaxInt32
-			var hx = rectx / 2
-			chunkMask = &RectangeChunkMask{cx - hx, math.MinInt32, cx - hx + rectx, math.MaxInt32}
-		case rectz != math.MaxInt32:
-			chunkLimit = math.MaxInt32
-			var hz = rectz / 2
-			chunkMask = &RectangeChunkMask{math.MinInt32, cz - hz, math.MaxInt32, cz - hz + rectz}
-		}
-	} else {
-		chunkLimit = math.MaxInt32
-		chunkMask = &AllChunksMask{}
-	}
-
 	if prt && outFilename == defaultObjOutFilename {
 		outFilename = defaultPrtOutFilename
 	}
@@ -181,12 +165,16 @@ func main() {
 		}
 	}
 
-	settings := &ProcessingSettings {
-		Prt: prt,
-		OutFilename: outFilename,
-		MaxProcs: maxProcs,
-		Cx: cx,
-		Cz: cz,
+	settings := &ProcessingSettings{
+		Prt:          prt,
+		OutFilename:  outFilename,
+		MaxProcs:     maxProcs,
+		ManualCenter: manualCenter,
+		Cx:           cx,
+		Cz:           cz,
+		Square:       square,
+		Rectx:        rectx,
+		Rectz:        rectz,
 	}
 
 	validPath := false
@@ -220,10 +208,13 @@ func parseFakeCommandLine(commandLine *flag.FlagSet, line []byte) {
 }
 
 type ProcessingSettings struct {
-	Prt         bool
-	OutFilename string
-	MaxProcs    int
-	Cx, Cz      int
+	Prt          bool
+	OutFilename  string
+	MaxProcs     int
+	ManualCenter bool
+	Cx, Cz       int
+	Square		 int
+	Rectx, Rectz int
 }
 
 func processWorldDir(dirpath string, settings *ProcessingSettings) {
@@ -233,6 +224,58 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 		return
 	} else if !fi.IsDirectory() {
 		fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
+	}
+
+	// Pick cx, cz
+	var cx, cz int
+	if settings.ManualCenter {
+		cx, cz = settings.Cx, settings.Cz
+	} else {
+		var file, fileErr = os.Open(filepath.Join(dirpath, "level.dat"))
+		defer file.Close()
+		if fileErr != nil {
+			fmt.Fprintln(os.Stderr, "os.Open", fileErr)
+			return
+		}
+		level, err := nbt.ReadLevelDat(file)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "nbt.ReadLevelDat", err)
+			return
+		}
+		file.Close()
+		cx, cz = level.SpawnX / 16, level.SpawnZ / 16
+	}
+
+	// Create ChunkMask
+	var (
+		chunkMask ChunkMask
+		chunkLimit int
+	)
+	if settings.Square != math.MaxInt32 {
+		chunkLimit = settings.Square * settings.Square
+		var h = settings.Square / 2
+		chunkMask = &RectangeChunkMask{cx - h, cz - h, cx - h + settings.Square, cz - h + settings.Square}
+	} else if settings.Rectx != math.MaxInt32 || settings.Rectz != math.MaxInt32 {
+		switch {
+		case settings.Rectx != math.MaxInt32 && settings.Rectz != math.MaxInt32:
+			chunkLimit = settings.Rectx * settings.Rectz
+			var (
+				hx = settings.Rectx / 2
+				hz = settings.Rectz / 2
+			)
+			chunkMask = &RectangeChunkMask{cx - hx, cz - hz, cx - hx + settings.Rectx, cz - hz + settings.Rectz}
+		case settings.Rectx != math.MaxInt32:
+			chunkLimit = math.MaxInt32
+			var hx = settings.Rectx / 2
+			chunkMask = &RectangeChunkMask{cx - hx, math.MinInt32, cx - hx + settings.Rectx, math.MaxInt32}
+		case settings.Rectz != math.MaxInt32:
+			chunkLimit = math.MaxInt32
+			var hz = settings.Rectz / 2
+			chunkMask = &RectangeChunkMask{math.MinInt32, cz - hz, math.MaxInt32, cz - hz + settings.Rectz}
+		}
+	} else {
+		chunkLimit = math.MaxInt32
+		chunkMask = &AllChunksMask{}
 	}
 
 	var world = OpenWorld(dirpath, chunkMask)
@@ -256,7 +299,7 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 		return
 	}
 
-	if walkEnclosedChunks(pool, world, settings.Cx, settings.Cz, generator.GetEnclosedJobsChan()) {
+	if walkEnclosedChunks(pool, world, chunkMask, chunkLimit, cx, cz, generator.GetEnclosedJobsChan()) {
 		<-generator.GetCompleteChan()
 	}
 
@@ -279,25 +322,25 @@ type EnclosedChunkJob struct {
 	enclosed *EnclosedChunk
 }
 
-func walkEnclosedChunks(pool ChunkPool, opener ChunkOpener, cx, cz int, enclosedsChan chan *EnclosedChunkJob) bool {
+func walkEnclosedChunks(pool ChunkPool, opener ChunkOpener, chunkMask ChunkMask, chunkLimit int, cx, cz int, enclosedsChan chan *EnclosedChunkJob) bool {
 	var (
 		sideCache = new(SideCache)
 		started   = false
 	)
 
-	for i := 0; moreChunks(pool.Remaining()); i++ {
-		for x := 0; x < i && moreChunks(pool.Remaining()); x++ {
-			for z := 0; z < i && moreChunks(pool.Remaining()); z++ {
+	for i := 0; moreChunks(pool.Remaining(), chunkLimit); i++ {
+		for x := 0; x < i && moreChunks(pool.Remaining(), chunkLimit); x++ {
+			for z := 0; z < i && moreChunks(pool.Remaining(), chunkLimit); z++ {
 				var (
 					ax = cx + unzigzag(x)
 					az = cz + unzigzag(z)
 				)
 
 				if pool.Pop(ax, az) {
-					loadSide(sideCache, opener, ax-1, az)
-					loadSide(sideCache, opener, ax+1, az)
-					loadSide(sideCache, opener, ax, az-1)
-					loadSide(sideCache, opener, ax, az+1)
+					loadSide(sideCache, opener, chunkMask, ax-1, az)
+					loadSide(sideCache, opener, chunkMask, ax+1, az)
+					loadSide(sideCache, opener, chunkMask, ax, az-1)
+					loadSide(sideCache, opener, chunkMask, ax, az+1)
 
 					var chunk, loadErr = loadChunk2(opener, ax, az)
 					if loadErr != nil {
@@ -306,7 +349,7 @@ func walkEnclosedChunks(pool ChunkPool, opener ChunkOpener, cx, cz int, enclosed
 						var enclosed = sideCache.EncloseChunk(chunk)
 						sideCache.AddChunk(chunk)
 						chunkCount++
-						enclosedsChan <- &EnclosedChunkJob{!moreChunks(pool.Remaining()), enclosed}
+						enclosedsChan <- &EnclosedChunkJob{!moreChunks(pool.Remaining(), chunkLimit), enclosed}
 						started = true
 					}
 				}
@@ -338,7 +381,7 @@ func unzigzag(n int) int {
 	return (n >> 1) ^ (-(n & 1))
 }
 
-func moreChunks(unprocessedCount int) bool {
+func moreChunks(unprocessedCount, chunkLimit int) bool {
 	return unprocessedCount > 0 && faceCount < faceLimit && chunkCount < chunkLimit
 }
 
@@ -369,7 +412,7 @@ func loadChunk2(opener ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
 	return chunk, nil
 }
 
-func loadSide(sideCache *SideCache, opener ChunkOpener, x, z int) {
+func loadSide(sideCache *SideCache, opener ChunkOpener, chunkMask ChunkMask, x, z int) {
 	if !sideCache.HasSide(x, z) && !chunkMask.IsMasked(x, z) {
 		var chunk, loadErr = loadChunk2(opener, x, z)
 		if loadErr != nil {

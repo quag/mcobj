@@ -9,11 +9,12 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"quag.geek.nz/mcobj/commandline"
+	"quag.geek.nz/mcworld"
 	"quag.geek.nz/nbt"
 	"runtime"
 	"strconv"
 	"strings"
-	"quag.geek.nz/mcobj/commandline"
 )
 
 var (
@@ -248,13 +249,13 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 
 	// Create ChunkMask
 	var (
-		chunkMask ChunkMask
+		chunkMask mcworld.ChunkMask
 		chunkLimit int
 	)
 	if settings.Square != math.MaxInt32 {
 		chunkLimit = settings.Square * settings.Square
 		var h = settings.Square / 2
-		chunkMask = &RectangeChunkMask{cx - h, cz - h, cx - h + settings.Square, cz - h + settings.Square}
+		chunkMask = &mcworld.RectangleChunkMask{cx - h, cz - h, cx - h + settings.Square, cz - h + settings.Square}
 	} else if settings.Rectx != math.MaxInt32 || settings.Rectz != math.MaxInt32 {
 		switch {
 		case settings.Rectx != math.MaxInt32 && settings.Rectz != math.MaxInt32:
@@ -263,22 +264,22 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 				hx = settings.Rectx / 2
 				hz = settings.Rectz / 2
 			)
-			chunkMask = &RectangeChunkMask{cx - hx, cz - hz, cx - hx + settings.Rectx, cz - hz + settings.Rectz}
+			chunkMask = &mcworld.RectangleChunkMask{cx - hx, cz - hz, cx - hx + settings.Rectx, cz - hz + settings.Rectz}
 		case settings.Rectx != math.MaxInt32:
 			chunkLimit = math.MaxInt32
 			var hx = settings.Rectx / 2
-			chunkMask = &RectangeChunkMask{cx - hx, math.MinInt32, cx - hx + settings.Rectx, math.MaxInt32}
+			chunkMask = &mcworld.RectangleChunkMask{cx - hx, math.MinInt32, cx - hx + settings.Rectx, math.MaxInt32}
 		case settings.Rectz != math.MaxInt32:
 			chunkLimit = math.MaxInt32
 			var hz = settings.Rectz / 2
-			chunkMask = &RectangeChunkMask{math.MinInt32, cz - hz, math.MaxInt32, cz - hz + settings.Rectz}
+			chunkMask = &mcworld.RectangleChunkMask{math.MinInt32, cz - hz, math.MaxInt32, cz - hz + settings.Rectz}
 		}
 	} else {
 		chunkLimit = math.MaxInt32
-		chunkMask = &AllChunksMask{}
+		chunkMask = &mcworld.AllChunksMask{}
 	}
 
-	var world = OpenWorld(dirpath, chunkMask)
+	var world = mcworld.OpenWorld(dirpath, chunkMask)
 	var pool, poolErr = world.ChunkPool()
 	if poolErr != nil {
 		fmt.Fprintln(os.Stderr, "Chunk pool error:", poolErr)
@@ -322,7 +323,7 @@ type EnclosedChunkJob struct {
 	enclosed *EnclosedChunk
 }
 
-func walkEnclosedChunks(pool ChunkPool, opener ChunkOpener, chunkMask ChunkMask, chunkLimit int, cx, cz int, enclosedsChan chan *EnclosedChunkJob) bool {
+func walkEnclosedChunks(pool mcworld.ChunkPool, opener mcworld.ChunkOpener, chunkMask mcworld.ChunkMask, chunkLimit int, cx, cz int, enclosedsChan chan *EnclosedChunkJob) bool {
 	var (
 		sideCache = new(SideCache)
 		started   = false
@@ -398,7 +399,7 @@ func loadChunk(filename string) (*nbt.Chunk, os.Error) {
 	return chunk, err
 }
 
-func loadChunk2(opener ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
+func loadChunk2(opener mcworld.ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
 	var r, openErr = opener.OpenChunk(x, z)
 	if openErr != nil {
 		return nil, openErr
@@ -412,7 +413,7 @@ func loadChunk2(opener ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
 	return chunk, nil
 }
 
-func loadSide(sideCache *SideCache, opener ChunkOpener, chunkMask ChunkMask, x, z int) {
+func loadSide(sideCache *SideCache, opener mcworld.ChunkOpener, chunkMask mcworld.ChunkMask, x, z int) {
 	if !sideCache.HasSide(x, z) && !chunkMask.IsMasked(x, z) {
 		var chunk, loadErr = loadChunk2(opener, x, z)
 		if loadErr != nil {

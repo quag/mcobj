@@ -12,7 +12,6 @@ import (
 
 type AlphaWorld struct {
 	worldDir string
-	mask     ChunkMask
 }
 
 func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
@@ -44,7 +43,7 @@ func (p *AlphaChunkPool) Remaining() int {
 	return len(p.chunkMap)
 }
 
-func (w *AlphaWorld) ChunkPool() (ChunkPool, os.Error) {
+func (w *AlphaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 	var errors = make(chan os.Error, 5)
 	var done = make(chan bool)
 	go func() {
@@ -53,7 +52,7 @@ func (w *AlphaWorld) ChunkPool() (ChunkPool, os.Error) {
 		}
 		done <- true
 	}()
-	var v = &visitor{make(map[string]bool), w.mask}
+	var v = &visitor{make(map[string]bool), mask}
 	filepath.Walk(w.worldDir, v, errors)
 	close(errors)
 	<-done

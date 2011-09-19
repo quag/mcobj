@@ -11,7 +11,7 @@ type ChunkOpener interface {
 }
 
 type ChunkPooler interface {
-	ChunkPool() (ChunkPool, os.Error)
+	ChunkPool(mask ChunkMask) (ChunkPool, os.Error)
 }
 
 type World interface {
@@ -24,12 +24,12 @@ type ChunkPool interface {
 	Remaining() int
 }
 
-func OpenWorld(worldDir string, mask ChunkMask) World {
+func OpenWorld(worldDir string) World {
 	var _, err = os.Stat(filepath.Join(worldDir, "region"))
 	if err != nil {
-		return &AlphaWorld{worldDir, mask}
+		return &AlphaWorld{worldDir}
 	}
-	return &BetaWorld{worldDir, mask}
+	return &BetaWorld{worldDir}
 }
 
 type ReadCloserPair struct {

@@ -279,8 +279,8 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 		chunkMask = &mcworld.AllChunksMask{}
 	}
 
-	var world = mcworld.OpenWorld(dirpath, chunkMask)
-	var pool, poolErr = world.ChunkPool()
+	var world = mcworld.OpenWorld(dirpath)
+	var pool, poolErr = world.ChunkPool(chunkMask)
 	if poolErr != nil {
 		fmt.Fprintln(os.Stderr, "Chunk pool error:", poolErr)
 		return

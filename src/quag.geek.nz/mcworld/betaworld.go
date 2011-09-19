@@ -17,7 +17,6 @@ var (
 
 type BetaWorld struct {
 	worldDir string
-	mask     ChunkMask
 }
 
 type McrFile struct {
@@ -101,7 +100,7 @@ func (cl ChunkLocation) Sectors() int {
 	return (int(cl) & 0xff)
 }
 
-func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
+func (w *BetaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 	var regionDirname = filepath.Join(w.worldDir, "region")
 	var dir, dirOpenErr = os.Open(regionDirname)
 	if dirOpenErr != nil {
@@ -130,7 +129,7 @@ func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
 
 			if rxErr == nil && ryErr == nil {
 				var regionFilename = filepath.Join(regionDirname, filenames[0])
-				var mcrErr = w.poolMcrChunks(regionFilename, pool, rx, rz)
+				var mcrErr = w.poolMcrChunks(regionFilename, mask, pool, rx, rz)
 				if mcrErr != nil {
 					return nil, mcrErr
 				}
@@ -141,7 +140,7 @@ func (w *BetaWorld) ChunkPool() (ChunkPool, os.Error) {
 	return pool, nil
 }
 
-func (w *BetaWorld) poolMcrChunks(regionFilename string, pool *BetaChunkPool, rx, rz int) os.Error {
+func (w *BetaWorld) poolMcrChunks(regionFilename string, mask ChunkMask, pool *BetaChunkPool, rx, rz int) os.Error {
 	var region, regionOpenErr = os.Open(regionFilename)
 	if regionOpenErr != nil {
 		return regionOpenErr
@@ -164,7 +163,7 @@ func (w *BetaWorld) poolMcrChunks(regionFilename string, pool *BetaChunkPool, rx
 					z = rz*32 + cz
 				)
 
-				if !w.mask.IsMasked(x, z) {
+				if !mask.IsMasked(x, z) {
 					pool.chunkMap[betaChunkPoolKey(x, z)] = true
 				}
 			}

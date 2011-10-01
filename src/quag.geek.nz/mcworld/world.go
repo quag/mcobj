@@ -2,6 +2,7 @@ package mcworld
 
 import (
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 )
@@ -22,6 +23,11 @@ type World interface {
 type ChunkPool interface {
 	Pop(x, z int) bool
 	Remaining() int
+	BoundingBox() BoundingBox
+}
+
+type BoundingBox struct {
+	X0, Z0, X1, Z1 int
 }
 
 func OpenWorld(worldDir string) World {
@@ -51,4 +57,22 @@ func (r *ReadCloserPair) Close() os.Error {
 		return closerErr
 	}
 	return readerErr
+}
+
+var (
+	EmptyBoundingBox = BoundingBox{math.MaxInt32, math.MaxInt32, math.MinInt32, math.MinInt32}
+)
+
+func (b *BoundingBox) Union(x, z int) {
+	if x < b.X0 {
+		b.X0 = x
+	} else if x > b.X1 {
+		b.X1 = x
+	}
+
+	if z < b.Z0 {
+		b.Z0 = z
+	} else if z > b.Z1 {
+		b.Z1 = z
+	}
 }

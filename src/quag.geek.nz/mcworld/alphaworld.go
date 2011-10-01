@@ -29,6 +29,7 @@ func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
 
 type AlphaChunkPool struct {
 	chunkMap map[string]bool
+	box		 BoundingBox
 	worldDir string
 }
 
@@ -37,6 +38,10 @@ func (p *AlphaChunkPool) Pop(x, z int) bool {
 	var _, exists = p.chunkMap[chunkFilename]
 	p.chunkMap[chunkFilename] = false, false
 	return exists
+}
+
+func (p *AlphaChunkPool) BoundingBox() BoundingBox {
+	return p.box
 }
 
 func (p *AlphaChunkPool) Remaining() int {
@@ -52,15 +57,16 @@ func (w *AlphaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 		}
 		done <- true
 	}()
-	var v = &visitor{make(map[string]bool), mask}
+	var v = &visitor{make(map[string]bool), EmptyBoundingBox, mask}
 	filepath.Walk(w.worldDir, v, errors)
 	close(errors)
 	<-done
-	return &AlphaChunkPool{v.chunks, w.worldDir}, nil
+	return &AlphaChunkPool{v.chunks, v.box, w.worldDir}, nil
 }
 
 type visitor struct {
 	chunks map[string]bool
+	box	   BoundingBox
 	mask   ChunkMask
 }
 
@@ -78,6 +84,7 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 		)
 		if xErr == nil && zErr == nil && !v.mask.IsMasked(int(x), int(z)) {
 			v.chunks[file] = true
+			v.box.Union(int(x), int(z))
 		}
 	}
 }

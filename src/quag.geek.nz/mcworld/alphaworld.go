@@ -29,7 +29,7 @@ func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
 
 type AlphaChunkPool struct {
 	chunkMap map[string]bool
-	box		 BoundingBox
+	box      BoundingBox
 	worldDir string
 }
 
@@ -66,7 +66,7 @@ func (w *AlphaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 
 type visitor struct {
 	chunks map[string]bool
-	box	   BoundingBox
+	box    BoundingBox
 	mask   ChunkMask
 }
 

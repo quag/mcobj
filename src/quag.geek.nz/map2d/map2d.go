@@ -25,8 +25,8 @@ func main() {
 		return
 	}
 
-	width, height := 16*(box.X1 - box.X0), 16*(box.Z1 - box.Z0)
-	xoffset, zoffset := -16 * box.X0, -16 * box.Z0
+	width, height := 16*(box.X1-box.X0), 16*(box.Z1-box.Z0)
+	xoffset, zoffset := -16*box.X0, -16*box.Z0
 
 	fmt.Println(box, width, height)
 
@@ -34,7 +34,7 @@ func main() {
 
 	for chunk := range chunks {
 		//fmt.Println(chunk.X, chunk.Z, xoffset, zoffset)
-		err := useChunk(chunk, img, xoffset + 16 * chunk.X, zoffset + 16 * chunk.Z)
+		err := useChunk(chunk, img, xoffset+16*chunk.X, zoffset+16*chunk.Z)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -75,7 +75,7 @@ func useChunk(chunk *Chunk, img *image.NRGBA, xoffset, zoffset int) os.Error {
 				}
 			}
 			//fmt.Printf("%7x", color[v&0xff])
-			img.Set(xoffset + x, zoffset + z, rgb(color[v&0xff]))
+			img.Set(xoffset+x, zoffset+z, rgb(color[v&0xff]))
 			//fmt.Printf("%7x", img.At(x, z))
 		}
 		//fmt.Println()

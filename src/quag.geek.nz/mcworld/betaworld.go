@@ -176,7 +176,7 @@ func (w *BetaWorld) poolMcrChunks(regionFilename string, mask ChunkMask, pool *B
 
 type BetaChunkPool struct {
 	chunkMap map[uint64]bool
-	box BoundingBox
+	box      BoundingBox
 }
 
 func (p *BetaChunkPool) Pop(x, z int) bool {

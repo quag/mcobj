@@ -214,7 +214,7 @@ type ProcessingSettings struct {
 	MaxProcs     int
 	ManualCenter bool
 	Cx, Cz       int
-	Square		 int
+	Square       int
 	Rectx, Rectz int
 }
 
@@ -244,12 +244,12 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 			return
 		}
 		file.Close()
-		cx, cz = level.SpawnX / 16, level.SpawnZ / 16
+		cx, cz = level.SpawnX/16, level.SpawnZ/16
 	}
 
 	// Create ChunkMask
 	var (
-		chunkMask mcworld.ChunkMask
+		chunkMask  mcworld.ChunkMask
 		chunkLimit int
 	)
 	if settings.Square != math.MaxInt32 {

@@ -6,7 +6,7 @@ var (
 	defaultSide = solidSide
 )
 
-type IChunkSide interface {
+type ChunkSide interface {
 	BlockId(x, y int) uint16
 }
 
@@ -18,29 +18,29 @@ func (s *FixedChunkSide) BlockId(x, y int) uint16 {
 	return s.blockId
 }
 
-func NewChunkSide(height int) *ChunkSide {
-	return &ChunkSide{make([]uint16, height*16)}
+func NewChunkSide(height int) *ChunkSideData {
+	return &ChunkSideData{make([]uint16, height*16)}
 }
 
-type ChunkSide struct {
+type ChunkSideData struct {
 	data []uint16
 }
 
-type ChunkSides [4]*ChunkSide
+type ChunkSidesData [4]*ChunkSideData
 
-func (s *ChunkSide) index(x, y int) int {
+func (s *ChunkSideData) index(x, y int) int {
 	return y + (x * s.height())
 }
 
-func (s *ChunkSide) BlockId(x, y int) uint16 {
+func (s *ChunkSideData) BlockId(x, y int) uint16 {
 	return s.data[s.index(x, y)]
 }
 
-func (s *ChunkSide) Column(x int) BlockColumn {
+func (s *ChunkSideData) Column(x int) BlockColumn {
 	var i = s.height() * x
 	return BlockColumn(s.data[i : i+s.height()])
 }
 
-func (s *ChunkSide) height() int {
+func (s *ChunkSideData) height() int {
 	return len(s.data) / 16
 }

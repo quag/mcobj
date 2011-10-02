@@ -1,13 +1,13 @@
 package main
 
-type EnclosingSides [4]IChunkSide
+type EnclosingSides [4]ChunkSide
 type EnclosedChunk struct {
 	xPos, zPos int
 	blocks     Blocks
 	enclosing  EnclosingSides
 }
 
-func (s *EnclosingSides) side(i int) IChunkSide {
+func (s *EnclosingSides) side(i int) ChunkSide {
 	return (*s)[i]
 }
 

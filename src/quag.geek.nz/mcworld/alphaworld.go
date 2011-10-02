@@ -1,4 +1,4 @@
-package main
+package mcworld
 
 import (
 	"compress/gzip"
@@ -12,7 +12,6 @@ import (
 
 type AlphaWorld struct {
 	worldDir string
-	mask     ChunkMask
 }
 
 func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
@@ -30,6 +29,7 @@ func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
 
 type AlphaChunkPool struct {
 	chunkMap map[string]bool
+	box		 BoundingBox
 	worldDir string
 }
 
@@ -40,11 +40,15 @@ func (p *AlphaChunkPool) Pop(x, z int) bool {
 	return exists
 }
 
+func (p *AlphaChunkPool) BoundingBox() BoundingBox {
+	return p.box
+}
+
 func (p *AlphaChunkPool) Remaining() int {
 	return len(p.chunkMap)
 }
 
-func (w *AlphaWorld) ChunkPool() (ChunkPool, os.Error) {
+func (w *AlphaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 	var errors = make(chan os.Error, 5)
 	var done = make(chan bool)
 	go func() {
@@ -53,15 +57,16 @@ func (w *AlphaWorld) ChunkPool() (ChunkPool, os.Error) {
 		}
 		done <- true
 	}()
-	var v = &visitor{make(map[string]bool), w.mask}
+	var v = &visitor{make(map[string]bool), EmptyBoundingBox, mask}
 	filepath.Walk(w.worldDir, v, errors)
 	close(errors)
 	<-done
-	return &AlphaChunkPool{v.chunks, w.worldDir}, nil
+	return &AlphaChunkPool{v.chunks, v.box, w.worldDir}, nil
 }
 
 type visitor struct {
 	chunks map[string]bool
+	box	   BoundingBox
 	mask   ChunkMask
 }
 
@@ -79,6 +84,7 @@ func (v *visitor) VisitFile(file string, f *os.FileInfo) {
 		)
 		if xErr == nil && zErr == nil && !v.mask.IsMasked(int(x), int(z)) {
 			v.chunks[file] = true
+			v.box.Union(int(x), int(z))
 		}
 	}
 }

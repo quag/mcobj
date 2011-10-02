@@ -362,7 +362,7 @@ func walkEnclosedChunks(pool mcworld.ChunkPool, opener mcworld.ChunkOpener, chun
 }
 
 type Blocks struct {
-	data   []uint16
+	data []uint16
 }
 
 type BlockColumn []uint16

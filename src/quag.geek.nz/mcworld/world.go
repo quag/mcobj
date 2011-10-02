@@ -22,7 +22,7 @@ type World interface {
 
 type ChunkPool interface {
 	Pop(x, z int) bool
-	Remaining()   int
+	Remaining() int
 	BoundingBox() *BoundingBox
 }
 

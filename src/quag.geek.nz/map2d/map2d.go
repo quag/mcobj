@@ -30,7 +30,7 @@ func main() {
 
 	fmt.Println(box, width, height)
 
-	img := image.NewNRGBA(width, height)
+	img := image.NewNRGBA(image.Rect(0, 0, width, height))
 
 	for chunk := range chunks {
 		//fmt.Println(chunk.X, chunk.Z, xoffset, zoffset)

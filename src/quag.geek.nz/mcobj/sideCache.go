@@ -25,7 +25,7 @@ func (s *SideCache) AddChunk(chunk *nbt.Chunk) {
 }
 
 func wrapBlockData(data []uint16) Blocks {
-	return Blocks{data}
+	return Blocks{data, len(data) / (16*16)}
 }
 
 func (s *SideCache) HasSide(x, z int) bool {

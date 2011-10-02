@@ -16,7 +16,7 @@ func (e *EnclosedChunk) Get(x, y, z int) (blockId uint16) {
 	case y < 0 && hideBottom:
 		blockId = 7 // Bedrock
 	case y < 0 && !hideBottom:
-	case y > 127:
+	case y >= e.blocks.height:
 		blockId = 0
 	case x == -1:
 		blockId = e.enclosing.side(0).BlockId(z, y)

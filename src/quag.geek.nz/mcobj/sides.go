@@ -14,7 +14,7 @@ func init() {
 	defaultSide = &solidSide
 }
 
-type ChunkSide [128 * 16]uint16
+type ChunkSide [128*16]uint16
 type ChunkSides [4]*ChunkSide
 
 func (s *ChunkSides) Side(i int) *ChunkSide {
@@ -22,7 +22,7 @@ func (s *ChunkSides) Side(i int) *ChunkSide {
 }
 
 func (s *ChunkSide) Index(x, y int) int {
-	return y + (x * 128)
+	return y + (x * s.height())
 }
 
 func (s *ChunkSide) BlockId(x, y int) uint16 {
@@ -30,10 +30,14 @@ func (s *ChunkSide) BlockId(x, y int) uint16 {
 }
 
 func (s *ChunkSide) Column(x int) BlockColumn {
-	var i = 128 * x
-	return BlockColumn((*s)[i : i+128])
+	var i = s.height() * x
+	return BlockColumn((*s)[i : i+s.height()])
 }
 
 func (s *ChunkSide) SetBlockId(x, y int, blockId uint16) {
 	(*s)[s.Index(x, y)] = blockId
+}
+
+func (s *ChunkSide) height() int {
+	return len(*s) / 16
 }

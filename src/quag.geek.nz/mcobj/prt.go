@@ -59,10 +59,10 @@ func (o *PrtGenerator) chunkProcessor() {
 
 		var e = job.enclosed
 
-		for i := 0; i < len(e.blocks); i += 128 {
+		for i := 0; i < len(e.blocks.data); i += 128 {
 			var x, z = (i / 128) / 16, (i / 128) % 16
 
-			var column = BlockColumn(e.blocks[i : i+128])
+			var column = BlockColumn(e.blocks.data[i : i+128])
 			for y, blockId := range column {
 				if y < yMin {
 					continue

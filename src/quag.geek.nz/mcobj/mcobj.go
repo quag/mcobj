@@ -361,17 +361,19 @@ func walkEnclosedChunks(pool mcworld.ChunkPool, opener mcworld.ChunkOpener, chun
 	return started
 }
 
-type Blocks []uint16
+type Blocks struct {
+	data   []uint16
+}
 
 type BlockColumn []uint16
 
 func (b *Blocks) Get(x, y, z int) uint16 {
-	return (*b)[y+(z*128+(x*128*16))]
+	return b.data[y+(z*128+(x*128*16))]
 }
 
 func (b *Blocks) Column(x, z int) BlockColumn {
 	var i = 128 * (z + x*16)
-	return BlockColumn((*b)[i : i+128])
+	return BlockColumn(b.data[i : i+128])
 }
 
 func zigzag(n int) int {

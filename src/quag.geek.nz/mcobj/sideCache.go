@@ -21,7 +21,11 @@ func (s *SideCache) AddChunk(chunk *nbt.Chunk) {
 		s.chunks = make(map[uint64]*ChunkSides)
 	}
 
-	s.chunks[s.key(chunk.XPos, chunk.ZPos)] = calculateSides(chunk.Blocks)
+	s.chunks[s.key(chunk.XPos, chunk.ZPos)] = calculateSides(wrapBlockData(chunk.Blocks))
+}
+
+func wrapBlockData(data []uint16) Blocks {
+	return Blocks{data}
 }
 
 func (s *SideCache) HasSide(x, z int) bool {
@@ -36,7 +40,7 @@ func (s *SideCache) EncloseChunk(chunk *nbt.Chunk) *EnclosedChunk {
 	return &EnclosedChunk{
 		chunk.XPos,
 		chunk.ZPos,
-		chunk.Blocks,
+		wrapBlockData(chunk.Blocks),
 		EnclosingSides{
 			s.getSide(chunk.XPos-1, chunk.ZPos, 1),
 			s.getSide(chunk.XPos+1, chunk.ZPos, 0),

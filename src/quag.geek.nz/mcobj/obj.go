@@ -498,7 +498,7 @@ func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 		}
 	}
 
-	for i := 0; i < len(enclosedChunk.blocks); i += 128 {
+	for i := 0; i < len(enclosedChunk.blocks.data); i += 128 {
 		var x, z = (i / 128) / 16, (i / 128) % 16
 
 		var (
@@ -508,7 +508,7 @@ func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 			r4 = new(blockRun)
 		)
 
-		var column = BlockColumn(enclosedChunk.blocks[i : i+128])
+		var column = BlockColumn(enclosedChunk.blocks.data[i : i+128])
 		for y, blockId := range column {
 			if y < yMin {
 				continue

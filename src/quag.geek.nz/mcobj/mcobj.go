@@ -155,7 +155,7 @@ func main() {
 	}
 
 	if solidSides {
-		defaultSide = &emptySide
+		defaultSide = emptySide
 	}
 
 	{

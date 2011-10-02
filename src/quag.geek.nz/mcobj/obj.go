@@ -242,18 +242,18 @@ type Faces struct {
 }
 
 func (fs *Faces) ProcessChunk(enclosed *EnclosedChunk, w io.Writer, vw io.Writer) (faceCount, vertexCount int, mtls []*MtlFaces) {
-	fs.clean(enclosed.xPos, enclosed.zPos)
+	fs.clean(enclosed.xPos, enclosed.zPos, enclosed.height())
 	fs.processBlocks(enclosed)
 	vertexCount, mtls = fs.Write(w, vw)
 	return len(fs.faces), vertexCount, mtls
 }
 
-func (fs *Faces) clean(xPos, zPos int) {
+func (fs *Faces) clean(xPos, zPos int, height int) {
 	fs.xPos = xPos
 	fs.zPos = zPos
 
 	if fs.vertexes == nil {
-		fs.vertexes = make([]int16, (128+1)*(16+1)*(16+1))
+		fs.vertexes = make([]int16, (height+1)*(16+1)*(16+1))
 	} else {
 		fs.vertexes.Clear()
 	}

@@ -51,7 +51,7 @@ func (s *SideCache) EncloseChunk(chunk *nbt.Chunk) *EnclosedChunk {
 }
 
 func calculateSides(blocks Blocks) *ChunkSides {
-	var sides = &ChunkSides{&ChunkSide{}, &ChunkSide{}, &ChunkSide{}, &ChunkSide{}}
+	var sides = &ChunkSides{NewChunkSide(blocks.height), NewChunkSide(blocks.height), NewChunkSide(blocks.height), NewChunkSide(blocks.height)}
 	for i := 0; i < 16; i++ {
 		copy(sides[0].Column(i), blocks.Column(0, i))
 		copy(sides[1].Column(i), blocks.Column(15, i))
@@ -62,7 +62,7 @@ func calculateSides(blocks Blocks) *ChunkSides {
 	return sides
 }
 
-func (s *SideCache) getSide(x, z int, side int) *ChunkSide {
+func (s *SideCache) getSide(x, z int, side int) IChunkSide {
 	if s.chunks == nil {
 		return defaultSide
 	}

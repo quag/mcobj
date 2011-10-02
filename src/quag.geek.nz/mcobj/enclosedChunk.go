@@ -1,13 +1,13 @@
 package main
 
-type EnclosingSides [4]*ChunkSide
+type EnclosingSides [4]IChunkSide
 type EnclosedChunk struct {
 	xPos, zPos int
 	blocks     Blocks
 	enclosing  EnclosingSides
 }
 
-func (s *EnclosingSides) side(i int) *ChunkSide {
+func (s *EnclosingSides) side(i int) IChunkSide {
 	return (*s)[i]
 }
 
@@ -31,4 +31,8 @@ func (e *EnclosedChunk) Get(x, y, z int) (blockId uint16) {
 	}
 
 	return
+}
+
+func (e *EnclosedChunk) height() int {
+	return e.blocks.height
 }

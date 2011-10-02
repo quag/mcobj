@@ -2,7 +2,6 @@ package mcworld
 
 import (
 	"compress/gzip"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -29,7 +28,7 @@ func (w *AlphaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
 
 type AlphaChunkPool struct {
 	chunkMap map[string]bool
-	box      BoundingBox
+	box      *BoundingBox
 	worldDir string
 }
 
@@ -40,7 +39,7 @@ func (p *AlphaChunkPool) Pop(x, z int) bool {
 	return exists
 }
 
-func (p *AlphaChunkPool) BoundingBox() BoundingBox {
+func (p *AlphaChunkPool) BoundingBox() *BoundingBox {
 	return p.box
 }
 
@@ -49,44 +48,32 @@ func (p *AlphaChunkPool) Remaining() int {
 }
 
 func (w *AlphaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
-	var errors = make(chan os.Error, 5)
-	var done = make(chan bool)
-	go func() {
-		for error := range errors {
-			fmt.Fprintln(os.Stderr, error) // TODO: return errors
+	chunks := make(map[string]bool)
+	box := EmptyBoundingBox()
+
+	err := filepath.Walk(w.worldDir, func(path string, info *os.FileInfo, err os.Error) os.Error {
+		if err != nil {
+			return err
 		}
-		done <- true
-	}()
-	var v = &visitor{make(map[string]bool), EmptyBoundingBox, mask}
-	filepath.Walk(w.worldDir, v, errors)
-	close(errors)
-	<-done
-	return &AlphaChunkPool{v.chunks, v.box, w.worldDir}, nil
-}
 
-type visitor struct {
-	chunks map[string]bool
-	box    BoundingBox
-	mask   ChunkMask
-}
-
-func (v *visitor) VisitDir(dir string, f *os.FileInfo) bool {
-	return true
-}
-
-func (v *visitor) VisitFile(file string, f *os.FileInfo) {
-	var match, err = filepath.Match("c.*.*.dat", filepath.Base(file))
-	if match && err == nil {
-		var (
-			s       = strings.SplitN(filepath.Base(file), ".", 4)
-			x, xErr = strconv.Btoi64(s[1], 36)
-			z, zErr = strconv.Btoi64(s[2], 36)
-		)
-		if xErr == nil && zErr == nil && !v.mask.IsMasked(int(x), int(z)) {
-			v.chunks[file] = true
-			v.box.Union(int(x), int(z))
+		if info.IsRegular() {
+			var match, err = filepath.Match("c.*.*.dat", filepath.Base(path))
+			if match && err == nil {
+				var (
+					s       = strings.SplitN(filepath.Base(path), ".", 4)
+					x, xErr = strconv.Btoi64(s[1], 36)
+					z, zErr = strconv.Btoi64(s[2], 36)
+				)
+				if xErr == nil && zErr == nil && !mask.IsMasked(int(x), int(z)) {
+					chunks[path] = true
+					box.Union(int(x), int(z))
+				}
+			}
 		}
-	}
+
+		return nil
+	})
+	return &AlphaChunkPool{chunks, box, w.worldDir}, err
 }
 
 func chunkPath(world string, x, z int) string {

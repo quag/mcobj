@@ -108,7 +108,7 @@ func (w *BetaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 	}
 	defer dir.Close()
 
-	var pool = &BetaChunkPool{make(map[uint64]bool), EmptyBoundingBox}
+	var pool = &BetaChunkPool{make(map[uint64]bool), EmptyBoundingBox()}
 
 	for {
 		var filenames, readErr = dir.Readdirnames(1)
@@ -176,7 +176,7 @@ func (w *BetaWorld) poolMcrChunks(regionFilename string, mask ChunkMask, pool *B
 
 type BetaChunkPool struct {
 	chunkMap map[uint64]bool
-	box      BoundingBox
+	box      *BoundingBox
 }
 
 func (p *BetaChunkPool) Pop(x, z int) bool {
@@ -190,7 +190,7 @@ func (p *BetaChunkPool) Remaining() int {
 	return len(p.chunkMap)
 }
 
-func (p *BetaChunkPool) BoundingBox() BoundingBox {
+func (p *BetaChunkPool) BoundingBox() *BoundingBox {
 	return p.box
 }
 

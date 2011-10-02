@@ -22,8 +22,8 @@ type World interface {
 
 type ChunkPool interface {
 	Pop(x, z int) bool
-	Remaining() int
-	BoundingBox() BoundingBox
+	Remaining()   int
+	BoundingBox() *BoundingBox
 }
 
 type BoundingBox struct {
@@ -59,9 +59,9 @@ func (r *ReadCloserPair) Close() os.Error {
 	return readerErr
 }
 
-var (
-	EmptyBoundingBox = BoundingBox{math.MaxInt32, math.MaxInt32, math.MinInt32, math.MinInt32}
-)
+func EmptyBoundingBox() *BoundingBox {
+	return &BoundingBox{math.MaxInt32, math.MaxInt32, math.MinInt32, math.MinInt32}
+}
 
 func (b *BoundingBox) Union(x, z int) {
 	if x < b.X0 {

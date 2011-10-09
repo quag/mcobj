@@ -252,8 +252,8 @@ func (fs *Faces) clean(xPos, zPos int, height int) {
 	fs.xPos = xPos
 	fs.zPos = zPos
 
-	if fs.vertexes == nil {
-		fs.vertexes = make([]int16, (height+1)*(16+1)*(16+1))
+	if fs.vertexes.data == nil {
+		fs.vertexes.data = make([]int16, (height+1)*(16+1)*(16+1))
 	} else {
 		fs.vertexes.Clear()
 	}
@@ -328,26 +328,29 @@ type Vertex struct {
 	x, y, z int
 }
 
-type Vertexes []int16
+type Vertexes struct {
+	data   []int16
+	height int
+}
 
 func (vs *Vertexes) Index(x, y, z int) int {
-	return y + (z*129 + (x * 129 * 17))
+	return y + (z*(vs.height+1) + (x * (vs.height+1) * 17))
 }
 
 func (vs *Vertexes) Use(v Vertex) int {
 	var i = vs.Index(v.x, v.y, v.z)
-	(*vs)[i]++
+	vs.data[i]++
 	return i
 }
 
 func (vs *Vertexes) Release(v Vertex) int {
 	var i = vs.Index(v.x, v.y, v.z)
-	(*vs)[i]--
+	vs.data[i]--
 	return i
 }
 
 func (vs *Vertexes) Get(i int) int16 {
-	return (*vs)[i]
+	return vs.data[i]
 }
 
 func (face *IndexFace) VertexNumFace(vs Vertexes) *VertexNumFace {
@@ -359,19 +362,19 @@ func (face *IndexFace) VertexNumFace(vs Vertexes) *VertexNumFace {
 }
 
 func (vs *Vertexes) Clear() {
-	for i, _ := range *vs {
-		(*vs)[i] = 0
+	for i, _ := range vs.data {
+		vs.data[i] = 0
 	}
 }
 
 func (vs *Vertexes) Number() {
 	var count int16 = 0
-	for i, references := range *vs {
+	for i, references := range vs.data {
 		if references != 0 {
 			count++
-			(*vs)[i] = count
+			vs.data[i] = count
 		} else {
-			(*vs)[i] = -1
+			vs.data[i] = -1
 		}
 	}
 }
@@ -381,10 +384,10 @@ func (vs *Vertexes) Print(w io.Writer, xPos, zPos int) (count int) {
 	copy(buf[0:2], "v ")
 
 	count = 0
-	for i := 0; i < len(*vs); i += 129 {
-		var x, z = (i / 129) / 17, (i / 129) % 17
+	for i := 0; i < len(vs.data); i += (vs.height+1) {
+		var x, z = (i / (vs.height+1)) / 17, (i / (vs.height+1)) % 17
 
-		var column = (*vs)[i : i+129]
+		var column = vs.data[i : i+(vs.height+1)]
 		for y, offset := range column {
 			if offset != -1 {
 

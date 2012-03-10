@@ -10,12 +10,3 @@ _*
 *.prt
 *.zip
 *.7z
-
-version.go
-
-src/quag.geek.nz/mcobj/mcobj
-
-bin/
-pkg/
-cmd/
-goinstall.log

@@ -71,7 +71,7 @@ func main() {
 	commandLine.Parse(os.Args[1:])
 
 	runtime.GOMAXPROCS(maxProcs)
-	fmt.Printf("mcobj %v (cpu: %d) Copyright (c) 2011 Jonathan Wright\n", version, runtime.GOMAXPROCS(0))
+	fmt.Printf("mcobj %v (cpu: %d) Copyright (c) 2011-2012 Jonathan Wright\n", version, runtime.GOMAXPROCS(0))
 
 	exeDir, _ := filepath.Split(strings.Replace(os.Args[0], "\\", "/", -1))
 

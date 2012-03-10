@@ -25,10 +25,22 @@ type McrFile struct {
 }
 
 func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, error) {
-	var mcrName = fmt.Sprintf("r.%v.%v.mcr", x>>5, z>>5)
-	var mcrPath = filepath.Join(w.worldDir, "region", mcrName)
+	mcaName := fmt.Sprintf("r.%v.%v.mca", x>>5, z>>5)
+	mcaPath := filepath.Join(w.worldDir, "region", mcaName)
 
-	var file, mcrOpenErr = os.Open(mcrPath)
+	mcrName := fmt.Sprintf("r.%v.%v.mcr", x>>5, z>>5)
+	mcrPath := filepath.Join(w.worldDir, "region", mcrName)
+
+	var name, path string
+	if _, err := os.Stat(mcaPath); err == nil {
+		name = mcaName
+		path = mcaPath
+	} else {
+		name = mcrName
+		path = mcrPath
+	}
+
+	var file, mcrOpenErr = os.Open(path)
 	if mcrOpenErr != nil {
 		return nil, mcrOpenErr
 	}
@@ -45,7 +57,7 @@ func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, error) {
 	}
 
 	if loc == 0 {
-		return nil, errors.New(fmt.Sprintf("Chunk missing: %v,%v in %v. %v", x, z, mcrName, (x&31)+(z&31)*32))
+		return nil, errors.New(fmt.Sprintf("Chunk missing: %v,%v in %v. %v", x, z, name, (x&31)+(z&31)*32))
 	}
 
 	var (

@@ -56,3 +56,4 @@
  - add FBX output format (http://usa.autodesk.com/adsk/servlet/pc/index?id=6837478&siteID=123112)
  - add player and mob meshes
  - clean up error handling
+ - blocks.json is not located relative to exe when exe is on the $PATH. Provide multiple ways to locate the blocks.json file

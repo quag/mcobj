@@ -2,10 +2,10 @@ package nbt
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"math"
-	"os"
 )
 
 type TypeId byte
@@ -28,7 +28,7 @@ type Reader struct {
 	r *bufio.Reader
 }
 
-func Parse(r io.Reader) (map[string]interface{}, os.Error) {
+func Parse(r io.Reader) (map[string]interface{}, error) {
 	nr := NewReader(r)
 	typeId, _, err := nr.ReadTag()
 	if err != nil {
@@ -46,7 +46,7 @@ func NewReader(r io.Reader) *Reader {
 	return &Reader{bufio.NewReader(r)}
 }
 
-func (r *Reader) ReadTag() (typeId TypeId, name string, err os.Error) {
+func (r *Reader) ReadTag() (typeId TypeId, name string, err error) {
 	typeId, err = r.readTypeId()
 	if err != nil || typeId == 0 {
 		return typeId, "", err
@@ -60,7 +60,7 @@ func (r *Reader) ReadTag() (typeId TypeId, name string, err os.Error) {
 	return typeId, name, nil
 }
 
-func (r *Reader) ReadListHeader() (itemTypeId TypeId, length int, err os.Error) {
+func (r *Reader) ReadListHeader() (itemTypeId TypeId, length int, err error) {
 	length = 0
 
 	itemTypeId, err = r.readTypeId()
@@ -71,7 +71,7 @@ func (r *Reader) ReadListHeader() (itemTypeId TypeId, length int, err os.Error) 
 	return
 }
 
-func (r *Reader) ReadString() (string, os.Error) {
+func (r *Reader) ReadString() (string, error) {
 	var length, err1 = r.ReadInt16()
 	if err1 != nil {
 		return "", err1
@@ -82,7 +82,7 @@ func (r *Reader) ReadString() (string, os.Error) {
 	return string(bytes), err
 }
 
-func (r *Reader) ReadBytes() ([]byte, os.Error) {
+func (r *Reader) ReadBytes() ([]byte, error) {
 	var length, err1 = r.ReadInt32()
 	if err1 != nil {
 		return nil, err1
@@ -93,38 +93,38 @@ func (r *Reader) ReadBytes() ([]byte, os.Error) {
 	return bytes, err
 }
 
-func (r *Reader) ReadInt8() (int, os.Error) {
+func (r *Reader) ReadInt8() (int, error) {
 	return r.readIntN(1)
 }
 
-func (r *Reader) ReadInt16() (int, os.Error) {
+func (r *Reader) ReadInt16() (int, error) {
 	return r.readIntN(2)
 }
 
-func (r *Reader) ReadInt32() (int, os.Error) {
+func (r *Reader) ReadInt32() (int, error) {
 	return r.readIntN(4)
 }
 
-func (r *Reader) ReadInt64() (int, os.Error) {
+func (r *Reader) ReadInt64() (int, error) {
 	return r.readIntN(8)
 }
 
-func (r *Reader) ReadFloat32() (float32, os.Error) {
+func (r *Reader) ReadFloat32() (float32, error) {
 	x, err := r.readUintN(4)
 	return math.Float32frombits(uint32(x)), err
 }
 
-func (r *Reader) ReadFloat64() (float64, os.Error) {
+func (r *Reader) ReadFloat64() (float64, error) {
 	x, err := r.readUintN(8)
 	return math.Float64frombits(x), err
 }
 
-func (r *Reader) readTypeId() (TypeId, os.Error) {
+func (r *Reader) readTypeId() (TypeId, error) {
 	id, err := r.r.ReadByte()
 	return TypeId(id), err
 }
 
-func (r *Reader) readIntN(n int) (int, os.Error) {
+func (r *Reader) readIntN(n int) (int, error) {
 	var a int = 0
 
 	for i := 0; i < n; i++ {
@@ -138,7 +138,7 @@ func (r *Reader) readIntN(n int) (int, os.Error) {
 	return a, nil
 }
 
-func (r *Reader) readUintN(n int) (uint64, os.Error) {
+func (r *Reader) readUintN(n int) (uint64, error) {
 	var a uint64 = 0
 
 	for i := 0; i < n; i++ {
@@ -152,7 +152,7 @@ func (r *Reader) readUintN(n int) (uint64, os.Error) {
 	return a, nil
 }
 
-func (r *Reader) ReadStruct() (map[string]interface{}, os.Error) {
+func (r *Reader) ReadStruct() (map[string]interface{}, error) {
 	s := make(map[string]interface{})
 	for {
 		typeId, name, err := r.ReadTag()
@@ -171,7 +171,7 @@ func (r *Reader) ReadStruct() (map[string]interface{}, os.Error) {
 	return s, nil
 }
 
-func (r *Reader) ReadValue(typeId TypeId) (interface{}, os.Error) {
+func (r *Reader) ReadValue(typeId TypeId) (interface{}, error) {
 	switch typeId {
 	case TagStruct:
 		return r.ReadStruct()
@@ -241,9 +241,9 @@ func (r *Reader) ReadValue(typeId TypeId) (interface{}, os.Error) {
 			}
 			return list, nil
 		default:
-			return nil, os.NewError(fmt.Sprintf("reading lists of typeId %d not supported. length:%d", itemTypeId, length))
+			return nil, errors.New(fmt.Sprintf("reading lists of typeId %d not supported. length:%d", itemTypeId, length))
 		}
 	}
 
-	return nil, os.NewError(fmt.Sprintf("reading typeId %d not supported", typeId))
+	return nil, errors.New(fmt.Sprintf("reading typeId %d not supported", typeId))
 }

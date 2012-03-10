@@ -3,6 +3,7 @@ package mcworld
 import (
 	"compress/zlib"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -12,7 +13,7 @@ import (
 )
 
 var (
-	ChunkNotFoundError = os.NewError("Chunk Missing")
+	ChunkNotFoundError = errors.New("Chunk Missing")
 )
 
 type BetaWorld struct {
@@ -23,7 +24,7 @@ type McrFile struct {
 	*os.File
 }
 
-func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
+func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, error) {
 	var mcrName = fmt.Sprintf("r.%v.%v.mcr", x>>5, z>>5)
 	var mcrPath = filepath.Join(w.worldDir, "region", mcrName)
 
@@ -44,7 +45,7 @@ func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
 	}
 
 	if loc == 0 {
-		return nil, os.NewError(fmt.Sprintf("Chunk missing: %v,%v in %v. %v", x, z, mcrName, (x&31)+(z&31)*32))
+		return nil, errors.New(fmt.Sprintf("Chunk missing: %v,%v in %v. %v", x, z, mcrName, (x&31)+(z&31)*32))
 	}
 
 	var (
@@ -77,7 +78,7 @@ func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, os.Error) {
 	return pair, nil
 }
 
-func (r McrFile) ReadLocation(x, z int) (ChunkLocation, os.Error) {
+func (r McrFile) ReadLocation(x, z int) (ChunkLocation, error) {
 	var _, seekErr = r.Seek(int64(4*((x&31)+(z&31)*32)), 0)
 	if seekErr != nil {
 		return ChunkLocation(0), seekErr
@@ -100,7 +101,7 @@ func (cl ChunkLocation) Sectors() int {
 	return (int(cl) & 0xff)
 }
 
-func (w *BetaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
+func (w *BetaWorld) ChunkPool(mask ChunkMask) (ChunkPool, error) {
 	var regionDirname = filepath.Join(w.worldDir, "region")
 	var dir, dirOpenErr = os.Open(regionDirname)
 	if dirOpenErr != nil {
@@ -112,14 +113,14 @@ func (w *BetaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 
 	for {
 		var filenames, readErr = dir.Readdirnames(1)
-		if readErr == os.EOF || len(filenames) == 0 {
+		if readErr == io.EOF || len(filenames) == 0 {
 			break
 		}
 		if readErr != nil {
 			return nil, readErr
 		}
 
-		var fields = strings.FieldsFunc(filenames[0], func(c int) bool { return c == '.' })
+		var fields = strings.FieldsFunc(filenames[0], func(c rune) bool { return c == '.' })
 
 		if len(fields) == 4 {
 			var (
@@ -140,7 +141,7 @@ func (w *BetaWorld) ChunkPool(mask ChunkMask) (ChunkPool, os.Error) {
 	return pool, nil
 }
 
-func (w *BetaWorld) poolMcrChunks(regionFilename string, mask ChunkMask, pool *BetaChunkPool, rx, rz int) os.Error {
+func (w *BetaWorld) poolMcrChunks(regionFilename string, mask ChunkMask, pool *BetaChunkPool, rx, rz int) error {
 	var region, regionOpenErr = os.Open(regionFilename)
 	if regionOpenErr != nil {
 		return regionOpenErr
@@ -151,7 +152,7 @@ func (w *BetaWorld) poolMcrChunks(regionFilename string, mask ChunkMask, pool *B
 		for cx := 0; cx < 32; cx++ {
 			var location uint32
 			var readErr = binary.Read(region, binary.BigEndian, &location)
-			if readErr == os.EOF {
+			if readErr == io.EOF {
 				continue
 			}
 			if readErr != nil {
@@ -182,7 +183,7 @@ type BetaChunkPool struct {
 func (p *BetaChunkPool) Pop(x, z int) bool {
 	var key = betaChunkPoolKey(x, z)
 	var _, exists = p.chunkMap[key]
-	p.chunkMap[key] = false, false
+	delete(p.chunkMap, key)
 	return exists
 }
 

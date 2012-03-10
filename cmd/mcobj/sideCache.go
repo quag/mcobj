@@ -1,7 +1,7 @@
 package main
 
 import (
-	"quag.geek.nz/nbt"
+	"github.com/quag/mcobj/nbt"
 )
 
 type SideCache struct {
@@ -25,7 +25,7 @@ func (s *SideCache) AddChunk(chunk *nbt.Chunk) {
 }
 
 func wrapBlockData(data []uint16) Blocks {
-	return Blocks{data, len(data) / (16*16)}
+	return Blocks{data, len(data) / (16 * 16)}
 }
 
 func (s *SideCache) HasSide(x, z int) bool {
@@ -76,7 +76,7 @@ func (s *SideCache) getSide(x, z int, side int) ChunkSide {
 	chunk[side] = nil
 
 	if chunk[0] == nil && chunk[1] == nil && chunk[2] == nil && chunk[3] == nil {
-		s.chunks[s.key(x, z)] = nil, false
+		delete(s.chunks, s.key(x, z))
 	}
 
 	return chunkSide

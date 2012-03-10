@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
+	"github.com/quag/mcobj/mcworld"
+	"github.com/quag/mcobj/nbt"
 	"image"
 	"image/png"
+	"io"
 	"os"
-	"quag.geek.nz/mcworld"
-	"quag.geek.nz/nbt"
 )
 
 func main() {
@@ -50,7 +50,7 @@ func main() {
 	png.Encode(pngFile, img)
 }
 
-func useChunk(chunk *Chunk, img *image.NRGBA, xoffset, zoffset int) os.Error {
+func useChunk(chunk *Chunk, img *image.NRGBA, xoffset, zoffset int) error {
 	var r, openErr = chunk.Open()
 	if openErr != nil {
 		return openErr
@@ -90,7 +90,7 @@ type Chunk struct {
 	X, Z   int
 }
 
-func (c *Chunk) Open() (io.ReadCloser, os.Error) {
+func (c *Chunk) Open() (io.ReadCloser, error) {
 	return c.opener.OpenChunk(c.X, c.Z)
 }
 
@@ -102,10 +102,10 @@ func unzigzag(n int) int {
 	return (n >> 1) ^ (-(n & 1))
 }
 
-func ZigZagChunks(world mcworld.World, mask mcworld.ChunkMask) (chan *Chunk, mcworld.BoundingBox, os.Error) {
+func ZigZagChunks(world mcworld.World, mask mcworld.ChunkMask) (chan *Chunk, *mcworld.BoundingBox, error) {
 	pool, err := world.ChunkPool(mask)
 	if err != nil {
-		return nil, mcworld.BoundingBox{}, err
+		return nil, &mcworld.BoundingBox{}, err
 	}
 
 	c := make(chan *Chunk)

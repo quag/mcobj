@@ -12,7 +12,7 @@ func printMtl(w io.Writer, blockId uint16) {
 	}
 }
 
-func writeMtlFile(filename string) os.Error {
+func writeMtlFile(filename string) error {
 	if noColor {
 		return nil
 	}

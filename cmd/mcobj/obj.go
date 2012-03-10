@@ -24,7 +24,7 @@ type ObjGenerator struct {
 	outFilename, vFilename, fFilename string
 }
 
-func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error {
+func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) error {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.writeFacesChan = make(chan *WriteFacesJob, maxProcs*2)
 	o.completeChan = make(chan bool)
@@ -96,7 +96,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	o.fFilename = outFilename + ".f"
 
 	var outFile, voutFile, foutFile *os.File
-	var outErr os.Error
+	var outErr error
 	outFile, outErr = os.Create(o.outFilename)
 	if outErr != nil {
 		return outErr
@@ -107,11 +107,7 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 		}
 	}()
 
-	var bufErr os.Error
-	o.out, bufErr = bufio.NewWriterSize(outFile, 1024*1024)
-	if bufErr != nil {
-		return bufErr
-	}
+	o.out = bufio.NewWriterSize(outFile, 1024*1024)
 
 	if obj3dsmax {
 		voutFile, outErr = os.Create(o.vFilename)
@@ -134,14 +130,8 @@ func (o *ObjGenerator) Start(outFilename string, total int, maxProcs int, bounda
 			}
 		}()
 
-		o.vout, bufErr = bufio.NewWriterSize(voutFile, 1024*1024)
-		if bufErr != nil {
-			return bufErr
-		}
-		o.fout, bufErr = bufio.NewWriterSize(foutFile, 1024*1024)
-		if bufErr != nil {
-			return bufErr
-		}
+		o.vout = bufio.NewWriterSize(voutFile, 1024*1024)
+		o.fout = bufio.NewWriterSize(foutFile, 1024*1024)
 	}
 
 	var mw io.Writer
@@ -167,7 +157,7 @@ func (o *ObjGenerator) GetCompleteChan() chan bool {
 	return o.completeChan
 }
 
-func (o *ObjGenerator) Close() os.Error {
+func (o *ObjGenerator) Close() error {
 	o.out.Flush()
 	o.outFile.Close()
 
@@ -215,7 +205,7 @@ func (o *ObjGenerator) Close() os.Error {
 	return nil
 }
 
-func copyFile(w io.Writer, filename string) os.Error {
+func copyFile(w io.Writer, filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -334,7 +324,7 @@ type Vertexes struct {
 }
 
 func (vs *Vertexes) Index(x, y, z int) int {
-	return y + (z*(vs.height+1) + (x * (vs.height+1) * 17))
+	return y + (z*(vs.height+1) + (x * (vs.height + 1) * 17))
 }
 
 func (vs *Vertexes) Use(v Vertex) int {
@@ -384,8 +374,8 @@ func (vs *Vertexes) Print(w io.Writer, xPos, zPos int) (count int) {
 	copy(buf[0:2], "v ")
 
 	count = 0
-	for i := 0; i < len(vs.data); i += (vs.height+1) {
-		var x, z = (i / (vs.height+1)) / 17, (i / (vs.height+1)) % 17
+	for i := 0; i < len(vs.data); i += (vs.height + 1) {
+		var x, z = (i / (vs.height + 1)) / 17, (i / (vs.height + 1)) % 17
 
 		var column = vs.data[i : i+(vs.height+1)]
 		for y, offset := range column {

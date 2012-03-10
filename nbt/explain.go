@@ -1,18 +1,18 @@
 package nbt
 
 import (
+	"errors"
 	"fmt"
 	"io"
-	"os"
 )
 
-func Explain(r io.Reader, w io.Writer) os.Error {
+func Explain(r io.Reader, w io.Writer) error {
 	e := &explainer{w, pathStack{make([]string, 0, 8)}}
 
 	nr := NewReader(r)
 	for {
 		err := e.parseStruct(nr, false)
-		if err == os.EOF {
+		if err == io.EOF {
 			break
 		} else if err != nil {
 			return err
@@ -27,7 +27,7 @@ type explainer struct {
 	stack pathStack
 }
 
-func (e *explainer) parseStruct(nr *Reader, listStruct bool) os.Error {
+func (e *explainer) parseStruct(nr *Reader, listStruct bool) error {
 	structDepth := 0
 	if listStruct {
 		structDepth = 1
@@ -121,7 +121,7 @@ func (e *explainer) parseStruct(nr *Reader, listStruct bool) os.Error {
 					e.stack.pop()
 				}
 			default:
-				return os.NewError(fmt.Sprintf("reading lists of typeId %d not supported. length:%d", itemTypeId, length))
+				return errors.New(fmt.Sprintf("reading lists of typeId %d not supported. length:%d", itemTypeId, length))
 			}
 		}
 
@@ -151,7 +151,7 @@ func (e *explainer) RecordList(itemTypeId TypeId, length int) {
 	fmt.Fprintf(e.w, " (%2d, %d) ", itemTypeId, length)
 }
 
-func (e *explainer) RecordValue(value interface{}, err os.Error) {
+func (e *explainer) RecordValue(value interface{}, err error) {
 	if err != nil {
 		fmt.Fprintln(e.w, err)
 	}

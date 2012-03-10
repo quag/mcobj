@@ -8,11 +8,11 @@ import (
 )
 
 type ChunkOpener interface {
-	OpenChunk(x, z int) (io.ReadCloser, os.Error)
+	OpenChunk(x, z int) (io.ReadCloser, error)
 }
 
 type ChunkPooler interface {
-	ChunkPool(mask ChunkMask) (ChunkPool, os.Error)
+	ChunkPool(mask ChunkMask) (ChunkPool, error)
 }
 
 type World interface {
@@ -43,11 +43,11 @@ type ReadCloserPair struct {
 	closer io.Closer
 }
 
-func (r *ReadCloserPair) Read(p []byte) (int, os.Error) {
+func (r *ReadCloserPair) Read(p []byte) (int, error) {
 	return r.reader.Read(p)
 }
 
-func (r *ReadCloserPair) Close() os.Error {
+func (r *ReadCloserPair) Close() error {
 	var (
 		readerErr = r.reader.Close()
 		closerErr = r.closer.Close()

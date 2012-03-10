@@ -2,16 +2,17 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/quag/mcobj/commandline"
+	"github.com/quag/mcobj/mcworld"
+	"github.com/quag/mcobj/nbt"
+	"io"
 	"io/ioutil"
-	"json"
 	"math"
 	"os"
 	"path/filepath"
-	"quag.geek.nz/mcobj/commandline"
-	"quag.geek.nz/mcworld"
-	"quag.geek.nz/nbt"
 	"runtime"
 	"strconv"
 	"strings"
@@ -77,7 +78,7 @@ func main() {
 	if *showHelp || commandLine.NArg() == 0 {
 		settingsPath := filepath.Join(exeDir, "settings.txt")
 		fi, err := os.Stat(settingsPath)
-		if err == nil && (fi.IsRegular() || fi.IsSymlink()) {
+		if err == nil && (!fi.IsDir() || fi.Mode() & os.ModeSymlink != 0) {
 			line, err := ioutil.ReadFile(settingsPath)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ioutil.ReadFile:", err)
@@ -98,7 +99,7 @@ func main() {
 			for commandLine.NArg() == 0 {
 				fmt.Printf("command line: ")
 				line, _, err := stdin.ReadLine()
-				if err == os.EOF {
+				if err == io.EOF {
 					fmt.Println()
 					return
 				} else if err != nil {
@@ -181,7 +182,7 @@ func main() {
 	validPath := false
 	for _, dirpath := range commandLine.Args() {
 		var fi, err = os.Stat(dirpath)
-		validPath = validPath || (err == nil && !fi.IsDirectory())
+		validPath = validPath || (err == nil && !fi.IsDir())
 	}
 
 	if validPath {
@@ -223,7 +224,7 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "World error:", err)
 		return
-	} else if !fi.IsDirectory() {
+	} else if !fi.IsDir() {
 		fmt.Fprintln(os.Stderr, dirpath, "is not a directory")
 	}
 
@@ -312,10 +313,10 @@ func processWorldDir(dirpath string, settings *ProcessingSettings) {
 }
 
 type OutputGenerator interface {
-	Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error
+	Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) error
 	GetEnclosedJobsChan() chan *EnclosedChunkJob
 	GetCompleteChan() chan bool
-	Close() os.Error
+	Close() error
 }
 
 type EnclosedChunkJob struct {
@@ -389,20 +390,20 @@ func moreChunks(unprocessedCount, chunkLimit int) bool {
 	return unprocessedCount > 0 && faceCount < faceLimit && chunkCount < chunkLimit
 }
 
-func loadChunk(filename string) (*nbt.Chunk, os.Error) {
+func loadChunk(filename string) (*nbt.Chunk, error) {
 	var file, fileErr = os.Open(filename)
 	defer file.Close()
 	if fileErr != nil {
 		return nil, fileErr
 	}
 	var chunk, err = nbt.ReadChunkDat(file)
-	if err == os.EOF {
+	if err == io.EOF {
 		err = nil
 	}
 	return chunk, err
 }
 
-func loadChunk2(opener mcworld.ChunkOpener, x, z int) (*nbt.Chunk, os.Error) {
+func loadChunk2(opener mcworld.ChunkOpener, x, z int) (*nbt.Chunk, error) {
 	var r, openErr = opener.OpenChunk(x, z)
 	if openErr != nil {
 		return nil, openErr
@@ -427,7 +428,7 @@ func loadSide(sideCache *SideCache, opener mcworld.ChunkOpener, chunkMask mcworl
 	}
 }
 
-func loadBlockTypesJson(filename string) os.Error {
+func loadBlockTypesJson(filename string) error {
 	var jsonBytes, jsonIoError = ioutil.ReadFile(filename)
 
 	if jsonIoError != nil {
@@ -462,12 +463,12 @@ func loadBlockTypesJson(filename string) os.Error {
 					case "color":
 						switch len(v.(string)) {
 						case 7:
-							var n, numErr = strconv.Btoui64(v.(string)[1:], 16)
+							var n, numErr = strconv.ParseUint(v.(string)[1:], 16, 64)
 							if numErr == nil {
 								color = uint32(n*0x100 + 0xff)
 							}
 						case 9:
-							var n, numErr = strconv.Btoui64(v.(string)[1:], 16)
+							var n, numErr = strconv.ParseUint(v.(string)[1:], 16, 64)
 							if numErr == nil {
 								color = uint32(n)
 							}

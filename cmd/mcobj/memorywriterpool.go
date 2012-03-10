@@ -1,9 +1,5 @@
 package main
 
-import (
-	"os"
-)
-
 type MemoryWriter struct {
 	buf []byte
 }
@@ -14,7 +10,7 @@ func (m *MemoryWriter) Clean() {
 	}
 }
 
-func (m *MemoryWriter) Write(p []byte) (n int, err os.Error) {
+func (m *MemoryWriter) Write(p []byte) (n int, err error) {
 	m.buf = append(m.buf, p...)
 	return len(p), nil
 }

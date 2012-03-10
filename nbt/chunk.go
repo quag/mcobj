@@ -2,9 +2,9 @@ package nbt
 
 import (
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
-	"os"
 )
 
 type Chunk struct {
@@ -13,10 +13,10 @@ type Chunk struct {
 }
 
 var (
-	ErrListUnknown = os.NewError("Lists of unknown type aren't supported")
+	ErrListUnknown = errors.New("Lists of unknown type aren't supported")
 )
 
-func ReadChunkDat(reader io.Reader) (*Chunk, os.Error) {
+func ReadChunkDat(reader io.Reader) (*Chunk, error) {
 	r, err := gzip.NewReader(reader)
 	defer r.Close()
 	if err != nil {
@@ -26,7 +26,7 @@ func ReadChunkDat(reader io.Reader) (*Chunk, os.Error) {
 	return ReadChunkNbt(r)
 }
 
-func ReadChunkNbt(reader io.Reader) (*Chunk, os.Error) {
+func ReadChunkNbt(reader io.Reader) (*Chunk, error) {
 	chunkData := new(chunkData)
 	if err := chunkData.parse(NewReader(reader), false); err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ type chunkData struct {
 	data       []byte
 }
 
-func (chunk *chunkData) parse(r *Reader, listStruct bool) os.Error {
+func (chunk *chunkData) parse(r *Reader, listStruct bool) error {
 	structDepth := 0
 	if listStruct {
 		structDepth++
@@ -65,7 +65,7 @@ func (chunk *chunkData) parse(r *Reader, listStruct bool) os.Error {
 	for {
 		typeId, name, err := r.ReadTag()
 		if err != nil {
-			if err == os.EOF {
+			if err == io.EOF {
 				break
 			}
 			return err

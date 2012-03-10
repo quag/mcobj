@@ -2,20 +2,20 @@ package nbt
 
 import (
 	"compress/gzip"
+	"errors"
 	"io"
-	"os"
 )
 
 var (
-	DataStructNotFound = os.NewError("'Data' struct not found")
-	SpawnIntNotFound   = os.NewError("SpawnX/SpawnY/SpawnZ int32s not found")
+	DataStructNotFound = errors.New("'Data' struct not found")
+	SpawnIntNotFound   = errors.New("SpawnX/SpawnY/SpawnZ int32s not found")
 )
 
 type Level struct {
 	SpawnX, SpawnY, SpawnZ int
 }
 
-func ReadLevelDat(reader io.Reader) (*Level, os.Error) {
+func ReadLevelDat(reader io.Reader) (*Level, error) {
 	r, err := gzip.NewReader(reader)
 	defer r.Close()
 	if err != nil {
@@ -25,7 +25,7 @@ func ReadLevelDat(reader io.Reader) (*Level, os.Error) {
 	return ReadLevelNbt(r)
 }
 
-func ReadLevelNbt(reader io.Reader) (*Level, os.Error) {
+func ReadLevelNbt(reader io.Reader) (*Level, error) {
 	root, err := Parse(reader)
 	if err != nil {
 		return nil, err

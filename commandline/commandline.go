@@ -2,7 +2,7 @@ package commandline
 
 import (
 	"strings"
-	"utf8"
+	"unicode/utf8"
 )
 
 const eof = -1
@@ -19,20 +19,20 @@ type lexer struct {
 	frags []string
 }
 
-func (l *lexer) next() (rune int) {
+func (l *lexer) next() (r rune) {
 	if l.pos >= len(l.input) {
 		l.width = 0
 		return eof
 	}
-	rune, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
+	r, l.width = utf8.DecodeRuneInString(l.input[l.pos:])
 	l.pos += l.width
-	return rune
+	return r
 }
 
-func (l *lexer) peek() (rune int) {
-	rune = l.next()
+func (l *lexer) peek() (r rune) {
+	r = l.next()
 	l.backup()
-	return rune
+	return r
 }
 
 func (l *lexer) backup() {
@@ -149,7 +149,7 @@ func lexSglQuoteArg(l *lexer) stateFn {
 	return lexQuoteArg(l, '\'')
 }
 
-func lexQuoteArg(l *lexer, quote int) stateFn {
+func lexQuoteArg(l *lexer, quote rune) stateFn {
 	l.next()
 	l.ignore()
 Loop:

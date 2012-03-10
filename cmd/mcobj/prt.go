@@ -22,7 +22,7 @@ type PrtGenerator struct {
 	boundary      *BoundaryLocator
 }
 
-func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) os.Error {
+func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, boundary *BoundaryLocator) error {
 	o.enclosedsChan = make(chan *EnclosedChunkJob, maxProcs*2)
 	o.completeChan = make(chan bool)
 	o.total = total
@@ -33,7 +33,7 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, bounda
 		go o.chunkProcessor()
 	}
 
-	var openErr os.Error
+	var openErr error
 
 	o.outFile, openErr = os.Create(outFilename)
 	if openErr != nil {
@@ -43,7 +43,7 @@ func (o *PrtGenerator) Start(outFilename string, total int, maxProcs int, bounda
 	o.w = bufio.NewWriter(o.outFile)
 	WriteHeader(o.w, -1, []ChannelDefinition{{"Position", 4, 3, 0}, {"BlockID", 1, 1, 12}})
 
-	var zErr os.Error
+	var zErr error
 	o.zw, zErr = zlib.NewWriterLevel(o.w, zlib.NoCompression)
 	if zErr != nil {
 		return zErr
@@ -105,7 +105,7 @@ func (o *PrtGenerator) chunkProcessor() {
 	}
 }
 
-func (o *PrtGenerator) Close() os.Error {
+func (o *PrtGenerator) Close() error {
 	o.zw.Close()
 	o.w.Flush()
 	UpdateParticleCount(o.outFile, o.particleCount)
@@ -166,7 +166,7 @@ func WriteHeader(w io.Writer, particleCount int64, channels []ChannelDefinition)
 	}
 }
 
-func UpdateParticleCount(file *os.File, particleCount int64) os.Error {
+func UpdateParticleCount(file *os.File, particleCount int64) error {
 	var storedOffset, err = file.Seek(0, 1)
 	if err != nil {
 		return err

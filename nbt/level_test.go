@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
-	"os"
 	"testing"
 )
 
@@ -31,7 +30,7 @@ func TestReadSpawnXYZ(t *testing.T) {
 }
 
 func TestLevelParseError(t *testing.T) {
-	checkLevelReadError(t, os.EOF, 0xff)
+	checkLevelReadError(t, io.EOF, 0xff)
 }
 
 func TestLevelDataNotFound(t *testing.T) {
@@ -52,7 +51,7 @@ func TestSpawnNotInt(t *testing.T) {
 
 // TODO: Data/Player/Pos
 
-func readLevelBytes(b ...byte) (*Level, os.Error) {
+func readLevelBytes(b ...byte) (*Level, error) {
 	r, err := gzipBytesReader(b)
 	if err != nil {
 		return nil, err
@@ -60,24 +59,21 @@ func readLevelBytes(b ...byte) (*Level, os.Error) {
 	return ReadLevelDat(r)
 }
 
-func gzipBytesReader(b []byte) (io.Reader, os.Error) {
+func gzipBytesReader(b []byte) (io.Reader, error) {
 	buffer := new(bytes.Buffer)
-	gw, err := gzip.NewWriter(buffer)
-	if err != nil {
-		return nil, err
-	}
+	gw := gzip.NewWriter(buffer)
 	gw.Write(b)
 	gw.Close()
 	return buffer, nil
 }
 
-func checkLevelReadError(t *testing.T, expectedErr os.Error, bytes ...byte) {
+func checkLevelReadError(t *testing.T, expectedErr error, bytes ...byte) {
 	level, err := readLevelBytes(bytes...)
 	checkError(t, err, expectedErr)
 	checkLevelNil(t, level)
 }
 
-func checkError(t *testing.T, err, expectedErr os.Error) {
+func checkError(t *testing.T, err, expectedErr error) {
 	if err != expectedErr {
 		t.Errorf("Error was %q not %q", err, expectedErr)
 	}

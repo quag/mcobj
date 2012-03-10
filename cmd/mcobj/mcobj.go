@@ -78,7 +78,7 @@ func main() {
 	if *showHelp || commandLine.NArg() == 0 {
 		settingsPath := filepath.Join(exeDir, "settings.txt")
 		fi, err := os.Stat(settingsPath)
-		if err == nil && (!fi.IsDir() || fi.Mode() & os.ModeSymlink != 0) {
+		if err == nil && (!fi.IsDir() || fi.Mode()&os.ModeSymlink != 0) {
 			line, err := ioutil.ReadFile(settingsPath)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "ioutil.ReadFile:", err)

@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"github.com/quag/mcobj/nbt"
 )
 
 type ObjGenerator struct {
@@ -256,18 +257,18 @@ func (fs *Faces) clean(xPos, zPos int, height int) {
 }
 
 type IndexFace struct {
-	blockId uint16
+	blockId nbt.Block
 	indexes [4]int
 }
 
 type VertexNumFace [4]int
 
 type MtlFaces struct {
-	blockId uint16
+	blockId nbt.Block
 	faces   []*VertexNumFace
 }
 
-func (fs *Faces) AddFace(blockId uint16, v1, v2, v3, v4 Vertex) {
+func (fs *Faces) AddFace(blockId nbt.Block, v1, v2, v3, v4 Vertex) {
 	var face = IndexFace{blockId, [4]int{fs.vertexes.Use(v1), fs.vertexes.Use(v2), fs.vertexes.Use(v3), fs.vertexes.Use(v4)}}
 	fs.faces = append(fs.faces, face)
 }
@@ -276,7 +277,7 @@ func (fs *Faces) Write(w io.Writer, vw io.Writer) (vertexCount int, mtls []*MtlF
 	fs.vertexes.Number()
 	var vc = int16(fs.vertexes.Print(io.MultiWriter(w, vw), fs.xPos, fs.zPos))
 
-	var blockIds = make([]uint16, 0, 16)
+	var blockIds = make([]nbt.Block, 0, 16)
 	for _, face := range fs.faces {
 		var found = false
 		for _, id := range blockIds {
@@ -452,7 +453,7 @@ func appendCoord(buf []byte, x int) []byte {
 
 func (fs *Faces) processBlocks(enclosedChunk *EnclosedChunk) {
 	type blockRun struct {
-		blockId        uint16
+		blockId        nbt.Block
 		v1, v2, v3, v4 Vertex
 		dirty          bool
 	}

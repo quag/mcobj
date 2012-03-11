@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/quag/mcobj/nbt"
+)
+
 type BoundaryLocator struct {
 	describer BlockDescriber
 }
@@ -10,7 +14,7 @@ func (b *BoundaryLocator) Init() {
 	b.describer = describer
 }
 
-func (b *BoundaryLocator) IsBoundary(blockId, otherBlockId uint16) bool {
+func (b *BoundaryLocator) IsBoundary(blockId, otherBlockId nbt.Block) bool {
 	var (
 		block = b.describer.BlockInfo(byte(blockId & 0xff))
 		other = b.describer.BlockInfo(byte(otherBlockId & 0xff))

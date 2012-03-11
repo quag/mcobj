@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/quag/mcobj/nbt"
+)
+
 var (
 	emptySide   = &FixedChunkSide{0}
 	solidSide   = &FixedChunkSide{1}
@@ -7,23 +11,23 @@ var (
 )
 
 type ChunkSide interface {
-	BlockId(x, y int) uint16
+	BlockId(x, y int) nbt.Block
 }
 
 type FixedChunkSide struct {
-	blockId uint16
+	blockId nbt.Block
 }
 
-func (s *FixedChunkSide) BlockId(x, y int) uint16 {
+func (s *FixedChunkSide) BlockId(x, y int) nbt.Block {
 	return s.blockId
 }
 
 func NewChunkSide(height int) *ChunkSideData {
-	return &ChunkSideData{make([]uint16, height*16)}
+	return &ChunkSideData{make([]nbt.Block, height*16)}
 }
 
 type ChunkSideData struct {
-	data []uint16
+	data []nbt.Block
 }
 
 type ChunkSidesData [4]*ChunkSideData
@@ -32,7 +36,7 @@ func (s *ChunkSideData) index(x, y int) int {
 	return y + (x * s.height())
 }
 
-func (s *ChunkSideData) BlockId(x, y int) uint16 {
+func (s *ChunkSideData) BlockId(x, y int) nbt.Block {
 	return s.data[s.index(x, y)]
 }
 

@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/quag/mcobj/nbt"
+)
+
 type EnclosingSides [4]ChunkSide
 type EnclosedChunk struct {
 	xPos, zPos int
@@ -11,7 +15,7 @@ func (s *EnclosingSides) side(i int) ChunkSide {
 	return (*s)[i]
 }
 
-func (e *EnclosedChunk) Get(x, y, z int) (blockId uint16) {
+func (e *EnclosedChunk) Get(x, y, z int) (blockId nbt.Block) {
 	switch {
 	case y < 0 && hideBottom:
 		blockId = 7 // Bedrock

@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"github.com/quag/mcobj/nbt"
 )
 
-func printMtl(w io.Writer, blockId uint16) {
+func printMtl(w io.Writer, blockId nbt.Block) {
 	if !noColor {
 		fmt.Fprintln(w, "usemtl", MaterialNamer.NameBlockId(blockId))
 	}
@@ -45,13 +46,13 @@ func (mtl *MTL) Print(w io.Writer) {
 		a = mtl.color & 0xff
 	)
 
-	fmt.Fprintf(w, "# %s\nnewmtl %s\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\n\n", mtl.name, MaterialNamer.NameBlockId(uint16(mtl.blockId)+uint16(mtl.metadata)*256), float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
+	fmt.Fprintf(w, "# %s\nnewmtl %s\nKd %.4f %.4f %.4f\nd %.4f\nillum 1\n\n", mtl.name, MaterialNamer.NameBlockId(nbt.Block(mtl.blockId)+nbt.Block(mtl.metadata)*256), float64(r)/255, float64(g)/255, float64(b)/255, float64(a)/255)
 }
 
-func (mtl *MTL) colorId() uint16 {
-	var id = uint16(mtl.blockId)
+func (mtl *MTL) colorId() nbt.Block {
+	var id = nbt.Block(mtl.blockId)
 	if mtl.metadata != 255 {
-		id += uint16(mtl.metadata) << 8
+		id += nbt.Block(mtl.metadata) << 8
 	}
 	return id
 }
@@ -74,12 +75,12 @@ var (
 )
 
 type BlockIdNamer interface {
-	NameBlockId(blockId uint16) string
+	NameBlockId(blockId nbt.Block) string
 }
 
 type NumberBlockIdNamer struct{}
 
-func (n *NumberBlockIdNamer) NameBlockId(blockId uint16) (name string) {
+func (n *NumberBlockIdNamer) NameBlockId(blockId nbt.Block) (name string) {
 	var idByte = byte(blockId & 0xff)
 	var extraValue, extraPresent = extraData[idByte]
 	if extraValue && extraPresent {
@@ -92,7 +93,7 @@ func (n *NumberBlockIdNamer) NameBlockId(blockId uint16) (name string) {
 
 type NameBlockIdNamer struct{}
 
-func (n *NameBlockIdNamer) NameBlockId(blockId uint16) (name string) {
+func (n *NameBlockIdNamer) NameBlockId(blockId nbt.Block) (name string) {
 	var idByte = byte(blockId & 0xff)
 	var extraValue, extraPresent = extraData[idByte]
 	if extraValue && extraPresent {

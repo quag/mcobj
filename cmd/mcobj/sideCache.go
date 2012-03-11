@@ -24,7 +24,7 @@ func (s *SideCache) AddChunk(chunk *nbt.Chunk) {
 	s.chunks[s.key(chunk.XPos, chunk.ZPos)] = calculateSides(wrapBlockData(chunk.Blocks))
 }
 
-func wrapBlockData(data []uint16) Blocks {
+func wrapBlockData(data []nbt.Block) Blocks {
 	return Blocks{data, len(data) / (16 * 16)}
 }
 

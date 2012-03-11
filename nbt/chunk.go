@@ -9,7 +9,7 @@ import (
 
 type Chunk struct {
 	XPos, ZPos int
-	Blocks     []uint16
+	Blocks     []Block
 }
 
 var (
@@ -35,7 +35,7 @@ func ReadChunkNbt(reader io.Reader) (*Chunk, error) {
 	chunk := &Chunk{chunkData.xPos, chunkData.zPos, nil}
 
 	if chunkData.blocks != nil && chunkData.data != nil {
-		chunk.Blocks = make([]uint16, len(chunkData.blocks))
+		chunk.Blocks = make([]Block, len(chunkData.blocks))
 		for i, blockId := range chunkData.blocks {
 			var metadata byte
 			if i&1 == 1 {
@@ -43,7 +43,7 @@ func ReadChunkNbt(reader io.Reader) (*Chunk, error) {
 			} else {
 				metadata = chunkData.data[i/2] & 0xf
 			}
-			chunk.Blocks[i] = uint16(blockId) + (uint16(metadata) << 8)
+			chunk.Blocks[i] = Block(blockId) + (Block(metadata) << 8)
 		}
 	}
 

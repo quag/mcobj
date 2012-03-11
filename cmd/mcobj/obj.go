@@ -3,10 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/quag/mcobj/nbt"
 	"io"
 	"os"
 	"path/filepath"
-	"github.com/quag/mcobj/nbt"
 )
 
 type ObjGenerator struct {
@@ -245,6 +245,7 @@ func (fs *Faces) clean(xPos, zPos int, height int) {
 
 	if fs.vertexes.data == nil {
 		fs.vertexes.data = make([]int16, (height+1)*(16+1)*(16+1))
+		fs.vertexes.height = height
 	} else {
 		fs.vertexes.Clear()
 	}

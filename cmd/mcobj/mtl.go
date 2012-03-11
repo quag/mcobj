@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/quag/mcobj/nbt"
 	"io"
 	"os"
-	"github.com/quag/mcobj/nbt"
 )
 
 func printMtl(w io.Writer, blockId nbt.Block) {

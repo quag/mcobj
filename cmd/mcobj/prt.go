@@ -84,7 +84,7 @@ func (o *PrtGenerator) chunkProcessor() {
 					o.particleCount++
 					var (
 						xa = x + e.xPos*16
-						ya = y - 64
+						ya = y - height/2
 						za = -(z + e.zPos*16)
 					)
 					binary.Write(o.zw, binary.LittleEndian, float32(xa))

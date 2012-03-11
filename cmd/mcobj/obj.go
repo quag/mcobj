@@ -387,7 +387,7 @@ func (vs *Vertexes) Print(w io.Writer, xPos, zPos int) (count int) {
 
 				var (
 					xa = x + xPos*16
-					ya = y - 64
+					ya = y - vs.height/2
 					za = z + zPos*16
 				)
 

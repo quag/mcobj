@@ -22,6 +22,7 @@ const (
 	TagString    TypeId = 8  // { TAG_Short length; An array of bytes defining a string in UTF-8 format. The length of this array is <length> bytes }
 	TagList      TypeId = 9  // { TAG_Byte tagId; TAG_Int length; A sequential list of Tags (not Named Tags), of type <typeId>. The length of this array is <length> Tags. } Notes: All tags share the same type.
 	TagStruct    TypeId = 10 // { A sequential list of Named Tags. This array keeps going until a TAG_End is found.; TAG_End end } Notes: If there's a nested TAG_Compound within this tag, that one will also have a TAG_End, so simply reading until the next TAG_End will not work. The names of the named tags have to be unique within each TAG_Compound The order of the tags is not guaranteed.
+	TagIntArray  TypeId = 11 // { TAG_Int length; An array of ints. The length of this array is <length> ints }
 )
 
 type Reader struct {
@@ -91,6 +92,22 @@ func (r *Reader) ReadBytes() ([]byte, error) {
 	var bytes = make([]byte, length)
 	var _, err = io.ReadFull(r.r, bytes)
 	return bytes, err
+}
+
+func (r *Reader) ReadInts() ([]int, error) {
+	length, err := r.ReadInt32()
+	if err != nil {
+		return nil, err
+	}
+
+	ints := make([]int, length)
+	for i := 0; i < length; i++ {
+		ints[i], err = r.ReadInt32()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ints, nil
 }
 
 func (r *Reader) ReadInt8() (int, error) {

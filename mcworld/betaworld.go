@@ -31,18 +31,16 @@ func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, error) {
 	mcrName := fmt.Sprintf("r.%v.%v.mcr", x>>5, z>>5)
 	mcrPath := filepath.Join(w.worldDir, "region", mcrName)
 
-	var name, path string
+	var path string
 	if _, err := os.Stat(mcaPath); err == nil {
-		name = mcaName
 		path = mcaPath
 	} else {
-		name = mcrName
 		path = mcrPath
 	}
 
-	var file, mcrOpenErr = os.Open(path)
-	if mcrOpenErr != nil {
-		return nil, mcrOpenErr
+	file, openErr := os.Open(path)
+	if openErr != nil {
+		return nil, openErr
 	}
 	defer func() {
 		if file != nil {
@@ -57,7 +55,7 @@ func (w *BetaWorld) OpenChunk(x, z int) (io.ReadCloser, error) {
 	}
 
 	if loc == 0 {
-		return nil, errors.New(fmt.Sprintf("Chunk missing: %v,%v in %v. %v", x, z, name, (x&31)+(z&31)*32))
+		return nil, errors.New(fmt.Sprintf("Chunk missing: %v,%v in %v. %v", x, z, mcaName, (x&31)+(z&31)*32))
 	}
 
 	var (

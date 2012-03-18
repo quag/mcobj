@@ -370,7 +370,7 @@ type Blocks struct {
 type BlockColumn []nbt.Block
 
 func (b *Blocks) Get(x, y, z int) nbt.Block {
-	return b.data[y+(z*b.height+(x*b.height*16))]
+	return b.data[y+b.height*(z+16*x)]
 }
 
 func (b *Blocks) Column(x, z int) BlockColumn {

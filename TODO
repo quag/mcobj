@@ -57,3 +57,4 @@
  - add player and mob meshes
  - clean up error handling
  - blocks.json is not located relative to exe when exe is on the $PATH. Provide multiple ways to locate the blocks.json file
+ - add flag for -sealevel=64

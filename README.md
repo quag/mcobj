@@ -68,6 +68,17 @@ Change Log
     <th>Change Log</th>
   </tr>
   <tr>
+    <td>2012-04-03</td>
+    <td>0.14</td>
+    <td>
+      <ul>
+        <li>Support the Anvil world format</li>
+        <li>Update blocks to 1.2.4</li>
+        <li>Add variable height support</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
     <td>2011-09-12</td>
     <td>0.13.1</td>
     <td>

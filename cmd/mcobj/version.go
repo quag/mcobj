@@ -1,3 +1,3 @@
 package main
 
-const version = "(development build)"
+const version = "development-build"

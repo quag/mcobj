@@ -71,21 +71,21 @@ func ReadChunkNbt(reader io.Reader) (*Chunk, error) {
 func indexToCoords(i, aMax, bMax int) (a, b, c int) {
 	a = i % aMax
 	b = (i / aMax) % bMax
-	c = i / (aMax*bMax)
+	c = i / (aMax * bMax)
 	return
 }
 
 func coordsToIndex(a, b, c, bMax, cMax int) int {
-	return c + cMax*(b + bMax*a)
+	return c + cMax*(b+bMax*a)
 }
 
 func yzxToXzy(yzx, xMax, zMax, yMax int) int {
 	x := yzx % xMax
 	z := (yzx / xMax) % zMax
-	y := (yzx / (xMax*zMax)) % yMax
+	y := (yzx / (xMax * zMax)) % yMax
 
 	// yzx := x + xMax*(z + zMax*y)
-	xzy := y + yMax*(z + zMax*x)
+	xzy := y + yMax*(z+zMax*x)
 	return xzy
 }
 

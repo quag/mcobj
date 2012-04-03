@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/quag/mcobj/nbt"
 	"github.com/quag/mcobj/mcworld"
+	"github.com/quag/mcobj/nbt"
 	"os"
 )
 
